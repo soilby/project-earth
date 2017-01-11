@@ -1,0 +1,147 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование изображения{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('template_mirclub_index')}}">Настройка цветов и фона</a>
+    <span>Редактирование изображения &laquo;{{image['title']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Параметры</a>
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Страницы</a>
+</div>
+<form action="{{path('template_mirclub_image_edit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                <button type="submit">Сохранить</button>
+                <a class="button" href="{{path('template_mirclub_index')}}">Отмена</a>
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Заголовок</td>
+                    <td><input type="text" name="image[title]" value="{{image['title']}}" /></td>
+                    <td class="cfgError">{{imageerror['title']}}</td>
+                </tr>
+                <tr>
+                    <td>Изображение</td>
+                    <td class="tac">
+                        <span id="fotoWrap">
+                            <a href="{{image['image']}}" rel="lightbox"><img src="{{image['image']}}" style="max-width:100px;max-height:100px;" /></a>
+                        </span>
+                    </td>
+                    <td class="cfgError"></td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                <button type="submit">Сохранить</button>
+                <a class="button" href="{{path('template_mirclub_index')}}">Отмена</a>
+            </div>
+            <table class="cfgTable">
+                {#<tr>
+                    <td colspan="2"><label><input type="checkbox" name="page[enable]" value="1" {% if (page['enable'] != 0) %}checked="checked"{% endif %} />Включить страницу просмотра</label><span class="helpContainerButton" data-id="seopageEnabled">?</span></td>
+                    <td class="cfgError">{{pageerror['enable']}}</td>
+                </tr>
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>#}
+            </table>
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                <button type="submit">Сохранить</button>
+                <a class="button" href="{{path('template_mirclub_index')}}">Отмена</a>
+            </div>
+            
+            
+            <p>Страницы для отображения</p>
+            <div class="siteMapTree">
+                <ul>
+                    {% for page in pages %}
+                        <li class="noselect"><span class="deleteButton" onclick="$(this).closest('li').remove();">&nbsp</span>{{page['description']}}
+                            <input type="hidden" name="pages[]" value="{{page['id']}}" />
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="mt20"><button type="button" id="pathItemAdd" onclick="return false;">Добавить страницу</button></div>
+            <div class="popupCfgWindow" id="popupCfgWindow">
+                <div id="pagesPopup">
+                </div>
+            </div>
+        </div>
+</div>​
+</form>
+<script>
+    function addItemToPath(description,id)
+    {
+        $('.siteMapTree > ul').append(
+                            '<li class="noselect"><span class="deleteButton" onclick="$(this).closest(\'li\').remove();">&nbsp</span>'+description+
+                            '    <input type="hidden" name="pages[]" value="'+id+'" />'+
+                            '</li>');
+    }
+    
+    function loadPagesToPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('basic_cms_path_getpages')}}',
+            data: "page="+page+"&search="+($('#searchFromPages').length > 0 ? $('#searchFromPages').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                $('#popupCfgWindow').show();
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadPagesToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadPagesToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['pages'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="addItemToPath(\''+addslashes(answer['pages'][key]['description'])+'\','+parseInt(answer['pages'][key]['id'])+');'+
+'$(\'#popupCfgWindow\').hide();return false;'+
+'" href="#">'+htmlentities(answer['pages'][key]['description'])+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#pagesPopup').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromPages" id="searchFromPages" value="'+($('#searchFromPages').length > 0 ? htmlentities($('#searchFromPages').val()) : '')+'"/><button onclick="loadPagesToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#pagesPopup input, #pagesPopup button, #pagesPopup a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+    
+    $(function ()
+    {
+        $('#pathItemAdd').click(function () {
+            loadPagesToPopup(0);
+            return false;
+        });
+    });
+    
+</script>
+{% endblock %}       
+
+
+

@@ -1,0 +1,190 @@
+{% if (page is equal('check')) %}
+<div>
+    {% if (orderStatus == 'Not found') %}<h1>Заказ не найден</h1>{% endif %}
+    {% if (orderStatus == 'Not payed') %}<h1>Заказ еще не оплачен</h1>{% endif %}
+    {% if (orderStatus == 'OK') %}<h1>Заказ успешно оформлен</h1>{% endif %}
+</div>
+{% else %}
+<script src="/adminjs/jquery-1.8.1.min.js"></script>
+<div>
+    <form method="post">
+        <input type="hidden" name="finalize" value="true" />
+    <h1>Корзина {{name}}</h1>
+    <p>Список товаров</p>
+    <table>
+        <tr>
+            <th>Товар</th>
+            <th>Стоимость</th>
+            <th>Количество</th>
+            <th>Сумма</th>
+            <th>Опции</th>
+            <th>Удалить</th>
+        </tr>
+        {% for productkey, product in basket['products'] %}
+        <tr>
+            <input type="hidden" name="products[{{productkey}}][id]" value="{{product['id']}}" />
+            <td>{{product['title']}}</td>
+            <td>{{product['priceWithDiscount']}}</td>
+            <td><input type="text" name="products[{{productkey}}][count]" id="productCount{{productkey}}" onchange="calcBasket();" value="{{product['count']}}" /></td>
+            <td><span id="productOrderPrice{{productkey}}">{{product['priceWithDiscount'] * product['count']}}
+                {% for item in product['formatOrderPrice'] %} / {{item}}{%endfor %}
+                </span></td>
+            <td>
+                {% for option in product['options'] %}
+                    <p>{{option['title']}}
+                    {% if (option['type'] == 'product') %}
+                        <select name="products[{{productkey}}][options][{{option['name']}}]">
+                            {% for optkey, optitem in option['items'] %}
+                                <option value="{{optkey}}" {% if ((product['optionValues'][option['name']] is defined) and (optkey == product['optionValues'][option['name']])) %}selected="selected"{% endif %}>{{optitem['title']}}</option>
+                            {% endfor %}
+                        </select>    
+                    {% else %}
+                        <select name="products[{{productkey}}][options][{{option['name']}}]">
+                            {% for optkey, optitem in option['items'] %}
+                                <option value="{{optkey}}" {% if ((product['optionValues'][option['name']] is defined) and (optkey == product['optionValues'][option['name']])) %}selected="selected"{% endif %}>{{optitem}}</option>
+                            {% endfor %}
+                        </select>    
+                    {% endif %}
+                    </p>
+                {% endfor %}
+            </td>
+            <td><a href="?actionobject=product&action=basketremove&actionbasketid={{product['id']}}">Удалить</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Способ доставки
+        <select name="shipment" onchange="calcBasket();" id="basketShipment">
+            <option value="">-- Не выбрано --</option>
+            {% for key,descr in shipments %}
+            <option value="{{key}}" {% if basket['shipment'] == key %}selected="selected"{% endif %}>{{descr['description']}}</option>
+            {% endfor %}
+        </select>
+        <small>{{basket['shipmenterror']}}</small>
+    </p>
+    <p>Способ оплаты
+        <select name="payment" onchange="calcBasket();" id="basketPayment">
+            <option value="">-- Не выбрано --</option>
+            {% for key,descr in payments %}
+            <option value="{{key}}" {% if basket['payment'] == key %}selected="selected"{% endif %}>{{descr['description']}}</option>
+            {% endfor %}
+        </select>
+        <small>{{basket['paymenterror']}}</small>
+    </p>
+    {% for field in basket['parameters'] %}
+        {% if (field['type'] == 'text') %}
+        <p>
+        {{field['name']}}
+        <input type="text" name="parameters[{{field['techName']}}]" value="{{field['value']}}" />
+        <small>{{field['error']}}</small>
+        </p>
+        {% endif %}
+        {% if (field['type'] == 'textarea') %}
+        <p>
+        {{field['name']}}
+        <textarea name="parameters[{{field['techName']}}]">{{field['value']}}</textarea>
+        <small>{{field['error']}}</small>
+        </p>
+        {% endif %}
+        {% if (field['type'] == 'select') %}
+        <p>
+        {{field['name']}}
+        <select name="parameters[{{field['techName']}}]">
+         {% for item in field['items'] %}
+                <option value="{{item}}" {% if (field['value'] == item) %}selected="selected"{% endif %}>{{item}}</option>
+         {% endfor %}
+        </select>
+        <small>{{field['error']}}</small>
+        </p>
+        {% endif %}
+        {% if (field['type'] == 'radio') %}
+        <p>
+        {{field['name']}}
+         {% for item in field['items'] %}
+                <label><input type="radio" name="parameters[{{field['techName']}}]" value="{{item}}" {% if (field['value'] == item) %}checked="checked"{% endif %} />{{item}}</label>
+         {% endfor %}
+        <small>{{field['error']}}</small>
+        </p>
+        {% endif %}
+        {% if (field['type'] == 'checkbox') %}
+        <p>
+        <label><input type="checkbox" name="parameters[{{field['techName']}}]" value="1" {% if (field['value'] != 0) %}checked="checked"{% endif %} />{{field['name']}}</label>
+        <small>{{field['error']}}</small>
+        </p>
+        {% endif %}
+    {% endfor %}
+    <p>Дополнительные расчёты</p>
+    {% for item in basket['summInfo'] %}
+        <p> - {{item['description']}} - <span id="summInfoPrice{{item['name']}}">{{item['orderPrice']}}{% for summ in item['formatOrderPrice'] %} / {{summ}}{%endfor %}</span></p>
+    {% endfor %}
+    <p>Итоговая сумма: <span id="orderFinishSumm">{{basket['summ']}}
+                {% for item in basket['formatSumm'] %} / {{item}}{%endfor %}
+        </span><p>
+    <small>{{basket['basketerror']}}</small>
+    <input type="submit" value="Отправить" />
+    </form>
+</div>
+        
+<script>
+function number_format( number, decimals, dec_point, thousands_sep ) 
+{	
+	var i, j, kw, kd, km;
+	if( isNaN(decimals = Math.abs(decimals))){
+		decimals = 2;
+	}
+	if( dec_point == undefined ){
+		dec_point = ",";
+	}
+	if( thousands_sep == undefined ){
+		thousands_sep = ".";
+	}
+
+	i = parseInt(number = (+number || 0).toFixed(decimals)) + "";
+
+	if( (j = i.length) > 3 ){
+		j = j % 3;
+	} else{
+		j = 0;
+	}
+
+	km = (j ? i.substr(0, j) + thousands_sep : "");
+	kw = i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands_sep);
+	//kd = (decimals ? dec_point + Math.abs(number - i).toFixed(decimals).slice(2) : "");
+	kd = (decimals ? dec_point + Math.abs(number - i).toFixed(decimals).replace(/-/, 0).slice(2) : "");
+
+	return km + kw + kd;
+}
+
+
+function calcBasket()
+{
+    var basket = [];
+    basket['products'] = []
+    {% for productkey, product in basket['products'] %}
+    basket['products'][{{productkey}}] = []
+    basket['products'][{{productkey}}]['count'] = parseInt($('#productCount{{productkey}}').val());
+    {% endfor %}
+    basket['shipment'] = $('#basketShipment').val();
+    basket['payment'] = $('#basketPayment').val();
+{{basket['jsCalc'] | raw}}
+    
+    {% for productkey, product in basket['products'] %}
+    var str = basket['products'][{{productkey}}]['orderPrice'];
+    for (i in basket['products'][{{productkey}}]['formatOrderPrice'])
+    {
+        str = str + ' / ' + basket['products'][{{productkey}}]['formatOrderPrice'][i];
+    }
+    $('#productOrderPrice{{productkey}}').html(str);
+    {% endfor %}
+    for (i in basket['summInfo'])
+    {
+        $('#summInfoPrice'+i).html(basket['summInfo'][i]);
+    }
+    var str = basket['summ'];
+    for (i in basket['formatSumm'])
+    {
+        str = str + ' / ' + basket['formatSumm'][i];
+    }
+    $('#orderFinishSumm').html(str);
+}
+</script>
+{% endif %}

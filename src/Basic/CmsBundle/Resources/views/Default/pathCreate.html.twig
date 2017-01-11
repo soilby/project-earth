@@ -1,0 +1,185 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание нового пути{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_sitemap')}}">Карта сайта</a>
+    <span>Создание нового пути</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Основные данные</a>
+</div>
+<form action="{{path('basic_cms_path_create')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('site_map') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('site_map') == 1) %}<a class="button" href="{{path('basic_cms_sitemap')}}">Отмена</a>{% endif %}
+            </div>
+            <p>Начальная страница: <span class="helpContainerButton" data-id="pageid">?</span></p>
+            <p class="ml30" id="basePageDescription">{{path['pagedescription']}}<span class="globalError">{{patherror['pageid']}}</span></p>
+            <input type="hidden" name="path[pageid]" id="basePageId" value="{{path['pageid']}}" />
+            <p class="mb20"><button type="button" id="changeBasePage" onclick="return false;">Изменить начальную страницу</button></p>
+            <p>Путь к странице: <span class="helpContainerButton" data-id="path">?</span></p>
+            <div class="siteMapTree">
+                <ul>
+                    {% if (path['path']|length) > 0 %}
+                        {% for key,field in path['path'] %}
+                            <li class="noselect"><span class="moveButton">&nbsp</span><span class="deleteButton">&nbsp</span>{{field['description']}}
+                                <input type="hidden" name="path[path][{{key}}][ordering]" class="itemOrdering" value="{{field['ordering']}}" />
+                                <input type="hidden" name="path[path][{{key}}][id]" value="{{field['id']}}" />
+                                {% if (field['error'] is defined) %}<span class="ml20 globalError">{{field['error']}}</span>{% endif %}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="mt20"><button type="button" id="pathItemAdd" onclick="return false;">Добавить элемент пути</button></div>
+            <div class="popupCfgWindow" id="popupCfgWindow">
+                <div id="pagesPopup">
+                </div>
+            </div>
+                
+        </div>
+</div>​
+</form>
+<script>
+    window.moveelement = null;
+    window.indexofpath = {{path['path']|length}};
+    function updateSiteMapIerarhy()
+    {
+        var index = 0;
+        $('.siteMapTree > ul').children('li').each(function (i, element)
+        {
+            $(element).find('.itemOrdering').val(index);
+            index++;
+        });
+        $('.siteMapTree li>a').unbind('click').click(function () 
+        {
+            //Редактирование
+            $('#formPopupCfgWindow').show();
+        });
+        $('.siteMapTree span.deleteButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.siteMapTree span.moveButton').unbind('mousedown').unbind('mouseenter').removeClass('active');
+        $('.siteMapTree ul>li>span.deleteButton').removeClass('unactive');
+        
+        $('.siteMapTree span.deleteButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                              mouseleave(function () {$(this).removeClass('active');}).
+                                                              click(function () 
+        {
+            if (confirm('Вы действительно хотите удалить элемент пути?')) $(this).closest('li').remove();
+            updateSiteMapIerarhy();
+        });
+        $('.siteMapTree span.moveButton').not('.unactive').mousedown(function()
+        {
+            $(this).addClass('active');
+            window.moveelement = $(this).closest('li');
+            $(window.moveelement).parent().children().children('span.moveButton').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().children();
+                    var indexnew = elements.index($(this).closest('li'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+        });
+    }
+    updateSiteMapIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateSiteMapIerarhy();});
+
+    
+    function changeMainItem(description,id)
+    {
+        $('#basePageDescription').html(description);
+        $('#basePageId').val(id);
+    }
+    
+    
+    function addItemToPath(description,id)
+    {
+        $('.siteMapTree > ul').append(
+                            '<li class="noselect"><span class="moveButton">&nbsp</span><span class="deleteButton">&nbsp</span>'+description+
+                            '    <input type="hidden" name="path[path]['+window.indexofpath+'][ordering]" class="itemOrdering" value="" />'+
+                            '    <input type="hidden" name="path[path]['+window.indexofpath+'][id]" value="'+id+'" />'+
+                            '</li>');
+        window.indexofpath++;
+        updateSiteMapIerarhy();
+    }
+    
+    function loadPagesToPopup(page, mode)
+    {
+        var procedure = 'changeMainItem';
+        if (mode != 0) procedure = 'addItemToPath';
+        $.ajax({
+            type: "POST",
+            url: '{{path('basic_cms_path_getpages')}}',
+            data: "page="+page+"&search="+($('#searchFromPages').length > 0 ? $('#searchFromPages').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                $('#popupCfgWindow').show();
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadPagesToPopup('+(parseInt(answer['page'])-1)+','+mode+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadPagesToPopup('+(parseInt(answer['page'])+1)+','+mode+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['pages'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+procedure+'(\''+addslashes(answer['pages'][key]['description'])+'\','+parseInt(answer['pages'][key]['id'])+');'+
+'$(\'#popupCfgWindow\').hide();return false;'+
+'" href="#">'+htmlentities(answer['pages'][key]['description'])+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#pagesPopup').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromPages" id="searchFromPages" value="'+($('#searchFromPages').length > 0 ? htmlentities($('#searchFromPages').val()) : '')+'"/><button onclick="loadPagesToPopup(0,'+mode+');return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#pagesPopup input, #pagesPopup button, #pagesPopup a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+    
+    $(function ()
+    {
+        $('#pathItemAdd').click(function () {
+            loadPagesToPopup(0,1);
+            return false;
+        });
+        $('#changeBasePage').click(function () {
+            loadPagesToPopup(0,0);
+            return false;
+        });
+    });
+    
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-pageid">Страница, для которой требуется задать особый путь в системе хлебных крошек.</div>
+    <div id="helpContainer-path">Требуемый путь к странице.</div>
+</div>
+{% endblock %}       
+
+
+

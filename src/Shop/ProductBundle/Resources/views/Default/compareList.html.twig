@@ -1,0 +1,22 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Настройка сраниц сравнения товаров{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Страницы сравнения</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" id="tab1" class="active">Страницы сравнения товаров</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" class="active">
+        {% include "ShopProductBundle:Default:compareListTab1.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

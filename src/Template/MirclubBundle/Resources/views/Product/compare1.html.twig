@@ -1,0 +1,36 @@
+<div>
+<h1>{{name}}</h1>
+<small>Выбрано товаров: {{itemCount}} <a href="?actionobject=product&action=compareclear">очистить</a></small>
+<table>
+    <tr>
+        <th></th>
+        {% for product in items %}
+        <th>{{product['title']}}<a href="?actionobject=product&action=compareremove&compareid={{product['id']}}">-</a></th>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Скидка</th>
+        {% for product in items %}
+        <td>{{product['discount'] | number_format(0,',',' ')}}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Цена</th>
+        {% for product in items %}
+        <td>{% for pr in product['formatPrice'] %}{% if (loop.index0 > 0) %} / {% endif %}{{pr}}{% endfor %}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Цена со скидкой</th>
+        {% for product in items %}
+        <td>{% for pr in product['formatPriceWithDiscount'] %}{% if (loop.index0 > 0) %} / {% endif %}{{pr}}{% endfor %}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>На складе</th>
+        {% for product in items %}
+        <td>{% if (product['onStock'] != 0) %}есть{% else %}нет{% endif %}</td>
+        {% endfor %}
+    </tr>
+</table>
+</div>

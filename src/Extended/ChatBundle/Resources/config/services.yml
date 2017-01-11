@@ -1,0 +1,4 @@
+services:
+    object.chat:
+        class: Extended\ChatBundle\ChatManager
+        arguments: ['@service_container']

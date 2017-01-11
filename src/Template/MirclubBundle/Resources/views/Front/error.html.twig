@@ -1,0 +1,77 @@
+{% if currentLocale == 'en' %}
+    <div>
+    {% if errorNumber == 0 %}
+    <h1>Page not found</h1>
+    <p>The page with the specified address is not found on the site.</p>
+    <p>Why it could happen:</p>
+    <p>1. Was incorrectly entered the page address in the address bar of the site;</p>
+    <p>2. The page was moved to another location;</p>
+    <p>3. The page has been removed.</p>
+    <p>You can send an error message to the site administrator.</p>
+    {% endif %}
+    {% if errorNumber == 1 %}
+        {% if (requestSeoPage != null) and (requestSeoPage.contentType == 'object.project') and (requestSeoPage.contentAction == 'view') and (project is defined) and (projectusers is defined) %}
+        <h1>Access is limited</h1>
+        <p>You are trying to enter the workshop without being a member.</p>
+        <p>To gain access you must register on the website and refer to the master's workshop (her supervisor) for permission
+            {% set projectusers = doctrine.getRepository('ExtendedProjectBundle:ProjectUsers').findOneBy({'projectId':requestSeoPage.contentId, 'projectRole':3}) %}
+            {% if projectusers != null %}
+                {% set userid = projectusers.userId %}
+            {% else %}
+                {% set project = doctrine.getRepository('ExtendedProjectBundle:Projects').find(requestSeoPage.contentId) %}
+                {% set userid = project.createrId %}
+            {% endif %}
+            {% set user = doctrine.getRepository('BasicCmsBundle:Users').find(userid) %}
+            {% if user != null %}
+                to address <a href="mailto:{{user.email}}">{{user.email}}</a>
+            {% endif %}
+        </p>
+        {% else %}
+        <h1>Access is limited</h1>
+        <p>Access to this page of the website You are prohibited.</p>
+        <p>Why this could happen:</p>
+        <p>1. The website administrator has not had time to provide You with access to the page;</p>
+        <p>2. Access to this page has been forbidden to You.</p>
+        <p>You can send a message to the site administrator for access.</p>
+        {% endif %}
+    {% endif %}
+    </div>
+{% else %}
+    <div>
+    {% if errorNumber == 0 %}
+    <h1>Страница не найдена</h1>
+    <p>Страница с указанным адресом не найдена на сайте.</p>
+    <p>Почему такое могло случиться:</p>
+    <p>1. Неправильно был введён адрес страницы в адресной строке сайта;</p>
+    <p>2. Страница сайта была перемещена в другое место;</p>
+    <p>3. Страница сайта была удалена.</p>
+    <p>Вы можете отправить сообщение об ошибке администратору сайта.</p>
+    {% endif %}
+    {% if errorNumber == 1 %}
+        {% if (requestSeoPage != null) and (requestSeoPage.contentType == 'object.project') and (requestSeoPage.contentAction == 'view') and (project is defined) and (projectusers is defined) %}
+        <h1>Доступ ограничен</h1>
+        <p>Вы пытаетесь зайти в мастерскую, не будучи её участником.</p>
+        <p>Для получения доступа необходимо зарегистрироваться на сайте и обратиться к мастеру мастерской (её руководителю) для получения разрешения 
+            {% set projectusers = doctrine.getRepository('ExtendedProjectBundle:ProjectUsers').findOneBy({'projectId':requestSeoPage.contentId, 'projectRole':3}) %}
+            {% if projectusers != null %}
+                {% set userid = projectusers.userId %}
+            {% else %}
+                {% set project = doctrine.getRepository('ExtendedProjectBundle:Projects').find(requestSeoPage.contentId) %}
+                {% set userid = project.createrId %}
+            {% endif %}
+            {% set user = doctrine.getRepository('BasicCmsBundle:Users').find(userid) %}
+            {% if user != null %}
+                по адресу <a href="mailto:{{user.email}}">{{user.email}}</a>
+            {% endif %}
+        </p>
+        {% else %}
+        <h1>Доступ ограничен</h1>
+        <p>Доступ к данной странице сайта Вам запрещен.</p>
+        <p>Почему такое могло случиться:</p>
+        <p>1. Администратор сайта еще не успел предоставить Вам доступ к странице;</p>
+        <p>2. Доступ к данной странице был Вам запрещён.</p>
+        <p>Вы можете отправить сообщение администратору сайта о предоставлении доступа.</p>
+        {% endif %}
+    {% endif %}
+    </div>
+{% endif %}

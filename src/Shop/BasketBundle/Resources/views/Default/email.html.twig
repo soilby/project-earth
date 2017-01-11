@@ -1,0 +1,36 @@
+<h1>Новый заказ &laquo;{{title}}&raquo;</h1>
+<p>На сумму {{summ}}</p>
+<br />
+<p>Выбранная продукция:</p>
+<table>
+        <tr>
+            <th>Название</th>
+            <th>Кол-во</th>
+        </tr>
+{% for product in products %}
+        <tr>
+            <td>{{product['title']}}</td>
+            <td>{{product['count']}}</td>
+        </tr>
+{% endfor %}        
+</table>
+<br />
+<p>Следующая информация была заполнена:<p>
+<table>
+    <tr>
+        <td><pre>Способ доставки</pre></td>
+        <td><pre>{{shipment}}</pre></td>
+    </tr>
+    <tr>
+        <td><pre>Способ оплаты</pre></td>
+        <td><pre>{{payment}}</pre></td>
+    </tr>
+{% for field in fields %}    
+    <tr>
+        <td><pre>{{field['name']}}</pre></td>
+        <td><pre>{{field['value']}}</pre></td>
+    </tr>
+{% endfor %}
+</table>
+<br />
+<p><a href="{{url}}">Перейти к просмотру заказа</a></p>

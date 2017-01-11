@@ -1,0 +1,133 @@
+<div id="referenceCfgTable" class="noselect">
+    {% for item in references %}
+        <div class="referItem">
+            <p>{{item['name']}}</p>
+            <div class="referWrap"><img src="{{(item['avatar'] == '' ? '/adminimg/noava.jpg' : item['avatar'])}}" /></div>
+            <label><input type="checkbox" name="temp" class="referEnabled" onclick="updateReferIerarhy();" autocomplate="off" {% if (item['enabled'] != 0) %}checked="checked"{% endif %}>Опубликован</label>
+            <button onclick="deleteRefer(this);return false;">Удалить</button>
+            <input type="hidden" name="temp" class="referId" value="{{item['id']}}" />
+        </div>
+    {% endfor %}
+</div>
+<div id="referenceFromWrap">
+</div>
+<button id="referenceAdd">Добавить рекомендуемый товар</button>
+<div class="popupCfgWindow" id="popupCfgWindow">
+    <div id="referPopup">
+    </div>
+</div>
+<script>
+    window.moveelement = null;
+    function updateReferIerarhy()
+    {
+        var index = 0;
+        $('#referenceFromWrap').html('');
+        $('#referenceCfgTable').children('div.referItem').each(function (i, element)
+        {
+            var enabled = ($(element).find('input.referEnabled').is(':checked') == false ? 0 : 1);
+            var avatar = $(element).find('img').attr('src');
+            var name = $(element).find('p').html();
+            var id = $(element).find('input.referId').val();
+            $('#referenceFromWrap').append('<input type="hidden" name="references['+index+'][id]" value="'+id+'" /><input type="hidden" name="references['+index+'][enabled]" value="'+enabled+'" />'+
+                                           '<input type="hidden" name="references['+index+'][name]" value="'+name+'" /><input type="hidden" name="references['+index+'][avatar]" value="'+avatar+'" />');
+            index++;
+        });
+        $('#referenceCfgTable div.referWrap').unbind('mousedown').unbind('mouseenter');
+        $('#referenceCfgTable div.referWrap').mousedown(function()
+        {
+            window.moveelement = $(this).closest('div.referItem');
+            $(window.moveelement).parent().find('div.referWrap').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().find('div.referItem');
+                    var indexnew = elements.index($(this).closest('div.referItem'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+            return false;
+        });
+    }
+    updateReferIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateReferIerarhy();});
+    
+    function addProductToCfgTable(name,avatar,id)
+    {
+        $('#referenceCfgTable').append(
+        '        <div class="referItem">'+
+        '            <p>'+name+'</p>'+
+        '            <div class="referWrap"><img src="'+(avatar == '' ? '/adminimg/noava.jpg' : htmlentities(avatar))+'" /></div>'+
+        '            <label><input type="checkbox" name="temp" class="referEnabled" onclick="updateReferIerarhy();" autocomplate="off" checked="checked">Опубликован</label>'+
+        '            <button onclick="deleteRefer(this);return false;">Удалить</button>'+
+        '            <input type="hidden" name="temp" class="referId" value="'+id+'" />'+
+        '        </div>');
+        $('#referenceCfgTable input, #referenceCfgTable button').not('.uniformOff').uniform();
+        updateReferIerarhy();
+    }
+    
+    function loadProductsToPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('shop_reference_ajaxproducts')}}',
+            data: "page="+page+"&search="+($('#searchFromProducts').length > 0 ? $('#searchFromProducts').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                $('#popupCfgWindow').show();
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadProductsToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadProductsToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['products'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'addProductToCfgTable(\''+addslashes(answer['products'][key]['title'])+'\',\''+addslashes(answer['products'][key]['avatar'])+'\','+parseInt(answer['products'][key]['id'])+');'+
+'$(\'#popupCfgWindow\').hide();return false;'+
+'" href="#">'+htmlentities(answer['products'][key]['title'])+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#referPopup').html(
+'                    <div class="pb20">Выберите продукт:'+
+'                    <span class="flr"><input type="text" name="searchFromProducts" id="searchFromProducts" value="'+($('#searchFromProducts').length > 0 ? htmlentities($('#searchFromProducts').val()) : '')+'"/><button onclick="loadProductsToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#referPopup input, #referPopup button, #referPopup a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+    
+    $(function ()
+    {
+        $('#referenceAdd').click(function () {
+            loadProductsToPopup(0);
+            return false;
+        });
+    });
+    
+    function deleteRefer(that)
+    {
+        $(that).closest('div.referItem').remove();
+        updateReferIerarhy();
+        return false;
+    }
+    
+</script>

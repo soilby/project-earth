@@ -1,0 +1,11 @@
+<div>
+<h1>{{title}}</h1>
+<small>Создано {{createDate | date('d.m.Y')}} пользователем {{createrFullName}}</small>
+<p>{{description | raw}}</p>
+<p>
+    <a href="{{path('files_files_front_filedownload')}}?id={{id}}">{{fileName}} ({{fileSize}} байт)</a>
+</p>
+{% if onlyAutorized != 0 %}
+<p>Только для авторизованных пользователей</p>
+{% endif %}
+</div>

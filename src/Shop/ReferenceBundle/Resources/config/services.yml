@@ -1,0 +1,4 @@
+services:
+    addone.product.reference:
+        class: Shop\ReferenceBundle\ReferenceManager
+        arguments: ['@service_container']

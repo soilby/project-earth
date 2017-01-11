@@ -1,0 +1,51 @@
+shop_product_list:
+    path:  /admin/products/
+    defaults: { _controller: ShopProductBundle:Default:productList }
+
+shop_product_create:
+    path:  /admin/products/create
+    defaults: { _controller: ShopProductBundle:Default:productCreate }
+
+shop_product_edit:
+    path:  /admin/products/edit
+    defaults: { _controller: ShopProductBundle:Default:productEdit }
+
+shop_product_ajax:
+    path:  /admin/products/ajax
+    defaults: { _controller: ShopProductBundle:Default:productAjax }
+
+shop_product_ajaxavatar:
+    path:  /admin/products/ajaxavatar
+    defaults: { _controller: ShopProductBundle:Default:productAjaxAvatar }
+
+shop_product_currency_list:
+    path:  /admin/products/currency
+    defaults: { _controller: ShopProductBundle:Default:productCurrencyList }
+
+shop_product_currency_create:
+    path:  /admin/products/currency/create
+    defaults: { _controller: ShopProductBundle:Default:productCurrencyCreate }
+
+shop_product_currency_edit:
+    path:  /admin/products/currency/edit
+    defaults: { _controller: ShopProductBundle:Default:productCurrencyEdit }
+
+shop_product_currency_ajax:
+    path:  /admin/products/currency/ajax
+    defaults: { _controller: ShopProductBundle:Default:productCurrencyAjax }
+
+shop_product_compare_list:
+    path:  /admin/products/compare
+    defaults: { _controller: ShopProductBundle:Default:productCompareList }
+
+shop_product_compare_create:
+    path:  /admin/products/compare/create
+    defaults: { _controller: ShopProductBundle:Default:productCompareCreate }
+
+shop_product_compare_edit:
+    path:  /admin/products/compare/edit
+    defaults: { _controller: ShopProductBundle:Default:productCompareEdit }
+
+shop_product_compare_ajax:
+    path:  /admin/products/compare/ajax
+    defaults: { _controller: ShopProductBundle:Default:productCompareAjax }

@@ -1,0 +1,10 @@
+<div>
+<p>Посещенные товары</p>
+{% for item in items %}
+<div>
+    {% for fieldname, field in item %}
+        <p>{{fieldname}}: {{field.timestamp is defined ? field | date('d.m.Y') : field}}</p>
+    {% endfor %}
+</div>
+{% endfor %}
+</div>

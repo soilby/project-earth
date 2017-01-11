@@ -1,0 +1,70 @@
+<form>
+    <input type="hidden" name="id" value="{{object['id']}}" />
+    <table>
+        <tr>
+            <td>Название объекта</td>
+            <td><input type="text" name="title[default]" value="{{object['titleLocale']['default']}}" />{% if errors['title']['default'] is defined %}<p class="error">{{errors['title']['default']}}</p>{% endif %}</td>
+        </tr>
+        {% for locale in locales %}
+        <tr>
+            <td>Название объекта ({{locale['fullName']}})</td>
+            <td><input type="text" name="title[{{locale['shortName']}}]" value="{{object['titleLocale'][locale['shortName']]}}" />{% if errors['title'][locale['shortName']] is defined %}<p class="error">{{errors['title'][locale['shortName']]}}</p>{% endif %}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>Тип объекта</td>
+            <td>{{objectTypes[object['objectType']] | default('Неизвестный тип')}}</td>
+        </tr>
+        <tr>
+            <td>Время создания</td>
+            <td>{{object['createDate'] | date('d.m.Y H:i')}}</td>
+        </tr>
+        <tr>
+            <td>Автор</td>
+            <td>{{object['fullName']}}</td>
+        </tr>
+        <tr>
+            <td>Рейтинг (позитивный оценки)</td>
+            <td><input type="text" name="ratingPositive" value="{{object['ratingPositive']}}" />{% if errors['ratingPositive'] is defined %}<p class="error">{{errors['ratingPositive']}}</p>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>Рейтинг (негативные оценки)</td>
+            <td><input type="text" name="ratingNegative" value="{{object['ratingNegative']}}" />{% if errors['ratingNegative'] is defined %}<p class="error">{{errors['ratingNegative']}}</p>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>Рейтинг (общий)</td>
+            <td>{{object['ratingPositive'] - object['ratingNegative']}}</td>
+        </tr>
+        <tr>
+            <td><a href="#" onclick="$(this).closest('tr').find('p').toggle();return false">Настроить дерево объектов</a></td>
+            <td>
+                {% for category in categories %}
+                    <p style="display:none;padding-left:{{category['nesting'] * 15}}px" ><label><input type="checkbox" name="categories[]" value="{{category['id']}}" {{category['linked'] != 0 ? 'checked="checked"' : ''}} autocomplete="off" />{{category['name']}}</label></p>
+                {% endfor %}
+                {% if errors['categories'] is defined %}<p class="error">{{errors['categories']}}</p>{% endif %}
+            </td>
+        </tr>
+    </table>
+    {% if editPermission != 0 %}
+    <p>
+        <button type="submit" id="knowledge-parameters-submit">Сохранить</button>
+        <button type="button" id="knowledge-parameters-remove" data-id="{{object['id']}}">Удалить</button>
+    </p>
+    {% endif %}
+</form>
+<p class="mt10">Изменения над объектом</p>
+<table>
+    {% for change in changes %}
+        <tr>
+            <td>{{change['createDate'] | date('d.m.Y H:i')}}</td>
+            <td>
+                {{changeTypes[change['changeType']] | default('Неизвестный тип')}}<br />
+                Пользователь: {{change['fullName']}}<br />
+                Комментарий: {{change['description']}}
+            </td>
+        </tr>
+    {% endfor %}
+</table>        
+    
+        
+        

@@ -1,0 +1,32 @@
+{% if knowledgeEnabled is defined %}
+    {% include "TemplateMirclubBundle:Knowledge:include.html.twig" %}
+{% endif %}    
+{% if fileView != 0 %}
+    {% if fileView == 1 %}
+        {% render 'ExtendedProjectBundle:Front:edit' with {'fileId': fileId, 'locale': currentLocale, 'user': currentUser, 'request': app.request} %}                 
+    {% elseif fileView == 2 %}
+        {% render 'ExtendedProjectBundle:Front:viewEmbedded' with {'fileId': fileId, 'locale': fileLocale, 'user': currentUser, 'request': app.request, 'version': fileVersion} %}                 
+    {% endif %}
+{% elseif documentView != 0 %}
+    {% include 'TemplateMirclubBundle:Project:_viewEdit.html.twig' %}
+{% else %}
+    <h1 id="projectTitle">{{title}}</h1>
+    {{(positions['projectAjaxMenu'] | default('')) | raw}}
+    <div class="tinymceContent">{{content | raw}}</div>
+    
+    {% include 'TemplateMirclubBundle:Project:_viewConfig.html.twig' %}
+    
+    {% if isLocked != 0 %}
+        <div class="alert alert-warning">
+            {{cmsManager.decodeLocalString(cmsManager.getConfigValue('project.lockmessages'), currentLocale) | raw}}
+        </div>
+    {% endif %}
+    
+    {% include 'TemplateMirclubBundle:Project:_viewDocList.html.twig' %}
+    
+    {% render 'ExtendedProjectBundle:Front:list' with {'projectId': id, 'locale': currentLocale, 'user': currentUser} %}
+
+    {% include 'TemplateMirclubBundle:Project:_viewBlog.html.twig' %}
+    
+    {% include 'TemplateMirclubBundle:Project:_viewNewDoc.html.twig' %}
+{% endif %}

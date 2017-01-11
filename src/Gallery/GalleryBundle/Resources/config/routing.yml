@@ -1,0 +1,19 @@
+gallery_gallery_images_list:
+    path:  /admin/gallery/
+    defaults: { _controller: GalleryGalleryBundle:Default:galleryImagesList }
+
+gallery_gallery_images_create:
+    path:  /admin/gallery/create
+    defaults: { _controller: GalleryGalleryBundle:Default:galleryImagesCreate }
+
+gallery_gallery_images_edit:
+    path:  /admin/gallery/edit
+    defaults: { _controller: GalleryGalleryBundle:Default:galleryImagesEdit }
+
+gallery_gallery_images_ajax:
+    path:  /admin/gallery/ajax
+    defaults: { _controller: GalleryGalleryBundle:Default:galleryImagesAjax }
+
+gallery_gallery_images_ajaximage:
+    path:  /admin/gallery/ajaximage
+    defaults: { _controller: GalleryGalleryBundle:Default:galleryImagesAjaxImage }

@@ -1,0 +1,99 @@
+<h1>{{title}}</h1>
+{% if saveStatus == 'OK' %}
+    <p class="alert alert-success"> Файл успешно отредактирован. Скачать его можно по <a href="{{path('files_files_front_filedownload')}}?id={{editedFile.id}}">ссылке</a>.</p>
+    <p><a href="/myfiles.html?userid={{currentUser.id}}" class="btn btn-default">Мои файлы</a></p>
+{% else %}
+    <div class="row">
+        <form action="" method="POST" enctype="multipart/form-data" class="col-md-6 col-md-offset-3 col-sm-12 form-horizontal">
+            <input type="hidden" name="actionobject" value="file" />
+            <input type="hidden" name="action" value="editpage" />
+            <input type="hidden" name="actionid" value="{{pageid}}" />
+            <input type="hidden" name="actionfileid" value="{{id}}" />
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Название файла</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" placeholder="Название файла" name="actionfields[title][default]" value="{{fileTitle['default']}}" />
+                    {% if fileTitleError['default'] != '' %}<p class="form-error">Поле заполнено неверно</p>{% endif %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Описание файла</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" placeholder="Описание файла" name="actionfields[description][default]">{{fileDescription['default']}}</textarea>
+                    {% if fileDescriptionError['default'] != '' %}<p class="form-error">Поле заполнено неверно</p>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Имя файла</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" placeholder="Название файла" name="actionfields[fileName]"  id="fileFileNameInput" value="{{fileFileName}}" />
+                    <input id="fileContentFile" type="hidden" name="actionfields[contentFile]" value="{{fileContentFile}}" />
+                    {% if fileFileNameError != '' %}<p class="form-error">Поле заполнено неверно</p>{% endif %}
+                    {% if fileContentFileError != '' %}<p class="form-error">Необходимо загрузить файл</p>{% endif %}
+                    <p><a href="#" id="fileUpload" class="btn btn-primary">Выбрать файл</a></p>
+
+                </div>
+            </div>
+            <script>
+                $(function ()
+                {
+                    new AjaxUpload('#fileUpload',
+                            {
+                                action: '{{path('files_files_front_fileupload')}}',
+                                name: 'file',
+                                onSubmit: function (file, extension)
+                                {
+                                    $('#preloader').show();
+                                },
+                                onComplete: function (file, response)
+                                {
+                                    $('#preloader').hide();
+                                    if (!response)
+                                        response = "{file:'', error:'Ошибка загрузки файла'}";
+                                    var answer = $.parseJSON(response);
+                                    if (answer.file)
+                                    {
+                                        $('#fileContentFile').val(answer.file);
+                                        $('#fileFileNameInput').val(answer.filename);
+                                    } else
+                                    {
+                                        alert(answer.error);
+                                    }
+                                }
+                            });
+                });
+            </script>
+            {#{% if fileCategoryMode == 1 %}
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">Категория файла</label>
+                    <div class="col-sm-8">
+                        <select name="actionfields[categoryId]" class="form-control">
+                            {% for category in categories %}
+                                <option value="{{category['id']}}" {% if fileCategoryId == category['id'] %}selected="selected"{% endif %} {% if (category['enabled'] == 0) or (category['enableAdd'] == 0) %}disabled="disabled"{% endif %} >{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658;{% endfor %}{% endif %}{{category['title']}}</option>
+                            {% endfor %}
+                        </select>
+                        {% if fileCategoryIdError != '' %}<p class="form-error">Поле заполнено неверно</p>{% endif %}
+                    </div>
+                </div>
+            {% endif %}  #}
+            {% if captchaEnabled != 0 %}
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">
+                        {% if currentLocale == 'en' %}Enter text from the image{% else %}Введите строку с картинки{% endif %}
+                        <br />
+                        <img src="{{captchaPath}}&rand={{random()}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand=' + Math.floor(Math.random() * 2000000000));"/>
+                    </label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" placeholder="{% if currentLocale == 'en' %}Enter text from the image{% else %}Введите строку с картинки{% endif %}" name="actionfields[captcha]" value="" />
+                        {% if captchaError != '' %}<p class="form-error">{% if currentLocale == 'en' %}Field is not valid{% else %}Поле заполнено неверно{% endif %}</p>{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <p class="text-center"><button class="btn btn-primary" type="submit">{% if currentLocale == 'en' %}Save{% else %}Сохранить{% endif %}</button></p>  
+
+        </form>
+    </div>
+{% endif %}

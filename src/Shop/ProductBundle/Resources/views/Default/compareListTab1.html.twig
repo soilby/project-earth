@@ -1,0 +1,32 @@
+        {% if (app.user.checkAccess('product_compareedit') == 1) %}<a class="button" href="#" id="deleteCompare0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('product_compareedit') == 1) %}<a href="{{path('shop_product_compare_create')}}" class="button">Создать страницу сравнения</a>{% endif %}
+        <table class="tableContent" id="compareList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Включена
+                </th>
+                <th>
+                    URL
+                </th>
+                <th>
+                    Лимит товаров
+                </th>
+            </tr>
+            {% for compare in compares %}
+            <tr>
+                <td><input type="checkbox" name="check[{{compare.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('shop_product_compare_edit')}}?id={{compare.id}}">{{compare.name}}</a>{% if (errors[compare.id] is defined) %}<p class="error">{{errors[compare.id]}}</p>{% endif %}</td>
+                <td>{{compare.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{compare.url}}</td>
+                <td>{{compare.productLimit}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#deleteCompare0').click(function () {ajaxActionConfirm('{{path('shop_product_compare_ajax')}}', 'delete', '#compareList0 input.check', '#con_tab1','Удалить выбранные страницы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

@@ -1,0 +1,34 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Список текстовых страниц{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Текстовые страницы</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    {% if (app.user.checkAccess('textpage_list') == 1) %}
+    <a href="#" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Текстовые материалы</a>
+    {% endif %}
+    {% if (app.user.checkAccess('textpage_listsite') == 1) %}
+    <a href="#" id="tab2" {% if (tab == 1) %}class="active"{% endif %}>Основные страницы сайта</a>
+    {% endif %}
+</div>
+<div id="tabsContent">
+    {% if (app.user.checkAccess('textpage_list') == 1) %}
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:TextPages:textListTab1.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('textpage_listsite') == 1) %}
+    <div id="con_tab2" {% if (tab == 1) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:TextPages:textListTab2.html.twig" %}
+    </div>
+    {% endif %}
+</div>​
+{% endblock %}       
+
+
+

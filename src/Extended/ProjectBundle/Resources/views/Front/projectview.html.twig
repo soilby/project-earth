@@ -1,0 +1,43 @@
+<div>
+    <h1>{{title}}</h1>
+    <div>{{content | raw}}</div>
+    {% for tmpdocument in documents %}
+        {% if (premissions.read != 0) or (tmpdocument.isPublic != 0) %}<p>- <a href="?document={{tmpdocument.id}}">{{tmpdocument.title}}</a></p>{% endif %}
+    {% endfor %}
+    {% if documentView != 0 %}
+        <h2>{{document.title}}</h2>
+        <div>{{document.content | raw}}</div>
+        {% if documentPremissions.write != 0 %}
+        <p>Редактирование</p>
+        <p>{{document.editStatus}}</p>
+        <form action="?document={{document.id}}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="actionobject" value="project" />
+            <input type="hidden" name="action" value="edit" />
+            <input type="hidden" name="actionid" value="{{document.id}}" />
+            <input type="text" name="actionfields[title]" value="{{document.editTitle}}" />
+            <small>{{document.editTitleError}}</small>
+            <br />
+            <textarea name="actionfields[content]">{{document.editContent}}</textarea>
+            <small>{{document.editContentError}}</small>
+            <br />
+            <button type="submit">Отправить</button>
+        </form>
+        {% endif %}
+    {% endif %}
+    {% if premissions.write != 0 %}
+        <p>Созданиен нового документа</p>
+        <p>{{createStatus}}</p>
+        <form action="?" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="actionobject" value="project" />
+            <input type="hidden" name="action" value="create" />
+            <input type="hidden" name="actionid" value="{{id}}" />
+            <input type="text" name="actionfields[title]" value="{{createTitle}}" />
+            <small>{{createTitleError}}</small>
+            <br />
+            <textarea name="actionfields[content]">{{createContent}}</textarea>
+            <small>{{createContentError}}</small>
+            <br />
+            <button type="submit">Отправить</button>
+        </form>
+    {% endif %}
+</div>

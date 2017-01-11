@@ -1,0 +1,27 @@
+extended_alert_config:
+    path:  /admin/alert/
+    defaults: { _controller: ExtendedAlertBundle:Default:index }
+
+extended_alert_social:
+    path:  /admin/alert/social
+    defaults: { _controller: ExtendedAlertBundle:Default:social }
+
+extended_alert_subscribe:
+    path:  /admin/alert/subscribe
+    defaults: { _controller: ExtendedAlertBundle:Default:subscribe }
+
+extended_alert_social_facebookupdateimage:
+    path:  /admin/alert/social/facebookupdateimage
+    defaults: { _controller: ExtendedAlertBundle:Default:facebookUpdateImage }
+
+extended_alert_social_facebookupdate:
+    path:  /admin/alert/social/facebookupdate
+    defaults: { _controller: ExtendedAlertBundle:Default:facebookUpdate }
+
+extended_alert_social_facebookgettoken:
+    path:  /admin/alert/social/facebookgettoken
+    defaults: { _controller: ExtendedAlertBundle:Default:facebookGetToken }
+
+extended_alert_social_vkontaktegettoken:
+    path:  /admin/alert/social/vkontaktegettoken
+    defaults: { _controller: ExtendedAlertBundle:Default:vkontakteGetToken }

@@ -1,0 +1,258 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование группы категорий{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_taxonomy_list')}}">Категории</a>
+    <span>Редактирование группы категорий &laquo;{{tax['title']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Дерево категорий</a>
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+2}}" {% if (activetab == loop.index0+2) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="{{path('basic_cms_taxonomy_edit')}}?id={{id}}" method="post" id="categoryForm" onsubmit="submitCategoryForm(this);return true;">
+    <div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_edit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            <div class="categoryTree">
+                <p><span class="moveButton unactive">&nbsp</span><span class="ierarhLeftButton unactive">&nbsp</span><span class="ierarhRightButton unactive">&nbsp</span><span class="deleteButton unactive">&nbsp</span><a href="#" id="mainCategoryName" {% if (tax['enabled'] == 0) %}class="disabled"{% endif %}>{{tax['title']}}</a></p>
+                <ul>
+                    {% if (categories|length) > 0 %}
+                        {% for i in 0..(categories|length - 1) %}
+                            <li class="noselect"><span class="moveButton">&nbsp</span><span class="ierarhLeftButton">&nbsp</span><span class="ierarhRightButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#" {% if (categories[i]['enabled'] == 0) %}class="disabled"{% endif %}>{{categories[i]['name']}}</a>
+                                <input class="categoriesIds" type="hidden" name="ids[]" value="{{categories[i]['id']}}" />
+                                {% if (categories[i]['error'] != '') %}<span class="ml20 globalError">{{categories[i]['error']}}</span>{% endif %}
+                            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] > categories[i]['nesting']))%}
+                            <ul>
+                            {%else%}
+                            </li>
+                            {%endif%}
+                            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] < categories[i]['nesting']))%}
+                                {% for j in 0..(categories[i]['nesting'] - categories[i+1]['nesting'] - 1) %}
+                                </ul></li>
+                                {% endfor %}
+                            {%endif%}
+                        {% endfor %}
+                        {%if (categories[categories|length-1]['nesting'] > 0)%}
+                            {% for j in 0..(categories[categories|length-1]['nesting'] - 1) %}
+                            </ul></li>
+                            {% endfor %}
+                        {%endif%}
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="mt20"><input type="text" name="categoryName" id="categoryName" onkeypress="if (event.keyCode == 13) {$('#categoryNameAdd').click();return false;} else return true;" /><button type="button" id="categoryNameAdd" onclick="return false">Добавить категорию</button><p class="globalError" id="categoryNameError"></p></div>    
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+2}}" {% if (activetab == loop.index0+2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_edit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>​
+</form>
+<script>
+    window.moveelement = null;
+    window.categorieschanged = false;
+    function updateIerarhy()
+    {
+        $('#mainCategoryName').unbind('click').click(function () {
+            if (window.categorieschanged)
+            {
+                if (confirm('Сохранить изменения на этой странице?'))
+                {
+                    submitCategoryForm('form#categoryForm');
+                    $.ajax({
+                        type: "POST",
+                        url: "{{path('basic_cms_taxonomy_edit_ajaxsave')}}?id={{id}}",
+                        data: $('form#categoryForm').serialize(),
+                        error: function(){
+                            alert('Ошибка обращения к серверу');
+                        },
+                        success: function(data){
+                            var answer = $.parseJSON(data);
+                            if (answer['result'] != 'OK') alert(answer['message']); else location.href = "{{path('basic_cms_taxonomy_catedit')}}?id={{id}}";
+                        }
+                    });	      
+                } else location.href = "{{path('basic_cms_taxonomy_catedit')}}?id={{id}}";
+            } else location.href = "{{path('basic_cms_taxonomy_catedit')}}?id={{id}}";
+        });
+        $('.categoryTree li>a').unbind('click').click(function () {
+            var id = $(this).closest('li').children('input.categoriesIds').val();
+            if (window.categorieschanged)
+            {
+                if (confirm('Сохранить изменения на этой странице?'))
+                {
+                    submitCategoryForm('form#categoryForm');
+                    $.ajax({
+                        type: "POST",
+                        url: "{{path('basic_cms_taxonomy_edit_ajaxsave')}}?id={{id}}",
+                        data: $('form#categoryForm').serialize(),
+                        error: function(){
+                            alert('Ошибка обращения к серверу');
+                        },
+                        success: function(data){
+                            var answer = $.parseJSON(data);
+                            if (answer['result'] != 'OK') alert(answer['message']); else location.href = "{{path('basic_cms_taxonomy_catedit')}}?id="+id;
+                        }
+                    });	      
+                } else location.href = "{{path('basic_cms_taxonomy_catedit')}}?id="+id;
+            } else location.href = "{{path('basic_cms_taxonomy_catedit')}}?id="+id;
+        });
+        $('.categoryTree span.ierarhLeftButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.categoryTree span.ierarhRightButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.categoryTree span.deleteButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.categoryTree li ul li').children('span.ierarhLeftButton').removeClass('unactive');
+        $('.categoryTree li+li').children('span.ierarhRightButton').removeClass('unactive');
+        $('.categoryTree ul>li>span.deleteButton').removeClass('unactive');
+        $('.categoryTree span.moveButton').unbind('mousedown').unbind('mouseenter').removeClass('active');
+        
+        $('.categoryTree span.ierarhLeftButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                                  mouseleave(function () {$(this).removeClass('active');}).
+                                                                  click(function () 
+        {
+            var element = $(this).closest('li').parent().closest('li');
+            var length = $(this).closest('li').parent().children('li').length;
+            var parent = $(this).closest('li').parent();
+            if (element.length != 0)
+            {
+                var savetr = $(this).closest('li').detach();
+                if (length == 1) parent.remove();
+                element.after(savetr);
+            }
+            window.categorieschanged = true;
+            updateIerarhy();
+        });
+        $('.categoryTree span.ierarhRightButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                                   mouseleave(function () {$(this).removeClass('active');}).
+                                                                   click(function () 
+        {
+            var element = $(this).closest('li').prev();
+            if (element.length != 0)
+            {
+                var savetr = $(this).closest('li').detach();
+                if (element.children('ul').length == 0) $('<ul></ul>').appendTo(element);
+                element.children('ul').append(savetr);
+            }
+            window.categorieschanged = true;
+            updateIerarhy();
+        });
+        $('.categoryTree span.deleteButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                              mouseleave(function () {$(this).removeClass('active');}).
+                                                              click(function () 
+        {
+            if (confirm('Вы действительно хотите удалить категорию?')) 
+            {
+                var id = $(this).closest('li').children('input.categoriesIds').val();
+                var that = this;
+                $.ajax({
+                    type: "POST",
+                    url: "{{path('basic_cms_taxonomy_edit_ajaxdelete')}}",
+                    data: "id="+id,
+                    error: function(){
+                        alert('Ошибка обращения к серверу');
+                    },
+                    success: function(data){
+                        var answer = $.parseJSON(data);
+                        if (answer['result'] != 'OK') alert(answer['message']); else
+                        {
+                            var length = $(that).closest('li').parent().children('li').length;
+                            var parent = $(that).closest('li').parent();
+                            $(that).closest('li').remove();
+                            if ((length == 1) && (parent.get(0) != $('.categoryTree > ul').get(0))) parent.remove();
+                            window.categorieschanged = true;
+                        }
+                    }
+                });	      
+            }
+            updateIerarhy();
+        });
+        $('.categoryTree span.moveButton').not('.unactive').mousedown(function()
+        {
+            $(this).addClass('active');
+            $(this).closest('li').find('ul').hide();
+            window.moveelement = $(this).closest('li');
+            $(window.moveelement).parent().children().children('span.moveButton').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().children();
+                    var indexnew = elements.index($(this).closest('li'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);window.categorieschanged = true;}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);window.categorieschanged = true;}
+                    }
+                }
+            });
+        });
+    }
+    updateIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateIerarhy(); $('.categoryTree ul').show();});
+    $('#categoryNameAdd').click(function ()
+    {
+        var name = $('#categoryName').val();
+        var regname = /^.{3,250}$/i;
+        if (!regname.test(name)) $('#categoryNameError').html('Заголовок должен содержать от 3 до 250 символов'); else 
+        {
+            $.ajax({
+                type: "POST",
+                url: "{{path('basic_cms_taxonomy_edit_ajaxadd')}}",
+                data: "id={{id}}&name="+name,
+                error: function(){
+                    alert('Ошибка обращения к серверу');
+                },
+                success: function(data){
+                    var answer = $.parseJSON(data);
+                    if (answer['result'] != 'OK') alert(answer['message']); else
+                    {
+                        $('#categoryNameError').html('');
+                        $('#categoryName').val('');
+                        $('<li class="noselect"><span class="moveButton">&nbsp</span><span class="ierarhLeftButton">&nbsp</span><span class="ierarhRightButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#">'+name+
+                          '</a><input class="categoriesIds" type="hidden" name="ids[]" value="'+answer['id']+'" /></li>').appendTo('.categoryTree > ul');
+                        updateIerarhy();
+                        window.categorieschanged = true;
+                    }
+                }
+            });	      
+        }
+        return false;
+    });
+    function submitCategoryFormUl(ul, nesting, form, index)
+    {
+        $(ul).children('li').each(function (i, element)
+        {
+            var id = $(element).children('input.categoriesIds').val();
+            $(form).append('<input type="hidden" name="categories['+index+'][nesting]" value="'+nesting+'" /><input type="hidden" name="categories['+index+'][id]" value="'+id+'" />');
+            index++;
+            if ($(element).children('ul').length != 0) index = submitCategoryFormUl($(element).children('ul'), nesting + 1, form, index);
+        });
+        return index;
+    }
+    
+    function submitCategoryForm(form)
+    {
+        submitCategoryFormUl('.categoryTree>ul', 0, form, 0);
+    }
+</script>
+{% endblock %}       
+
+
+

@@ -1,0 +1,45 @@
+<h1>{{title}}</h1>
+{% if saveStatus == 'OK' %}
+<p> Файл успешно создан <a href="{{createdUrl}}">{{createdUrl}}</a></p>
+{% else %}
+<form action="" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="actionobject" value="file" />
+    <input type="hidden" name="action" value="create" />
+    <input type="hidden" name="actionid" value="{{id}}" />
+    <p>Заголовок <input type="text" name="actionfields[title][default]" value="{{fileTitle['default']}}" /></p>
+    <small>{{fileTitleError['default']}}</small>
+    <p>Описание <input type="text" name="actionfields[description][default]" value="{{fileDescription['default']}}" /></p>
+    <small>{{fileDescriptionError['default']}}</small>
+    {% for loc in locales %}
+    <p>Заголовок ({{loc['fullName']}}) <input type="text" name="actionfields[title][{{loc['shortName']}}]" value="{{fileTitle[loc['shortName']]}}" /></p>
+    <small>{{fileTitleError['default']}}</small>
+    <p>Описание ({{loc['fullName']}}) <input type="text" name="actionfields[description][{{loc['shortName']}}]" value="{{fileDescription[loc['shortName']]}}" /></p>
+    <small>{{fileDescriptionError[loc['shortName']]}}</small>
+    {% endfor %}
+    <p>Аватар <img src="{{fileAvatar}}" /><input type="hidden" name="actionfields[avatar]" value="{{fileAvatar}}" /> <input type="file" name="actionfiles[avatar]" /></p>
+    <small>{{fileAvatarError}}</small>
+    <p>Имя файла <input type="text" name="actionfields[fileName]" value="{{fileFileName}}" /></p>
+    <small>{{fileFileNameError}}</small>
+    <p>Сам файл <input type="hidden" name="actionfields[contentFile]" value="{{fileContentFile}}" /> <input type="file" name="actionfiles[contentFile]" /></p>
+    <small>{{fileContentFileError}}</small>
+    {% if fileCategoryMode == 1 %}
+    <p>Категория файла
+        <select name="actionfields[categoryId]">
+            {% for category in categories %}
+            <option value="{{category['id']}}" {% if fileCategoryId == category['id'] %}selected="selected"{% endif %} {% if (category['enabled'] == 0) or (category['enableAdd'] == 0) %}disabled="disabled"{% endif %} >{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658; {% endfor %}{% endif %}{{category['title']}}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <small>{{fileCategoryIdError}}</small>
+    {% endif %}
+    {% if captchaEnabled != 0 %}
+    <p>
+    Введите строку с картинки
+    <img src="{{captchaPath}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));"/>
+    <input type="text" name="actionfields[captcha]" value="" />
+    <small>{{captchaError}}</small>
+    </p>
+    {% endif %}
+    <p><input type="submit" value="Ok" /></p>
+</form>
+{% endif %}

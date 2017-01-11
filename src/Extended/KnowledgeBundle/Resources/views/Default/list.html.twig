@@ -1,0 +1,277 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Браузер объектов{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Браузер объектов</span>
+{% endblock %}
+{% block content %}
+<style>
+    .knowledge-cat-list a{
+        display: block;
+        color: #000;
+        line-height: 25px;
+        padding: 0 5px;
+    }        
+        
+    .knowledge-cat-list a:hover{
+        background: #eee;
+    }        
+
+    .knowledge-cat-list a.active{
+        background: #ddd;
+        font-weight: bold;
+    }
+    .knowledge-object-item a {
+        display: block;
+        color: #000;
+        line-height: 25px;
+        padding: 0 5px;
+    }
+
+    .knowledge-object-item a:hover {
+        background: #eee;
+    }
+    .knowledge-object-item a.active{
+        background: #ddd;
+        font-weight: bold;
+    }
+    
+    .knowledge-objects-paginator a {
+        border: 1px solid #ccc;
+        display: inline-block;
+        line-height: 23px;
+        min-width: 16px;
+        padding: 0 3px;
+        text-align: center;
+        color: #000;        
+    }
+
+    .knowledge-objects-paginator a.active {
+        background: #ddd;
+        font-weight: bold;
+    }
+    
+    #knowledge-object-new {
+        border: 1px solid #ccc;
+        display: inline-block;
+        line-height: 23px;
+        padding: 0 10px;
+        color: #000;        
+    }
+    
+    #knowledge-parameters-wrap td{
+        padding: 5px;
+    }
+
+    #knowledge-parameters-wrap button{
+        border: 1px solid #ccc;
+        display: inline-block;
+        line-height: 23px;
+        padding: 0 10px;
+        color: #000;       
+        background: #fff;
+    }
+    #knowledge-parameters-wrap p.error {
+        font-size: 12px;
+        font-style: italic;
+        color: #f00;
+    }
+    .knowledge-cat-list small {
+        font-size: 10px;
+        display: inline-block;
+        padding-left: 5px;
+        vertical-align: top;
+        margin-top: -2px;
+        color: #888;        
+    }
+</style>
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Список</a>
+    <a href="{{path('extended_knowledge_listtable')}}">Таблица</a>
+</div>
+    <div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div style="width:30%;padding:0 1% 0 0;float:left;border-right:1px solid #ccc;">
+                <p>Места объектов:</p>
+                {% for category in categories %}
+                    <div style="padding-left:{{category['nesting'] * 15}}px" class="knowledge-cat-list"><a href="#" data-id="{{category['id']}}">{{category['name']}}<small>{{category['count'] | default(0)}}</small></a></div>
+                {% endfor %}
+            </div>
+            <div style="width:30%;padding:0 1%;float:left;border-right: 1px solid #ccc;">
+                <p>Список объектов:</p>
+                <div id="knowledge-objects-wrap">
+                </div>
+            </div>
+            <div style="margin-left:63%;padding:0 0 0 1%;">
+                <p>Параметры объекта:</p>
+                <div id="knowledge-parameters-wrap">
+                </div>
+            </div>
+            
+            
+            <div class="clearfix"></div>
+            {#<div class="mt20"><input type="text" name="categoryName" id="categoryName" onkeypress="if (event.keyCode == 13) {$('#categoryNameAdd').click();return false;} else return true;" /><button type="button" id="categoryNameAdd" onclick="return false">Добавить тип</button><p class="globalError" id="categoryNameError"></p></div>    #}
+        </div>
+    </div>​
+<script>
+var knowledge = {
+    
+    currentTypeId: null,
+    currentPage: null,
+    
+    loadObjects: function (typeId, page) {
+        $('#knowledge-objects-wrap').html('');
+        this.currentTypeId = typeId;
+        this.currentPage = page;
+        $.ajax({
+            type: "POST",
+            url: "{{path('extended_knowledge_loadobjects')}}",
+            data: {type: typeId, page: page},
+            error: function() {
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data) {
+                if (!data.items) {
+                    return ;
+                }
+                var itemsHtml = '';                
+                for (var i in data.items) {
+                    itemsHtml += '<div class="knowledge-object-item"><a href="#" data-id="'+data.items[i].id+'">'+data.items[i].title+'</a></div>';
+                }
+                itemsHtml += '<div class="knowledge-objects-paginator">';
+                for (var i = 0; i < data.pageCount; i++) {
+                    itemsHtml += '<a href="#" data-page="'+i+'" '+(i == data.page ? 'class="active"' : '')+'>'+(i + 1)+'</a>';
+                }
+                itemsHtml += '</div>';
+                if (data.addPermission) {
+                    itemsHtml += '<div><input type="text" id="knowledge-object-new-url" /> <a href="#" id="knowledge-object-new">Добавить объект по ссылке</a></div>';
+                }
+                $('#knowledge-objects-wrap').html(itemsHtml);
+                $('#knowledge-objects-wrap input, #knowledge-objects-wrap a.button').uniform();
+            }
+        });	      
+    },
+    
+    addObjectFromUrl: function (url) {
+        $.ajax({
+            type: "POST",
+            url: "{{path('extended_knowledge_addobject')}}",
+            data: {url: url},
+            error: function() {
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data) {
+                if (data.error) {
+                    alert(data.error);
+                }
+                if (data.result) {
+                    alert(data.result);
+                    knowledge.loadObjects(knowledge.currentTypeId, knowledge.currentPage);
+                }
+            }
+        });	      
+    },
+    
+    getObjectInfo: function (id) {
+        $('#knowledge-parameters-wrap').html('');
+        $.ajax({
+            type: "POST",
+            url: "{{path('extended_knowledge_getobject')}}",
+            data: {id: id},
+            error: function() {
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data) {
+                $('#knowledge-parameters-wrap').html(data);
+            }
+        });	      
+    },
+    
+    editObejct: function (data) {
+        $.ajax({
+            type: "POST",
+            url: "{{path('extended_knowledge_editobject')}}",
+            data: data,
+            error: function() {
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data) {
+                $('#knowledge-parameters-wrap').html(data);
+            }
+        });	      
+    },
+    
+    removeObejct: function (id) {
+        if (!confirm('Вы действительно хотите удалить этот объект?')) {
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "{{path('extended_knowledge_removeobject')}}",
+            data: {id: id},
+            error: function() {
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data) {
+                if (data.error) {
+                    alert(data.error);
+                }
+                if (data.result) {
+                    $('#knowledge-parameters-wrap').html('');
+                    alert(data.result);
+                    knowledge.loadObjects(knowledge.currentCategoryId, knowledge.currentPage);
+                }
+            }
+        });	      
+    },
+    
+    init: function () {
+        $('.knowledge-cat-list>a').click(function () {
+            $('.knowledge-cat-list>a.active').removeClass('active');
+            $('#knowledge-parameters-wrap').html('');
+            $(this).addClass('active');
+            var id = $(this).data('id');
+            knowledge.loadObjects(id, 0);
+            return false;
+        });
+        $('#knowledge-objects-wrap').delegate('.knowledge-objects-paginator>a', 'click', function () {
+            var page = $(this).data('page');
+            knowledge.loadObjects(knowledge.currentCategoryId, page);
+            return false;
+        });
+        $('#knowledge-objects-wrap').delegate('#knowledge-object-new', 'click', function (e) {
+            var url = $('#knowledge-object-new-url').val();
+            knowledge.addObjectFromUrl(url);
+            return false;
+        });
+        $('#knowledge-objects-wrap').delegate('.knowledge-object-item>a', 'click', function () {
+            $('.knowledge-object-item>a.active').removeClass('active');
+            $(this).addClass('active');
+            var id = $(this).data('id');
+            knowledge.getObjectInfo(id);
+            return false;
+        });
+        $('#knowledge-parameters-wrap').delegate('#knowledge-parameters-submit', 'click', function () {
+            var data = $('#knowledge-parameters-wrap form').serialize();
+            knowledge.editObejct(data);
+            return false;
+        });
+        $('#knowledge-parameters-wrap').delegate('#knowledge-parameters-remove', 'click', function () {
+            var id = $(this).data('id');
+            knowledge.removeObejct(id);
+            return false;
+        });
+    }
+    
+};
+$(function () {
+    knowledge.init();
+});
+</script>
+{% endblock %}       
+
+
+

@@ -1,0 +1,17 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+<div id="systemMessage">
+    {% if ((error is defined) and (error == true)) %}<p><img src="/adminimg/error.gif" /></p>{% endif %}
+    <p>{{message}}</p>
+    {% for key,item in paths %}
+        <a class="button" href="{{item}}">{{key}}</a>
+    {% endfor %}
+</div>
+{% endblock %}       
+
+
+

@@ -1,0 +1,28 @@
+forum_private_private_list:
+    path:  /forum/private/list
+    defaults: { _controller: ForumPrivateBundle:Default:privateList }
+
+forum_private_private_view:
+    path:  /forum/private/view
+    defaults: { _controller: ForumPrivateBundle:Default:privateView }
+
+forum_private_private_pagecreate:
+    path:  /forum/private/pagecreate
+    defaults: { _controller: ForumPrivateBundle:Default:privatePageCreate }
+
+forum_private_private_pageedit:
+    path:  /forum/private/pageedit
+    defaults: { _controller: ForumPrivateBundle:Default:privatePageEdit }
+
+forum_private_private_ajax:
+    path:  /forum/private/ajax
+    defaults: { _controller: ForumPrivateBundle:Default:privateAjax }
+
+
+forum_private_front_attachmentsdownload:
+    path:  /system/download/forumprivateattachments
+    defaults: { _controller: ForumPrivateBundle:Default:privateFrontDownloadAttachment }
+
+forum_private_front_attachmentsupload:
+    path:  /system/upload/forumprivateattachments
+    defaults: { _controller: ForumPrivateBundle:Default:privateFrontAjaxAttachment }

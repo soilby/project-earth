@@ -1,0 +1,7 @@
+parameters:
+#    basic_front.example.class: Basic\FrontBundle\Example
+
+services:
+#    basic_front.example:
+#        class: %basic_front.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

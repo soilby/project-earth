@@ -1,0 +1,68 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Настройка оформления ошибок{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Настройка оформления ошибок</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+</div>
+<form action="{{path('basic_cms_errorcfg')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('error_edit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+            </table>
+        </div>
+</div>​
+</form>
+<div id="helpContainer">
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+</div>
+{% endblock %}       
+
+
+

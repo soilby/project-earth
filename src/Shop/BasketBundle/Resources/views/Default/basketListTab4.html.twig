@@ -1,0 +1,44 @@
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="saveOrdering3">Сохранить порядок</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="unblockedFields3">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="blockedFields3">Выключить</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="deleteFields3">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a href="{{path('shop_basket_fieldcreate')}}" class="button">Создать параметр заказа</a>{% endif %}
+        <table class="tableContent" id="fieldList3">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название поля (техническое имя)
+                </th>
+                <th>
+                    Тип
+                </th>
+                <th>
+                    Включено
+                </th>
+                <th>
+                    Порядок
+                </th>
+            </tr>
+            {% for field in fields3 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{field.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('shop_basket_fieldedit')}}?id={{field.id}}">{{field.name}} ({{field.techName}})</a>{% if (errors3[field.id] is defined) %}<p class="error">{{errors3[field.id]}}</p>{% endif %}</td>
+                <td>
+                    {% if (field.type == 'text') %}Текстовое поле{% endif %}
+                    {% if (field.type == 'textarea') %}Многострочный текст{% endif %}
+                    {% if (field.type == 'select') %}Выпадающий список{% endif %}
+                    {% if (field.type == 'radio') %}Группа радиокнопок{% endif %}
+                    {% if (field.type == 'checkbox') %}Флажок{% endif %}
+                </td>
+                <td>{{field.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td><input type="text" class="ordering" name="ordering[{{field.id}}]" value="{{field.ordering}}" />{% if (errorsorder3[field.id] is defined) %}<p class="error">{{errorsorder3[field.id]}}</p>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#saveOrdering3').click(function () {ajaxAction('{{path('shop_basket_fieldajax')}}?tab=3', 'ordering', '#fieldList3 input.ordering', '#con_tab4');return false;});
+            $('#blockedFields3').click(function () {ajaxAction('{{path('shop_basket_fieldajax')}}?tab=3', 'blocked', '#fieldList3 input.check', '#con_tab4');return false;});
+            $('#unblockedFields3').click(function () {ajaxAction('{{path('shop_basket_fieldajax')}}?tab=3', 'unblocked', '#fieldList3 input.check', '#con_tab4');return false;});
+            $('#deleteFields3').click(function () {ajaxActionConfirm('{{path('shop_basket_fieldajax')}}?tab=3', 'delete', '#fieldList3 input.check', '#con_tab4','Удалить выбранные параметры?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

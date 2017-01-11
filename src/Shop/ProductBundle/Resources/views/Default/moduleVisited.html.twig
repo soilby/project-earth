@@ -1,0 +1,26 @@
+<table class="cfgTable">
+    <tr>
+        <td>Количество продуктов для вывода<span class="helpContainerButton" data-id="modulelimit">?</span></td>
+        <td><input type="text" name="parameters[limit]" value="{{parameters['limit']}}" /></td>
+        <td class="cfgError">{{parameterserror['limit']}}</td>
+    </tr>
+    <tr>
+        <td colspan="2"><label><input type="checkbox" name="parameters[unique]" value="1" {% if (parameters['unique'] != 0) %}checked="checked"{% endif %} />Только уникальные продукты</label><span class="helpContainerButton" data-id="moduleunique">?</span></td>
+        <td class="cfgError">{{parameterserror['unique']}}</td>
+    </tr>
+    <tr>
+        <td>Поля материала для вывода<span class="helpContainerButton" data-id="modulefields">?</span></td>
+        <td>
+            {% for objectparam, objectparamcfg in fieldlist %}
+                <label><input type="checkbox" name="parameters[fields][]" value="{{objectparam}}" {% if (objectparam in parameters['fields']) %}checked="checked"{% endif %} />{{objectparamcfg['name']}}</label><br />
+            {% endfor %}
+        </td>
+        <td class="cfgError">{{parameterserror['fields']}}</td>
+    </tr>
+</table>
+<div class="helpContainerAdd">
+    <div id="helpContainer-modulelimit">Задаёт количество товаров в очереди, которые нужно запоминать.</div>
+    <div id="helpContainer-moduleunique">Если данная опция включена, то в очереди просмотра товаров будут присутствовать только уникальные товары.</div>
+    <div id="helpContainer-modulefields">Задаёт поля товаров, которые необходимо вывести в модуле. Включение только необходимых полей позволяет уменьшить время выполнения запроса и память.</div>
+</div>
+

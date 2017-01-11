@@ -1,0 +1,57 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание новой роли{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_role_list')}}">Роли</a>
+    <span>Создание новой роли</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Основные данные</a>
+</div>
+<form action="{{path('basic_cms_role_create')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('role_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('role_list') == 1) %}<a class="button" href="{{path('basic_cms_role_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Имя роли<span class="helpContainerButton" data-id="rolename">?</span></td>
+                    <td><input type="text" name="rolename" value="{{rolename}}" /></td>
+                    <td class="cfgError">{{rolenameerror}}</td>
+                </tr>
+                <tr>
+                    <td>Разрешения роли<span class="helpContainerButton" data-id="premis">?</span></td>
+                    <td></td>
+                    <td class="cfgError">{{premiserror}}</td>
+                </tr>
+                {% for modulepremis in premis %}
+                    {% set modulekey = loop.index0 %}
+                    <tr>
+                        <td></td>
+                        <td colspan="2" class="pln"><label><input type="checkbox" name="temp[]" onclick="if ($(this).is(':checked')) $('input.rolesforindex{{modulekey}}').attr('checked','checked'); else $('input.rolesforindex{{modulekey}}').removeAttr('checked');$.uniform.update('input.rolesforindex{{modulekey}}');" />{{modulepremis['description']}}</label></td>
+                    </tr>
+                    {% for premname, premdescr in modulepremis['roles'] %}
+                    <tr>
+                        <td></td>
+                        <td colspan="2" class="pl30"><label><input class="rolesforindex{{modulekey}}" type="checkbox" name="premon[{{premname}}]" value="1" {% if ((premon[premname] is defined) and (premon[premname] == 1)) %}checked="checked"{% endif %} />{{premdescr}}</label></td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+</div>​
+</form>
+<div id="helpContainer">
+    <div id="helpContainer-rolename">Задаёт название роли в системе.</div>
+    <div id="helpContainer-premis">Задаёт перечень разрешенных действий для данной роли. Действия сгруппированы по объектам.</div>
+</div>
+{% endblock %}       
+
+
+

@@ -1,0 +1,21 @@
+services:
+    cms.cmsManager:
+        class: Basic\CmsBundle\CmsManager
+        arguments: ['@service_container']
+    object.user:
+        class: Basic\CmsBundle\UserManager
+        arguments: ['@service_container']
+    object.module:
+        class: Basic\CmsBundle\ModuleManager
+        arguments: ['@service_container']
+    object.textpage:
+        class: Basic\CmsBundle\TextPageManager
+        arguments: ['@service_container']
+    object.taxonomy:
+        class: Basic\CmsBundle\TaxonomyManager
+        arguments: ['@service_container']
+        
+    basic.twig.ceil_extension:
+        class: Basic\CmsBundle\Twig\CeilExtension
+        tags:
+            - { name: twig.extension }

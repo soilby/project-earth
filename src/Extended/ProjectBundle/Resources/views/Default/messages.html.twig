@@ -1,0 +1,57 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Прочие настройки{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('extended_project_list')}}">Мастерские</a>
+    <span>Прочие настройки</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Сообщение о блокировке документов</a>
+</div>
+<form action="{{path('extended_project_messages')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="saveButtons">
+                <button type="submit">Сохранить</button>
+            </div>
+                <div class="mb20">
+                <p>Сообщение о блокировке документов:</p>
+                <p class="globalError">{{errors['default'] | default('')}}</p>
+                <br />
+                <textarea name="parameters[default]" class="bodyTextarea">{{parameters['default']}}</textarea>
+                </div>
+            {% for locale in locales %}
+                <div class="mb20">
+                <p>Сообщение о блокировке документов ({{locale['fullName']}}):</p>
+                <p class="globalError">{{errors[locale['shortName']] | default('')}}</p>
+                <br />
+                <textarea name="parameters[{{locale['shortName']}}]" class="bodyTextarea">{{parameters[locale['shortName']]}}</textarea>
+                </div>
+            {% endfor %}
+        </div>
+                <script>
+                tinymce.init({
+                    selector: "textarea.bodyTextarea",
+                    language : 'ru',
+                    height: 400,
+                    convert_urls: false,
+                    verify_html : false,
+                    plugins: [
+                        "advlist autolink lists image charmap print preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "media table contextmenu paste textcolor",
+                        "jbimages link"
+                    ],
+                    toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+                });
+                </script>
+</div>​
+</form>
+{% endblock %}       
+
+
+

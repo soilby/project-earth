@@ -1,0 +1,87 @@
+extended_project_sabre_dav:
+    path:     /dav/{path}
+    defaults: { _controller: ExtendedProjectBundle:Server:exec }
+    requirements:
+        path: ".*"
+
+extended_project_front_upload:
+    path:  /system/upload/projectfiles
+    defaults: { _controller: ExtendedProjectBundle:Front:upload }
+
+extended_project_front_createfolder:
+    path:  /system/foldercreate/projectfiles
+    defaults: { _controller: ExtendedProjectBundle:Front:createFolder }
+
+extended_project_front_createdocument:
+    path:  /system/documentcreate/projectfiles
+    defaults: { _controller: ExtendedProjectBundle:Front:createDocument }
+
+extended_project_front_view:
+    path:  /system/view/projectfiles
+    defaults: { _controller: ExtendedProjectBundle:Front:view }
+
+extended_project_front_removeversion:
+    path:  /system/versionremove/projectfiles
+    defaults: { _controller: ExtendedProjectBundle:Front:removeVersion }
+
+extended_project_front_changeaccess:
+    path:  /system/changeaccess/projectfiles
+    defaults: { _controller: ExtendedProjectBundle:Front:changeAccessControl }
+
+
+extended_project_list:
+    path:  /admin/projects/
+    defaults: { _controller: ExtendedProjectBundle:Default:projectList }
+
+extended_project_create:
+    path:  /admin/projects/create
+    defaults: { _controller: ExtendedProjectBundle:Default:projectCreate }
+
+extended_project_edit:
+    path:  /admin/projects/edit
+    defaults: { _controller: ExtendedProjectBundle:Default:projectEdit }
+
+extended_project_ajax:
+    path:  /admin/projects/ajax
+    defaults: { _controller: ExtendedProjectBundle:Default:projectAjax }
+
+extended_project_ajaxusers:
+    path:  /admin/projects/ajaxusers
+    defaults: { _controller: ExtendedProjectBundle:Default:projectAjaxUsers }
+
+
+extended_project_documents_list:
+    path:  /admin/projects/documents
+    defaults: { _controller: ExtendedProjectBundle:Default:projectDocumentsList }
+
+extended_project_documents_create:
+    path:  /admin/projects/documents/create
+    defaults: { _controller: ExtendedProjectBundle:Default:projectDocumentsCreate }
+
+extended_project_documents_edit:
+    path:  /admin/projects/documents/edit
+    defaults: { _controller: ExtendedProjectBundle:Default:projectDocumentsEdit }
+
+extended_project_documents_ajax:
+    path:  /admin/projects/documents/ajax
+    defaults: { _controller: ExtendedProjectBundle:Default:projectDocumentsAjax }
+
+extended_project_tinymce_blank:
+    path:  /system/upload/mceprojectblank
+    defaults: { _controller: ExtendedProjectBundle:Default:tinyMceBlank }
+
+extended_project_tinymce_upload:
+    path:  /system/upload/mceproject
+    defaults: { _controller: ExtendedProjectBundle:Default:tinyMceUpload }
+
+extended_project_tinymce_filemgr_list:
+    path:  /system/download/mceprojectfilelist
+    defaults: { _controller: ExtendedProjectBundle:Default:tinyMceFileList }
+    
+extended_project_tinymce_filemgr_download:
+    path:  /system/download/mceprojectfile
+    defaults: { _controller: ExtendedProjectBundle:Default:tinyMceFileDownload }
+
+extended_project_messages:
+    path:  /admin/projects/messages
+    defaults: { _controller: ExtendedProjectBundle:Default:projectMessages }

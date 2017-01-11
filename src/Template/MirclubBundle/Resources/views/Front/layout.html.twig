@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="keywords" content="{{meta['keywords']}}" />
+        <meta name="description" content="{{meta['description']}}" />
+        {% if meta['robotindex'] == true %}
+        <meta name="robots" content="index, follow"/>
+        {% else %}
+        <meta name="robots" content="noindex, nofollow"/>
+        {% endif %}
+        <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}" />
+        <link rel="stylesheet" href="{{asset('assets/css/lightbox.css')}}" />
+        <link rel="stylesheet" href="{{asset('assets/css/main.css')}}" />
+        <!--[if lt IE 9]>
+        <script type="text/javascript" src="{{asset('assets/js/html5shiv.min.js')}}"></script>
+        <![endif]-->	
+        <script src="{{asset('assets/js/jquery.min.js')}}"></script>
+        <script src="{{asset('assets/js/bootstrap.min.js')}}"></script>
+        <script src="{{asset('assets/js/tinymce/tinymce.min.js')}}"></script>
+        <script src="{{asset('assets/js/ajaxupload.3.5.js')}}"></script>
+        <script src="{{asset('assets/js/lightbox.js')}}"></script>
+        <script src="{{asset('assets/js/jquery.cookie.js')}}"></script>
+        <script src="{{asset('assets/js/jquery.bxslider.min.js')}}"></script>
+        <script src="{{asset('assets/js/main.js')}}"></script>
+        <script>
+            earthTools.init('{{currentLocale}}');
+        </script>
+        <link rel="icon" type="image/x-icon" href="{{asset('favicon.ico')}}" />
+        <title>{{meta['title']}} - Клуб МиР</title>
+        {% if currentSeoPage.url == 'index.html' %}
+        <meta property="og:url" content="http://{{app.request.getHttpHost()}}/" />
+        <meta property="og:type" content="website" />
+        {% set facebookimage = cmsManager.getConfigValue('alerts.facebookimage') %}
+        {% if facebookimage != '' %}
+            <meta property="og:image" content="http://{{app.request.getHttpHost()}}{{(facebookimage | split('###'))[0] | default('')}}" />
+            <meta property="og:title" content="{{(facebookimage | split('###'))[2] | default('Project &laquo;Earth&raquo;')}}" />
+            <meta property="og:description" content="{{(facebookimage | split('###'))[1] | default('The main site of the project &laquo;Earth&raquo;')}}" />
+        {% endif %}
+        {% endif %}
+    </head>
+    <body>
+        <div id="earth-preloader"><img src="/img/ajaxloader.gif" /></div>
+	{% if (preHeader is defined) %}{{preHeader | raw}}{% endif %}
+        <header>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-9 col-lg-10 col-sm-12">
+                        <a href="#" class="pull-right hidden-md hidden-lg earth-btn-menu" id="earth-menu-btn"><i class="glyphicon glyphicon-menu-hamburger"></i></a>
+                        <div class="pull-right hidden-md hidden-lg" id="earth-menu-lang"></div>
+                        <div class="earth-logo"><img src="{{asset('assets/img/logo.png')}}" /><p>{% if currentLocale == 'en' %}Together make the world better.{% else %}Вместе сделаем мир лучше.{% endif %}</p></div>
+                    </div>
+                    <div class="col-md-3 col-lg-2 hidden-xs hidden-sm">
+                        {% if (headerRightSide is defined) %}{{headerRightSide | raw}}{% endif %}
+                        <p class="text-center" id="mirclubBackgroundButton"><br />
+                            {% if currentLocale == 'en' %}
+                                <a href="#" class="btn btn-default"><span class="on">Disable background</span><span class="off">Enable background</span></a>
+                            {% else %}
+                                <a href="#" class="btn btn-default"><span class="on">Выключить фон</span><span class="off">Включить фон</span></a>
+                            {% endif %}
+                        </p>                        
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3 col-lg-2" id="earth-menu">
+                    {% if (leftSide is defined) %}{{leftSide | raw}}{% endif %}
+                </div>
+                <div class="col-md-9 col-lg-10">
+                    {% if (preContent is defined) %}{{preContent | raw}}{% endif %}
+                    {{content | raw}}
+                    {% if (postContent is defined) %}{{postContent | raw}}{% endif %}
+                </div>
+            </div>
+        </div>
+        <footer>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p class="text-center">Разработка и создание сайта <a href="http://indebora.mir-club.by/">Indebora WEB</a> &copy; 2014-{{'now' | date('Y')}}</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        {% include "TemplateMirclubBundle:Default:front.html.twig" with {'seoPage': currentSeoPage, image: null}  %}
+    </body>
+</html>
+
+
+
+
+
+{#
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+        <meta name="keywords" content="{{meta['keywords']}}" />
+        <meta name="description" content="{{meta['description']}}" />
+        {% if meta['robotindex'] == true %}
+        <meta name="robots" content="index, follow"/>
+        {% else %}
+        <meta name="robots" content="noindex, nofollow"/>
+        {% endif %}
+	<link rel="stylesheet" href="/css/base.css" />
+	<link rel="stylesheet" href="/css/lightbox.css" />
+	<link rel="stylesheet" href="/css/main.css?update=3" />
+	<!--[if lt IE 9]>
+	<script type="text/javascript" src="/js/html5shiv.js"></script>
+	<![endif]-->	
+	<script src="/js/jquery-1.8.1.min.js"></script>
+        <script src="/js/ajaxupload.3.5.js"></script>
+        <script src="/js/lightbox.js"></script>
+	<script src="/js/tinymce/tinymce.min.js"></script>
+	<script src="/js/jquery.cookie.js"></script>
+	<script src="/js/main.js?update=2"></script>
+        <script>
+            $(function () {
+                var transliteration = new Array();
+                transliteration['А']='A'; transliteration['а']='a'; transliteration['Б']='B'; transliteration['б']='b'; transliteration['В']='V'; transliteration['в']='v';
+                transliteration['Г']='G'; transliteration['г']='g'; transliteration['Д']='D'; transliteration['д']='d'; transliteration['Е']='E'; transliteration['е']='e';
+                transliteration['Ё']='Yo'; transliteration['ё']='yo'; transliteration['Ж']='Zh'; transliteration['ж']='zh'; transliteration['З']='Z'; transliteration['з']='z';
+                transliteration['И']='I'; transliteration['и']='i'; transliteration['Й']='J'; transliteration['й']='j'; transliteration['К']='K'; transliteration['к']='k';
+                transliteration['Л']='L'; transliteration['л']='l'; transliteration['М']='M'; transliteration['м']='m'; transliteration['Н']='N'; transliteration['н']='n';
+                transliteration['О']='O'; transliteration['о']='o'; transliteration['П']='P'; transliteration['п']='p'; transliteration['Р']='R'; transliteration['р']='r';
+                transliteration['С']='S'; transliteration['с']='s'; transliteration['Т']='T'; transliteration['т']='t'; transliteration['У']='U'; transliteration['у']='u';
+                transliteration['Ф']='F'; transliteration['ф']='f'; transliteration['Х']='H'; transliteration['х']='h'; transliteration['Ц']='C'; transliteration['ц']='c';
+                transliteration['Ч']='Ch'; transliteration['ч']='ch'; transliteration['Ш']='Sh'; transliteration['ш']='sh'; transliteration['Щ']='Shch'; transliteration['щ']='shch';
+                transliteration['Ъ']='"'; transliteration['ъ']='"'; transliteration['Ы']='Y\''; transliteration['ы']='y\''; transliteration['Ь']='\''; transliteration['ь']='\'';
+                transliteration['Э']='E\''; transliteration['э']='e\''; transliteration['Ю']='Yu'; transliteration['ю']='yu'; transliteration['Я']='Ya'; transliteration['я']='ya';
+                $('span.mirclubTransliterationImportant{% if currentLocale == 'en' %},span.mirclubTransliteration{% endif %}').each(function () {
+                    var text = $(this).html();
+                    var result = '';
+                    for (i = 0; i < text.length; i++) {
+                        if (transliteration[text[i]] != undefined) result += transliteration[text[i]]; else result += text[i];
+                    }                
+                    $(this).html(result);                    
+                });
+            });
+        </script>
+        <title>{{meta['title']}} - Клуб МиР</title>
+        {% if currentSeoPage.url == 'index.html' %}
+        <meta property="og:url" content="http://{{app.request.getHttpHost()}}/" />
+        <meta property="og:type" content="website" />
+        {% set facebookimage = cmsManager.getConfigValue('alerts.facebookimage') %}
+        {% if facebookimage != '' %}
+            <meta property="og:image" content="http://{{app.request.getHttpHost()}}{{(facebookimage | split('###'))[0] | default('')}}" />
+            <meta property="og:title" content="{{(facebookimage | split('###'))[2] | default('Project &laquo;Earth&raquo;')}}" />
+            <meta property="og:description" content="{{(facebookimage | split('###'))[1] | default('The main site of the project &laquo;Earth&raquo;')}}" />
+        {% endif %}
+        {% endif %}
+</head>
+<body>
+        <div id="preloader"><img src="/img/ajaxloader.gif" /></div>
+	{% if (preHeader is defined) %}{{preHeader | raw}}{% endif %}
+	<header>
+		<div class="headerLogo fll">
+			<img src="/img/logo.png" />
+			<p>{% if currentLocale == 'en' %}Together make the world better.{% else %}Вместе сделаем мир лучше.{% endif %}</p>
+		</div>
+		<div class="headerRight flr">
+			{% if (headerRightSide is defined) %}{{headerRightSide | raw}}{% endif %}
+                        <div id="mirclubBackgroundButton" style="padding-top:15px;text-align:center;">
+                            {% if currentLocale == 'en' %}
+                                <a href="#" class="button"><span class="on">Disable background</span><span class="off">Enable background</span></a>
+                            {% else %}
+                                <a href="#" class="button"><span class="on">Выключить фон</span><span class="off">Включить фон</span></a>
+                            {% endif %}
+                        </div>
+		</div>
+		<div class="clearfix"></div>
+	</header>
+	<div id="contentMainWrap">
+		<div class="leftSide">
+                    {% if (leftSide is defined) %}{{leftSide | raw}}{% endif %}
+		</div>
+		<div class="mainContent">
+                    {% if (preContent is defined) %}{{preContent | raw}}{% endif %}
+                    {{content | raw}}
+                    {% if (postContent is defined) %}{{postContent | raw}}{% endif %}
+		</div>
+		<div class="clearfix">
+		</div>
+	</div>
+	<footer>
+		<p>Разработка и создание сайта <a href="http://indebora.mir-club.by/">Indebora WEB</a> &copy; 2014</p>
+	</footer>
+        {% render "TemplateMirclubBundle:Default:front" with {'seoPage': currentSeoPage}  %}
+</body>
+</html>
+#}

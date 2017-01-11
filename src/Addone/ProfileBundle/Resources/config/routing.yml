@@ -1,0 +1,15 @@
+addone_profile_parameter_list:
+    path:  /admin/users/profile/
+    defaults: { _controller: AddoneProfileBundle:Default:parameterList }
+
+addone_profile_parameter_create:
+    path:  /admin/users/profile/create
+    defaults: { _controller: AddoneProfileBundle:Default:parameterCreate }
+
+addone_profile_parameter_edit:
+    path:  /admin/users/profile/edit
+    defaults: { _controller: AddoneProfileBundle:Default:parameterEdit }
+
+addone_profile_parameter_ajax:
+    path:  /admin/users/profile/ajax
+    defaults: { _controller: AddoneProfileBundle:Default:parameterAjax }

@@ -1,0 +1,143 @@
+                <br />
+                <p><strong>Основная информация:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    <tr>
+                        <td>Название файла</td>
+                        <td>{{info['filename']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Название компании</td>
+                        <td>{{info['name']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Дата генерации файла</td>
+                        <td>{{info['date']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Количество продуктов</td>
+                        <td>{{info['products']}}</td>
+                    </tr>
+                </table>
+                <form id="import1ConfigForm">
+                <br />
+                <p><strong>Соответствие категорий:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    {% for cat in categories %}
+                    <tr>
+                        <td>{{cat['name']}} ({{cat['count']}} товаров)</td>
+                        <td>
+                            <select name="categories[{{cat['id']}}]">
+                                <option value="">Не импортировать</option>
+                                {% for ourcat in ourcategories %}
+                                <option value="{{ourcat['id']}}" {% if (importcfg[cat['id']] | default('') == ourcat['id']) %}selected="selected"{% endif %}>{% if (ourcat['nesting'] > 0) %}{% for i in 0..(ourcat['nesting']-1) %}- {% endfor %}{% endif %}{{ourcat['title']}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br />
+                <p><strong>Выбор валюты:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    <tr>
+                        <td>Выберите валюту в файле</td>
+                        <td>
+                            <select name="currency">
+                                {% for currency in currencies %}
+                                <option value="{{currency['id']}}" {% if (currency['id'] == curcfg) %}selected="selected"{% endif %}>{{currency['name']}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <p><strong>Параметры страницы:</strong></p>
+                <br />
+                <table class="cfgTable">
+                <tr>
+                    <td>Основной шаблон</td>
+                    <td>
+                        <select name="layout">
+                            <option value="" {% if (layoutcfg == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (layoutcfg == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента</td>
+                    <td>
+                        <select name="template">
+                            <option value="" {% if (templatecfg == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (templatecfg == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули</td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="modules[]" value="{{module['id']}}" {% if (module['id'] in modulecfg) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                </tr>
+                {% endif %}
+                </table>
+                </form>
+                <br />
+                <p><strong>Импорт:</strong></p>
+                <br />
+                <div id="progress1Wrap">
+                    <button id="import1StartImport" onclick="return false;">Начать импорт</button>
+                </div>
+<script type="text/javascript">
+    window.lastproduct1 = 0;
+
+    function import1ProcessBlock()
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('extended_shop_import_one_process')}}',
+            data: "start="+window.lastproduct1+'&'+$('#import1ConfigForm').serialize(),
+            global: false,
+            error: function(){
+                import1ProcessBlock();
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                if (answer['result'] != 'OK') import1ProcessBlock(); else
+                {
+                    if (answer['status'] == 'OK')
+                    {
+                        $('#progress1Wrap').html('<div class="progressBar"><p style="width:'+parseInt(answer['percent'])+'%"></p></div>');
+                        window.lastproduct1 = parseInt(answer['start']);
+                    }
+                    if (answer['status'] == 'Fine')
+                    {
+                        $('#progress1Wrap').html('<p>Импорт завершен.</p>');
+                    } else import1ProcessBlock();
+                }
+            }
+        });	      
+    }
+    
+    $('#import1StartImport').click(function () 
+    {
+        $('#import1ConfigForm').hide();
+        $('#progress1Wrap').html('<div class="progressBar"><p style="width:0%"></p></div>');
+        import1ProcessBlock();
+        return false;
+    });
+    $('#import1ImportData input, #import1ImportData button, #import1ImportData a.button, #import1ImportData select, #import1ImportData textarea').not('.uniformOff').uniform();
+</script>
+                
+                
+
+

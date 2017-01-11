@@ -1,0 +1,112 @@
+        {% if ((app.user.checkAccess('project_editall') == 1) and (project.createrId != app.user.id)) %}
+            <a class="button" href="#" id="unblockedDocument0">Опубликовать</a>
+            <a class="button" href="#" id="blockedDocument0">Скрыть</a>
+            <a class="button" href="#" id="deleteDocument0">Удалить выбранные</a>
+            <a href="{{path('extended_project_documents_create')}}?id={{project.id}}" class="button">Создать новый документ</a>
+        {% endif %}
+        {% if ((app.user.checkAccess('project_editown') == 1) and (project.createrId == app.user.id)) %}
+            <a class="button" href="#" id="unblockedDocument0">Опубликовать</a>
+            <a class="button" href="#" id="blockedDocument0">Скрыть</a>
+            <a class="button" href="#" id="deleteDocument0">Удалить выбранные</a>
+            <a href="{{path('extended_project_documents_create')}}?id={{project.id}}" class="button">Создать новый документ</a>
+        {% endif %}
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="documentList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Заголовок &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Заголовок &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Заголовок</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Опубликовано &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Опубликовано &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Опубликовано</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?tab=0&sort0=5">Создано &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?tab=0&sort0=4">Создано &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=4">Создано </a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for document in documents0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{document.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('extended_project_documents_edit')}}?id={{document.id}}">{{document.title}}</a>{% if (errors0[document.id] is defined) %}<p class="error">{{errors0[document.id]}}</p>{% endif %}</td>
+                <td>{{document.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{document.createDate | date('d.m.Y G:i')}}</td>
+                <td>{{document.fullName}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#blockedDocument0').click(function () {ajaxAction('{{path('extended_project_documents_ajax')}}?tab=0', 'blockeddocument', '#documentList0 input.check', '#con_tab1');return false;});
+            $('#unblockedDocument0').click(function () {ajaxAction('{{path('extended_project_documents_ajax')}}?tab=0', 'unblockeddocument', '#documentList0 input.check', '#con_tab1');return false;});
+            $('#deleteDocument0').click(function () {ajaxActionConfirm('{{path('extended_project_documents_ajax')}}?tab=0', 'deletedocument', '#documentList0 input.check', '#con_tab1','Удалить выбранные документы?');return false;});
+            $('input, button, a.button, select, textarea').uniform();
+        </script>

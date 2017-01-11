@@ -1,0 +1,66 @@
+<div>
+<h1>{{title}}</h1>
+<small>Создано пользователем {{createrFullName}}</small>
+<form action="" method="post">
+<input type="hidden" name="actionobject" value="form" />
+<input type="hidden" name="action" value="sendform" />
+<input type="hidden" name="actionid" value="{{id}}" />
+<p>{{status}}</p>
+{% for field in fields %}
+{% if (field['type'] == 'text') %}
+<p>
+{{field['name']}}{% if field['required'] != 0 %}*{% endif %}
+<input type="text" name="actionfields[{{field['id']}}]" value="{{field['value']}}" />
+<small>{{field['error']}}</small>
+</p>
+{% endif %}
+{% if (field['type'] == 'textarea') %}
+<p>
+{{field['name']}}{% if field['required'] != 0 %}*{% endif %}
+<textarea name="actionfields[{{field['id']}}]">{{field['value']}}</textarea>
+<small>{{field['error']}}</small>
+</p>
+{% endif %}
+{% if (field['type'] == 'select') %}
+<p>
+{{field['name']}}{% if field['required'] != 0 %}*{% endif %}
+<select name="actionfields[{{field['id']}}]">
+ {% for item in field['items'] %}
+        <option value="{{item}}" {% if (field['value'] == item) %}selected="selected"{% endif %}>{{item}}</option>
+ {% endfor %}
+</select>
+<small>{{field['error']}}</small>
+</p>
+{% endif %}
+{% if (field['type'] == 'radio') %}
+<p>
+{{field['name']}}{% if field['required'] != 0 %}*{% endif %}
+ {% for item in field['items'] %}
+        <label><input type="radio" name="actionfields[{{field['id']}}]" value="{{item}}" {% if (field['value'] == item) %}checked="checked"{% endif %} />{{item}}</label>
+ {% endfor %}
+<small>{{field['error']}}</small>
+</p>
+{% endif %}
+{% if (field['type'] == 'checkbox') %}
+<p>
+<label><input type="checkbox" name="actionfields[{{field['id']}}]" value="1" {% if (field['value'] != 0) %}checked="checked"{% endif %} />{{field['name']}}{% if field['required'] != 0 %}*{% endif %}</label>
+<small>{{field['error']}}</small>
+</p>
+{% endif %}
+{% if (field['type'] == 'group') %}
+<p>
+{{field['name']}}
+</p>
+{% endif %}
+{% endfor %}
+{% if captchaEnabled != 0 %}
+<p>
+Введите строку с картинки
+<img src="{{captchaPath}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));"/>
+<input type="text" name="actionfields[captcha]" value="" />
+<small>{{captchaError}}</small>
+</p>
+{% endif %}
+<button type="submit">Отправить</button>
+</form>
+</div>

@@ -1,0 +1,70 @@
+        {# if (app.user.checkAccess('user_editall') == 1) %}<a class="button" href="#" id="unblockedUser">Разблокировать</a>{% endif #}
+        <a class="button" href="#" id="saveOrdering">Сохранить порядок</a>
+        <a class="button" href="#" id="onModule">Включить</a>
+        <a class="button" href="#" id="offModule">Выключить</a>
+        <a class="button" href="#" id="deleteModule">Удалить выбранные</a>
+        <a class="button" href="{{path('basic_cms_module_new')}}">Создать новый модуль</a>
+        <div class="goToRight">
+        <form id="navigationForm">
+            <input type="hidden" name="page0" value="{{page0}}" id="page0" />
+        </form>
+        </div>
+        <table class="tableContent" id="moduleList">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>Имя модуля</th>
+                <th>Включен</th>
+                <th>Локаль</th>
+                <th>Тип модуля</th>
+                <th>Позиция</th>
+                <th>Порядок</th>
+            </tr>
+            {% for module in modules %}
+            <tr>
+                <td><input type="checkbox" name="check[{{module.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_module_edit')}}?id={{module.id}}">{{module.name}}</a>{% if (errors[module.id] is defined) %}<p class="error">{{errors[module.id]}}</p>{% endif %}</td>
+                <td>{{module.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{module.locale == '' ? 'Для всех' : module.locale}}</td>
+                <td>{{module.moduleTypeName}}{# ({{module.objectName}}.{{module.moduleType}})#}</td>
+                <td>{{module.positionName}} ({{module.layout}}.{{module.position}})</td>
+                <td><input type="text" class="ordering" name="ordering[{{module.id}}]" value="{{module.ordering}}" />{% if (errorsorder[module.id] is defined) %}<p class="error">{{errorsorder[module.id]}}</p>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?page0=0" onclick="$('#page0').val(0);location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?page0={{i}}" onclick="$('#page0').val({{i}});location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?page0={{pagecount0 - 1}}" onclick="$('#page0').val({{pagecount0 - 1}});location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#saveOrdering').click(function () {ajaxAction('{{path('basic_cms_module_ajax')}}', 'ordering', '#moduleList input.ordering', '#con_tab1');return false;});
+            $('#onModule').click(function () {ajaxAction('{{path('basic_cms_module_ajax')}}', 'unblocked', '#moduleList input.check', '#con_tab1');return false;});
+            $('#offModule').click(function () {ajaxAction('{{path('basic_cms_module_ajax')}}', 'blocked', '#moduleList input.check', '#con_tab1');return false;});
+            $('#deleteModule').click(function () {ajaxActionConfirm('{{path('basic_cms_module_ajax')}}', 'delete', '#moduleList input.check', '#con_tab1','Удалить выбранныe модули?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

@@ -1,0 +1,4 @@
+services:
+    addone.product.parameter:
+        class: Shop\ParameterBundle\ParameterManager
+        arguments: ['@service_container']

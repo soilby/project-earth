@@ -1,0 +1,26 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Список ролей{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Роли</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="$('#tab').val(0);return false;" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Роли</a>
+    <a href="#" onclick="$('#tab').val(1);return false;" id="tab2" {% if (tab == 1) %}class="active"{% endif %}>Переназначение ролей</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:Default:roleListTab1.html.twig" %}
+    </div>
+    <div id="con_tab2" {% if (tab == 1) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:Default:roleListTab2.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

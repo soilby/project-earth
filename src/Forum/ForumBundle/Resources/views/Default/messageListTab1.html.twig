@@ -1,0 +1,116 @@
+        {% if (app.user.checkAccess('forum_edit') == 1) %}<a class="button" href="#" id="unblockedMessage0">Опубликовать</a>{% endif %}
+        {% if (app.user.checkAccess('forum_edit') == 1) %}<a class="button" href="#" id="blockedMessage0">Скрыть</a>{% endif %}
+        {% if (app.user.checkAccess('forum_edit') == 1) %}<a class="button" href="#" id="deleteMessage0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('forum_edit') == 1) %}<a href="{{path('forum_forum_messages_create')}}?id={{forum.id}}" class="button">Создать новое сообщение</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="messageList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Создано (изменено) &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Создано (изменено) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Создано (изменено)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Опубликовано &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Опубликовано &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Опубликовано</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?tab=0&sort0=5">Текст сообщения &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?tab=0&sort0=4">Текст сообщения &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=4">Текст сообщения</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 8) %}
+                        <a href="?tab=0&sort0=9">Модератор &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 9) %}
+                        <a href="?tab=0&sort0=8">Модератор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=8">Модератор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for message in messages0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{message.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('forum_forum_messages_edit')}}?id={{message.id}}">{{message.createDate | date('d.m.Y G:i')}}{% if (message.modifyDate != message.createDate) %} ({{message.modifyDate | date('d.m.Y G:i')}}){% endif %}</a>{% if (errors0[message.id] is defined) %}<p class="error">{{errors0[message.id]}}</p>{% endif %}</td>
+                <td>{{message.isVisible != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{message.content | textlimit}}</td>
+                <td>{{message.fullName}}</td>
+                <td>{{message.moderatorFullName}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#blockedMessage0').click(function () {ajaxAction('{{path('forum_forum_messages_ajax')}}?tab=0', 'blockedmessage', '#messageList0 input.check', '#con_tab1');return false;});
+            $('#unblockedMessage0').click(function () {ajaxAction('{{path('forum_forum_messages_ajax')}}?tab=0', 'unblockedmessage', '#messageList0 input.check', '#con_tab1');return false;});
+            $('#deleteMessage0').click(function () {ajaxActionConfirm('{{path('forum_forum_messages_ajax')}}?tab=0', 'deletemessage', '#messageList0 input.check', '#con_tab1','Удалить выбранные сообщения?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

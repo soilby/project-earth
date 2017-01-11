@@ -1,0 +1,35 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Личные сообщения{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('forum_forum_topic_list')}}">Форум</a>
+    <span>Личные сообщения</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    {% if (app.user.checkAccess('forum_private') == 1) %}
+    <a href="#" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Список личных сообщений</a>
+    {% endif %}
+    {% if (app.user.checkAccess('forum_private') == 1) %}
+    <a href="#" id="tab2" {% if (tab == 1) %}class="active"{% endif %}>Страницы личных сообщений</a>
+    {% endif %}
+</div>
+<div id="tabsContent">
+    {% if (app.user.checkAccess('forum_private') == 1) %}
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "ForumPrivateBundle:Default:privateListTab1.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('forum_private') == 1) %}
+    <div id="con_tab2" {% if (tab == 1) %}class="active"{% endif %}>
+        {% include "ForumPrivateBundle:Default:privateListTab2.html.twig" %}
+    </div>
+    {% endif %}
+</div>​
+{% endblock %}       
+
+
+

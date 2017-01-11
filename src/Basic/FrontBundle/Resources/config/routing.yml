@@ -1,0 +1,15 @@
+basic_front_index:
+    path:  /
+    defaults: { _controller: BasicFrontBundle:Default:index }
+
+basic_front_url:
+    path:  /{url}
+    defaults: { _controller: BasicFrontBundle:Default:index }
+    requirements:
+      url: ".+"
+
+#basic_front_url_with_local:
+#    path:  /{locale}/{url}
+#    defaults: { _controller: BasicFrontBundle:Default:index }
+#    requirements:
+#      locale: \w\w

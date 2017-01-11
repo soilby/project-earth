@@ -1,0 +1,249 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание нового модуля{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_module_list')}}">Модули</a>
+    <span>Создание нового модуля</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страницы для отображения</a>
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Настройки модуля</a>
+</div>
+<form action="{{path('basic_cms_module_new')}}" method="post">
+    <input type="hidden" name="object" value="{{moduleobject}}" />
+    <input type="hidden" name="type" value="{{moduletype}}" />
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('module_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('module_list') == 1) %}<a class="button" href="{{path('basic_cms_module_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="module[enabled]" value="1" {% if (module['enabled'] != 0) %}checked="checked"{% endif %} />Включить модуль</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{moduleerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Имя модуля<span class="helpContainerButton" data-id="name">?</span></td>
+                    <td><input type="text" name="module[name]" value="{{module['name']}}" /></td>
+                    <td class="cfgError">{{moduleerror['name']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль модуля<span class="helpContainerButton" data-id="locale">?</span></td>
+                    <td>
+                        <select name="module[locale]">
+                            <option value="" {% if (module['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (module['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{moduleerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон модуля<span class="helpContainerButton" data-id="template">?</span></td>
+                    <td>
+                        <select name="module[template]">
+                            <option value="" {% if (module['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (module['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{moduleerror['template']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон страницы<span class="helpContainerButton" data-id="layout">?</span></td>
+                    <td>
+                        <select autocomplete="off" name="module[layout]" onchange="$('.positions_td .selector, .positions_td select').hide();$('#positions_'+$(this).val()+', #uniform-positions_'+$(this).val()).show();">
+                            <option value="" {% if (module['layout'] == '') %}selected="selected"{% endif %}>Выберите шаблон</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (module['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{moduleerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Позиция модуля в основном шаблоне<span class="helpContainerButton" data-id="position">?</span></td>
+                    <td class="positions_td">
+                        {% for layoutkey, positionarray in positions %}
+                        <select name="module[position][{{layoutkey}}]" id="positions_{{layoutkey}}" {% if (module['layout'] != layoutkey) %}style="display:none"{% endif %}>
+                            <option value="" {% if (module['position'] == '') %}selected="selected"{% endif %}>Выберите позицию</option>
+                            {% for positionkey,position in positionarray %}
+                                <option value="{{positionkey}}" {% if (module['position'] == positionkey) %}selected="selected"{% endif %}>{{position}}</option>
+                            {% endfor %}
+                        </select>
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{moduleerror['position']}}</td>
+                </tr>
+                <tr>
+                    <td>Ограничение доступа к модулю<span class="helpContainerButton" data-id="access">?</span></td>
+                    <td>
+                        <select name="module[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (module['accessOn'] == 0) %}selected="selected"{% endif %}>Доступен всем пользователям</option>
+                            <option value="1" {% if (module['accessOn'] != 0) %}selected="selected"{% endif %}>Доступен следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{moduleerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (module['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="module[access][]" value="{{role['id']}}" {% if (role['id'] in module['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{moduleerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('module_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('module_list') == 1) %}<a class="button" href="{{path('basic_cms_module_list')}}">Отмена</a>{% endif %}
+            </div>
+            <p>Группы страниц, на которых модуль включен по умолчанию:<span class="helpContainerButton" data-id="groups">?</span></p><br />
+            {% for objectkey,typearray in seogroups %}
+                {% for typekey,typename in typearray %}
+                    <p><label><input class="modulePageGroupInputs" autocomplete="off" type="checkbox" name="groups[]" value="{{objectkey}}.{{typekey}}" {% if ((objectkey~'.'~typekey) in groups) %}checked="checked"{% endif %}>{{typename}}</label></p>
+                {% endfor %}
+            {% endfor %}
+            <br />
+            <div id="modulePagesForm">
+                {% for val in pages['group'] %}
+                <input type="hidden" name="pages[group][]" value="{{val}}" />
+                {% endfor %}
+                {% for val in pages['on'] %}
+                <input type="hidden" name="pages[on][]" value="{{val}}" class="pagesOn" />
+                {% endfor %}
+                {% for val in pages['off'] %}
+                <input type="hidden" name="pages[off][]" value="{{val}}" class="pagesOff" />
+                {% endfor %}
+            </div>
+            <div id="modulePageWraper">
+                <p>Страницы, на которых отображается модуль (выбрано 0 из 0):</p><br />
+                <button onclick="return false;">Включить все</button>
+                <button onclick="return false;">Включить для заданных групп</button>
+                <button onclick="return false;">Выключить все</button>
+                <div class="goToRight mb10"><input type="text" name="moduleSearchFromPages" id="moduleSearchFromPages" value=""/><button onclick="return false;">Найти</button></div>
+                <div class="modulePageSelector">
+                    <p>Подождите загрузки списка страниц...</p>
+                </div>
+                <div class="modulePageSelectorPaginator">
+                    <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>
+                    <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>
+                    Страница 1 из 1
+                </div>
+            </div>
+        {#    {% for page in seopages %}
+                <p><label><input type="checkbox" autocomplete="off" name="pages[]" value="{{page.id}}" {% if (page.id in pages) %}checked="checked"{% endif %}>{{page.description}}</label></p>
+            {% endfor %}#}
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('module_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('module_list') == 1) %}<a class="button" href="{{path('basic_cms_module_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab | raw}}
+        </div>
+</div>​
+</form>
+<script>
+    
+    
+    function checkModuleGroup(mode)
+    {
+        $('#modulePagesForm').html('');
+        if (mode == 'all')
+        {
+            $('#modulePagesForm').append('<input type="hidden" name="pages[group][]" value="all" />');
+        } else
+        if (mode == 'group')
+        {
+            $('input.modulePageGroupInputs:checked').each(function (i, element) 
+            {
+                $('#modulePagesForm').append('<input type="hidden" name="pages[group][]" value="'+$(element).val()+'" />');
+            });
+        }
+    }
+    
+    
+    function checkModulePage(id, that)
+    {
+        var newcheck = ($(that).is(':checked') ? 1 : 0);
+        $('#modulePagesForm input.pagesOn').each(function (i, element) {if (parseInt($(element).val()) == id) $(element).remove();});
+        $('#modulePagesForm input.pagesOff').each(function (i, element) {if (parseInt($(element).val()) == id) $(element).remove();});
+        if (newcheck != 0) $('#modulePagesForm').append('<input type="hidden" name="pages[on][]" value="'+id+'" class="pagesOn" />');
+        if (newcheck == 0) $('#modulePagesForm').append('<input type="hidden" name="pages[off][]" value="'+id+'" class="pagesOff" />');
+        var oldcount = parseInt($('#modulePagesCounter').html());
+        if (newcheck != 0) oldcount++; else oldcount--;
+        $('#modulePagesCounter').html(oldcount);
+    }
+    
+    
+    function loadModulePagesToPopup(page, first)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('basic_cms_module_ajax_seopages')}}',
+            data: "page="+page+"&search="+($('#moduleSearchFromPages').length > 0 ? $('#moduleSearchFromPages').val() : '')+'&moduleid=0&'+$('#modulePagesForm input').serialize(),
+            global: !first,
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadModulePagesToPopup('+(parseInt(answer['page'])-1)+', false);return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadModulePagesToPopup('+(parseInt(answer['page'])+1)+', false);return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['pages'])
+                {
+                    pagestring = pagestring+
+'                        <label><input type="checkbox" autocompate="off" '+(parseInt(answer['pages'][key]['checkbox']) != 0 ? 'checked="checked"' : '')+' onclick="checkModulePage('+parseInt(answer['pages'][key]['id'])+', this);" />'+htmlentities(answer['pages'][key]['description'])+' ('+htmlentities(answer['pages'][key]['url'])+')'+'</label>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#modulePageWraper').html(
+'                <p>Страницы, на которых отображается модуль (выбрано <span id="modulePagesCounter">'+parseInt(answer['checkcount'])+'</span> из '+parseInt(answer['allcount'])+'):</p><br />'+
+'                <button onclick="checkModuleGroup(\'all\');loadModulePagesToPopup('+parseInt(answer['page'])+', false);return false;">Включить все</button>'+
+'                <button onclick="checkModuleGroup(\'group\');loadModulePagesToPopup('+parseInt(answer['page'])+', false);return false;">Включить для заданных групп</button>'+
+'                <button onclick="checkModuleGroup(\'none\');loadModulePagesToPopup('+parseInt(answer['page'])+', false);return false;">Выключить все</button>'+
+'                <div class="goToRight mb10"><input type="text" name="moduleSearchFromPages" id="moduleSearchFromPages" value="'+($('#moduleSearchFromPages').length > 0 ? htmlentities($('#moduleSearchFromPages').val()) : '')+'"/><button onclick="loadModulePagesToPopup(0, false);return false;">Найти</button></div>'+
+'                <div class="modulePageSelector">'+
+                        pagestring+
+'                </div>'+
+'                <div class="modulePageSelectorPaginator">'+
+                        buttons+
+'                    Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                </div>');
+                $('#modulePageWraper input, #modulePageWraper button, #modulePageWraper a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+    $(function () {loadModulePagesToPopup(0, true);});
+
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Включает модуль для вывода на страницу.</div>
+    <div id="helpContainer-name">Задаёт название модуля. Данное название нигде не используется, служит только для обозначения модуля.</div>
+    <div id="helpContainer-locale">В зависимости от значения позволяет выводить модуль дл всех или только для определённой локали. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-template">Задаёт шаблон модуля. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-layout">Задаёт основной шаблон, в котором модуль будет выводиться. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-position">Задаёт позицию основного шаблона, в которой модуль будет выводиться. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-access">В зависимости от значения позволяет ограничить вывод модуля для определённых ролей пользователей.</div>
+    <div id="helpContainer-groups">Указывает для каких страниц модуль будет включен по умолчанию.</div>
+</div>
+{% endblock %}       
+
+
+

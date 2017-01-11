@@ -1,0 +1,23 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Просмотр ответов форума{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('forum_forum_topic_list')}}">Форум</a>
+    <span>Просмотр сообщений форума &laquo;{{forum.title}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" id="tab1" class="active">Сообщения форума</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" class="active">
+        {% include "ForumForumBundle:Default:messageListTab1.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

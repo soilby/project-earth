@@ -1,0 +1,35 @@
+extended_shop_import:
+    path:  /admin/products/import/
+    defaults: { _controller: ExtendedShopImportBundle:Default:import }
+
+extended_shop_import_one_loadfile:
+    path:  /admin/products/import/1/loadfile
+    defaults: { _controller: ExtendedShopImportBundle:Default:import1LoadFile }
+
+extended_shop_import_one_process:
+    path:  /admin/products/import/1/process
+    defaults: { _controller: ExtendedShopImportBundle:Default:import1ProcessBlock }
+
+extended_shop_import_two_loadfile:
+    path:  /admin/products/import/2/loadfile
+    defaults: { _controller: ExtendedShopImportBundle:Default:import2LoadFile }
+
+extended_shop_import_two_loadpicfile:
+    path:  /admin/products/import/2/loadpicfile
+    defaults: { _controller: ExtendedShopImportBundle:Default:import2LoadPicFile }
+
+extended_shop_import_two_process:
+    path:  /admin/products/import/2/process
+    defaults: { _controller: ExtendedShopImportBundle:Default:import2ProcessBlock }
+
+extended_shop_import_three_loadfile:
+    path:  /admin/products/import/3/loadfile
+    defaults: { _controller: ExtendedShopImportBundle:Default:import3LoadFile }
+
+extended_shop_import_three_loadtablecfg:
+    path:  /admin/products/import/3/loadtablecfg
+    defaults: { _controller: ExtendedShopImportBundle:Default:import3LoadTableCfg }
+
+extended_shop_import_three_process:
+    path:  /admin/products/import/3/process
+    defaults: { _controller: ExtendedShopImportBundle:Default:import3ProcessBlock }

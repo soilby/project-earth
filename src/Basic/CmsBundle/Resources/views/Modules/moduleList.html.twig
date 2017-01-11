@@ -1,0 +1,22 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Список модулей{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Модули</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="$('#tab').val(0);return false;" id="tab1" class="active">Модули</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" class="active">
+        {% include "BasicCmsBundle:Modules:moduleListTab1.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

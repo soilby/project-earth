@@ -1,0 +1,61 @@
+<p class="mb10">Быстрый поиск <input type="text" value="" onkeyup="objectTabApplyFilter($(this).val())" onchange="objectTabApplyFilter($(this).val())" /></p>
+<div class="categoryTree" id="objectTabCategoryTree">
+    <ul>
+        {% for cat in categories %}
+            <li style="padding-left:{{cat['nesting'] * 20}}px">
+                <label><input type="checkbox" name="taxonomycategories[]" value="{{cat['id']}}" autocomplate="off" {% if (cat['selected'] != 0) %}checked="checked"{% endif %} {% if (cat['enableAdd'] == 0) %}disabled="disabled"{% endif %} />
+                <span {% if (cat['enabled'] == 0) %}class="disabled"{% endif %}>{{cat['title']}}</span></label>
+            {% if (cat['error'] != '') %}<span class="ml20 globalError">{{cat['error']}}</span>{% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<script>
+    function objectTabApplyFilter(text)
+    {
+        if (text != '')
+        {
+            text = text.toLowerCase();
+            $('#objectTabCategoryTree>ul>li').each(function (i,e) {
+                var etext = $(e).find('span').text();
+                etext = etext.toLowerCase();
+                if ((etext.indexOf(text) == 0) || (etext.indexOf(' '+text) >= 0))
+                {
+                    $(e).show();            
+                } else
+                {
+                    $(e).hide();            
+                }
+            });
+        } else
+        {
+            $('#objectTabCategoryTree>ul>li').show();
+        }
+    }
+</script>
+{#<div class="categoryTree">
+    <ul>
+        {% if (categories|length) > 0 %}
+            {% for i in 0..(categories|length - 1) %}
+                <li><label><input type="checkbox" name="taxonomycategories[]" value="{{categories[i]['id']}}" autocomplate="off" {% if (categories[i]['selected'] != 0) %}checked="checked"{% endif %} {% if (categories[i]['enableAdd'] == 0) %}disabled="disabled"{% endif %} />
+                    <span {% if (categories[i]['enabled'] == 0) %}class="disabled"{% endif %}>{{categories[i]['title']}}</span></label>
+                {% if (categories[i]['error'] != '') %}<span class="ml20 globalError">{{categories[i]['error']}}</span>{% endif %}
+                {%if ((i < categories|length-1) and (categories[i+1]['nesting'] > categories[i]['nesting']))%}
+                <ul>
+                {%else%}
+                </li>
+                {%endif%}
+                {%if ((i < categories|length-1) and (categories[i+1]['nesting'] < categories[i]['nesting']))%}
+                    {% for j in 0..(categories[i]['nesting'] - categories[i+1]['nesting'] - 1) %}
+                    </ul></li>
+                    {% endfor %}
+                {%endif%}
+            {% endfor %}
+            {%if (categories[categories|length-1]['nesting'] > 0)%}
+                {% for j in 0..(categories[categories|length-1]['nesting'] - 1) %}
+                </ul></li>
+                {% endfor %}
+            {%endif%}
+        {% endif %}
+    </ul>
+</div>#}

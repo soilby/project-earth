@@ -1,0 +1,13 @@
+<div class="earth-left-item">
+    <h4>{% if currentLocale == 'en' %}Now online{% else %}Сейчас на сайте{% endif %}</h4>
+    {% if users | length > 0 %}
+        <p>
+            {% for user in users %}
+                {% if loop.index0 != 0 %}, {% endif %}
+                <span class="mirclubTransliteration">{{user.fullName}}</span>
+            {% endfor %}
+        </p>
+    {% else %}
+        <p>{% if currentLocale == 'en' %}There is no one{% else %}Никого нет{% endif %}</p>
+    {% endif %}
+</div>

@@ -1,0 +1,27 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание резервных копий{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Создание резервных копий</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Создание резервных копий</a>
+</div>
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <p>Для создания резервной копиии нажмите на кнопку &laquo;Сохранить резервную копию&raquo; и сохраните файл на свой компьютер.</p>
+            <p>Для восстановления сайта из резервной копии воспользуйтесь следующей инструкцией:</p>
+            <p>- распакуйте архив в папку сайта на хостинге;</p>
+            <p>- перейдите по адресу [домен вашего сайта]/restore.php (например http://example.com/restore.php);</p>
+            <p>- дождитесь окончания восстановления сайта.</p>
+            <p><a href="{{path('addone_backup_makebackup')}}" class="button">Сохранить резервную копию</a></p>
+        </div>
+</div>​
+{% endblock %}       
+
+
+

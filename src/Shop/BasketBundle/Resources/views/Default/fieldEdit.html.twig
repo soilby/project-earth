@@ -1,0 +1,116 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование параметра заказа{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('shop_basket_list')}}">Настройки корзины</a>
+    <span>Редактирование параметра заказа &laquo;{{field['name']['default']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+</div>
+<form action="{{path('shop_basket_fieldedit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('bakset_configedit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('basket_configview') == 1) %}<a class="button" href="{{path('shop_basket_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="field[enabled]" value="1" {% if (field['enabled'] != 0) %}checked="checked"{% endif %} />Включен</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{fielderror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Техническое имя<span class="helpContainerButton" data-id="name">?</span></td>
+                    <td><input type="text" name="field[techName]" value="{{field['techName']}}" /></td>
+                    <td class="cfgError">{{fielderror['techName']}}</td>
+                </tr>
+                <tr>
+                    <td>Название<span class="helpContainerButton" data-id="description">?</span></td>
+                    <td><input type="text" name="field[name][default]" value="{{field['name']['default']}}" /></td>
+                    <td class="cfgError">{{fielderror['name']['default']}}</td>
+                </tr>
+                {% for locale in locales %}
+                <tr>
+                    <td>Название ({{locale['fullName']}})</td>
+                    <td><input type="text" name="field[name][{{locale['shortName']}}]" value="{{field['name'][locale['shortName']]}}" /></td>
+                    <td class="cfgError">{{fielderror['name'][locale['shortName']]}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td>Тип параметра<span class="helpContainerButton" data-id="type">?</span></td>
+                    <td>
+                        <select name="field[type]" id="fieldParamType" onchange="changeFieldParamVisible(this);">
+                            <option value="text" {% if (field['type'] == 'text') %}selected="selected"{% endif %}>Текстовое поле</option>
+                            <option value="textarea" {% if (field['type'] == 'textarea') %}selected="selected"{% endif %}>Многострочный текст</option>
+                            <option value="checkbox" {% if (field['type'] == 'checkbox') %}selected="selected"{% endif %}>Флажок</option>
+                            <option value="radio" {% if (field['type'] == 'radio') %}selected="selected"{% endif %}>Группа радиокнопок</option>
+                            <option value="select" {% if (field['type'] == 'select') %}selected="selected"{% endif %}>Выпадающий список</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{fielderror['type']}}</td>
+                </tr>
+                <tr class="fieldParamRegExp">
+                    <td>Регулярное выражение<span class="helpContainerButton" data-id="regularExp">?</span></td>
+                    <td><input type="text" name="field[paramRegExp][default]" value="{{field['paramRegExp']['default']}}" /></td>
+                    <td class="cfgError">{{fielderror['paramRegExp']['default']}}</td>
+                </tr>
+                {% for locale in locales %}
+                <tr class="fieldParamRegExp">
+                    <td>Регулярное выражение ({{locale['fullName']}})</td>
+                    <td><input type="text" name="field[paramRegExp][{{locale['shortName']}}]" value="{{field['paramRegExp'][locale['shortName']]}}" /></td>
+                    <td class="cfgError">{{fielderror['paramRegExp'][locale['shortName']]}}</td>
+                </tr>
+                {% endfor %}
+                <tr class="fieldParamItems">
+                    <td>Пункты разделённые переносом строк</td>
+                    <td><textarea name="field[paramItems][default]">{{field['paramItems']['default']}}</textarea></td>
+                    <td class="cfgError">{{fielderror['paramItems']['default']}}</td>
+                </tr>
+                {% for locale in locales %}
+                <tr class="fieldParamItems">
+                    <td>Пункты ({{locale['fullName']}})</td>
+                    <td><textarea name="field[paramItems][{{locale['shortName']}}]">{{field['paramItems'][locale['shortName']]}}</textarea></td>
+                    <td class="cfgError">{{fielderror['paramItems'][locale['shortName']]}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="field[defaultEnable]" value="1" {% if (field['defaultEnable'] != 0) %}checked="checked"{% endif %} />Включить значение по умолчанию</label><span class="helpContainerButton" data-id="defaultEnabled">?</span></td>
+                    <td class="cfgError">{{fielderror['defaultEnable']}}</td>
+                </tr>
+                <tr>
+                    <td>Значение по умолчанию<span class="helpContainerButton" data-id="defaultValue">?</span></td>
+                    <td><input type="text" name="field[defaultValue]" value="{{field['defaultValue']}}" /></td>
+                    <td class="cfgError">{{fielderror['defaultValue']}}</td>
+                </tr>
+            </table>
+        </div>
+</div>​
+</form>
+<script>
+function changeFieldParamVisible(that)
+{
+    $('.fieldParamRegExp').hide();
+    $('.fieldParamItems').hide();
+    if (($(that).val() == 'text') || ($(that).val() == 'textarea')) $('.fieldParamRegExp').show();
+    if (($(that).val() == 'select') || ($(that).val() == 'radio')) $('.fieldParamItems').show();
+}
+$(function () {changeFieldParamVisible('#fieldParamType')});
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить параметр заказа.</div>
+    <div id="helpContainer-name">Задаёт машинное имя параметра. Машинное имя должно состоят из латинских букв, не должно повторятся среди всех параметров.</div>
+    <div id="helpContainer-description">Задаёт человеко-понятное описание параметра.</div>
+    <div id="helpContainer-type">Задаёт тип параметра.</div>
+    <div id="helpContainer-regularExp">Регулярное выражение для проверки введенных данных от начала и до конца строки (в выражение уже включены строки /^ и $/ui). Если проверка не требуется, то заполните данное поле строкой <strong>[\s\S]*</strong></div>
+    <div id="helpContainer-defaultEnabled">Включает возможность значения по умолчанию. Если данная опция выключена, то параметр является обязательным для заполнения.</div>
+    <div id="helpContainer-defaultValue">Значение параметра по умолчанию. Если включена предыдущая опция, а пользователь оформляющий заказ ничего не передал в данном поле, то будет использоваться значение по умолчанию.</div>
+</div>
+{% endblock %}       
+
+
+

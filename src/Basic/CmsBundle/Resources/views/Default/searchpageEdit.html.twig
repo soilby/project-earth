@@ -1,0 +1,170 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование страницы поиска по сайту{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_sitemap_pageslist')}}">Прочие страницы</a>
+    <span>Редактирование страницы поиска по сайту &laquo;{{searchpage['title']['default']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+</div>
+<form action="{{path('basic_cms_sitemap_searchpage_edit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('site_searchpageedit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('basic_cms_sitemap_pageslist') == 1) %}<a class="button" href="{{path('basic_cms_sitemap_pageslist')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="searchpage[enabled]" value="1" {% if (searchpage['enabled'] != 0) %}checked="checked"{% endif %} />Включено</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{searchpageerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Название<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="searchpage[title][default]" value="{{searchpage['title']['default']}}" /></td>
+                    <td class="cfgError">{{searchpageerror['title']['default']}}</td>
+                </tr>
+                {% for locale in locales %}
+                <tr>
+                    <td>Название ({{locale['fullName']}})</td>
+                    <td><input type="text" name="searchpage[title][{{locale['shortName']}}]" value="{{searchpage['title'][locale['shortName']]}}" /></td>
+                    <td class="cfgError">{{searchpageerror['title'][locale['shortName']]}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td>Количество элементов на странице<span class="helpContainerButton" data-id="countInPage">?</span></td>
+                    <td><input type="text" name="searchpage[countInPage]" value="{{searchpage['countInPage']}}" /></td>
+                    <td class="cfgError">{{searchpageerror['countInPage']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="searchpage[getCountInPage]" value="1" {% if (searchpage['getCountInPage'] != 0) %}checked="checked"{% endif %} />Принимать количество элементов на странице через GET-параметр</label><span class="helpContainerButton" data-id="getCountInPage">?</span></td>
+                    <td class="cfgError">{{searchpageerror['getCountInPage']}}</td>
+                </tr>
+                <tr>
+                    <td>Сортировка результата<span class="helpContainerButton" data-id="sortDirection">?</span></td>
+                    <td>
+                        <select name="searchpage[sortDirection]">
+                            <option value="0" {% if searchpage['sortDirection'] == 0 %}selected="selected"{% endif %}>По возрастанию даты изменения</option>
+                            <option value="1" {% if searchpage['sortDirection'] != 0 %}selected="selected"{% endif %}>По убыванию даты изменения</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{searchpageerror['sortDirection']}}</td>
+                </tr>
+                {% if searchoptions | length > 0 %}
+                <tr>
+                    <td>Параметры поиска<span class="helpContainerButton" data-id="objectOptions">?</span></td>
+                    <td>
+                      {% for searchoptionkey, searchoption in searchoptions %}
+                        <label><input type="checkbox" name="searchpage[objectOptions][]" value="{{searchoptionkey}}" {% if (searchpage['objectOptions'][searchoptionkey] is defined) and (searchpage['objectOptions'][searchoptionkey] != 0) %}checked="checked"{% endif %} />{{searchoption}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{searchpageerror['objectOptions']}}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('site_searchpageedit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('basic_cms_sitemap_pageslist') == 1) %}<a class="button" href="{{path('basic_cms_sitemap_pageslist')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+</div>​
+</form>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить страницу поиска. Если страница выключена, то при доступе к ней пользователю будет выдано сообщение об ошибке 404 - страница не найдена.</div>
+    <div id="helpContainer-title">Задаёт название страницы поиска. Данное название будет отображаться в качестве заголовка страницы поиска.</div>
+    <div id="helpContainer-countInPage">Количество элементов на странице задаёт, сколько найденных элементов может одновременно отображаться на одной странице поиска. Все найденные элементы будут разбиты на страницы, в каждой странице будет заданное количество элементов.</div>
+    <div id="helpContainer-getCountInPage">Включает возможность пользователю задавать количество элементов на странице с помощью GET-параметра countinpage.</div>
+    <div id="helpContainer-objectOptions">Прочие опции поиска.</div>
+    <div id="helpContainer-sortDirection">Задаёт параметры сортировки результатов поиска.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+</div>
+{% endblock %}       
+
+
+

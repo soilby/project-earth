@@ -1,0 +1,13 @@
+<div>
+<p>Имя {{login}}</p>
+<p>E-mail {{email}}</p>
+<p>Полное имя {{fullName}}</p>
+<p>Тип {{userType}}</p>
+<p>Заблокирован {{blocked}}</p>
+<p>Дата регистрации {{regDate | date('d.m.Y')}}</p>
+<p>Роль {{role}}</p>
+{% for item in profile %}
+<p>{{item['description']}} {{item['value']}}</p>
+{% endfor %}
+<p>Пол {{profile['sex']['value']}}</p>
+</div>

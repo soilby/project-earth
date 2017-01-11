@@ -1,0 +1,86 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование поля параметров продукции{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('shop_parameter_list')}}">Параметры продукции</a>
+    <span>Редактирование поля параметров продукции &laquo;{{param['name']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Основные данные поля</a>
+</div>
+<form action="{{path('shop_parameter_edit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="saveButtons">
+                <button type="submit">Сохранить</button>
+                <a class="button" href="{{path('shop_parameter_list')}}">Отмена</a>
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Техническое имя<span class="helpContainerButton" data-id="name">?</span></td>
+                    <td><input type="text" name="param[name]" value="{{param['name']}}" /></td>
+                    <td class="cfgError">{{paramerror['name']}}</td>
+                </tr>
+                <tr>
+                    <td>Описание<span class="helpContainerButton" data-id="description">?</span></td>
+                    <td><input type="text" name="param[description][default]" value="{{param['description']['default']}}" /></td>
+                    <td class="cfgError">{{paramerror['description']['default']}}</td>
+                </tr>
+                {% for local in locales %}
+                <tr>
+                    <td>Описание ({{local['fullName']}})</td>
+                    <td><input type="text" name="param[description][{{local['shortName']}}]" value="{{param['description'][local['shortName']]}}" /></td>
+                    <td class="cfgError">{{paramerror['description'][local['shortName']]}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td>Тип<span class="helpContainerButton" data-id="type">?</span></td>
+                    <td>
+                        <select name="param[type]" id="parameterTypeSelect" onchange="changeParameterType(this);">
+                            <option value="text" {% if (param['type'] == 'text') %}selected="selected"{% endif %}>Текстовое поле</option>
+                            <option value="textarea" {% if (param['type'] == 'textarea') %}selected="selected"{% endif %}>Многострочный текст</option>
+                            <option value="html" {% if (param['type'] == 'html') %}selected="selected"{% endif %}>HTML текст</option>
+                            <option value="select" {% if (param['type'] == 'select') %}selected="selected"{% endif %}>Выпадающий список</option>
+                            <option value="checkbox" {% if (param['type'] == 'checkbox') %}selected="selected"{% endif %}>Флажок</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{paramerror['regularExp']}}</td>
+                </tr>
+                <tr class="parameterTypeRegExp">
+                    <td>Регулярное выражение<span class="helpContainerButton" data-id="regularExp">?</span></td>
+                    <td><input type="text" name="param[regularExp]" value="{{param['regularExp']}}" /></td>
+                    <td class="cfgError">{{paramerror['regularExp']}}</td>
+                </tr>
+                <tr class="parameterTypeItems">
+                    <td>Пункты списка (разделённые переносом строки)</td>
+                    <td><textarea name="param[items]">{{param['items']}}</textarea></td>
+                    <td class="cfgError">{{paramerror['items']}}</td>
+                </tr>
+            </table>
+        </div>
+</div>​
+</form>
+<script>
+    function changeParameterType(that)
+    {
+        $('.parameterTypeItems').hide();
+        $('.parameterTypeRegExp').hide();
+        if (($(that).val() == 'text') || ($(that).val() == 'textarea') || ($(that).val() == 'html')) $('.parameterTypeRegExp').show();
+        if ($(that).val() == 'select') $('.parameterTypeItems').show();
+    }
+    changeParameterType('#parameterTypeSelect');
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-name">Задаёт машинное имя параметра. Машинное имя должно состоят из латинских букв, не должно повторятся среди всех параметров.</div>
+    <div id="helpContainer-description">Задаёт человеко-понятное описание параметра.</div>
+    <div id="helpContainer-type">Задаёт тип параметра.</div>
+    <div id="helpContainer-regularExp">Регулярное выражение для проверки введенных данных от начала и до конца строки (в выражение уже включены строки /^ и $/ui). Если проверка не требуется, то заполните данное поле строкой <strong>[\s\S]*</strong></div>
+</div>
+{% endblock %}       
+
+
+

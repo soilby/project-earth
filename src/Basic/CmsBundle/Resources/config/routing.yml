@@ -1,0 +1,288 @@
+basic_cms_login:
+    path:  /system/login
+    defaults: { _controller: BasicCmsBundle:Default:login }
+    
+basic_cms_logout:
+    path:  /system/logout
+
+basic_cms_check_login:
+    path:  /system/login_check
+    
+basic_cms_tinymce_blank:
+    path:  /system/tinymce/blank
+    defaults: { _controller: BasicCmsBundle:Default:tinyMceBlank }
+
+basic_cms_tinymce_upload:
+    path:  /system/tinymce/upload
+    defaults: { _controller: BasicCmsBundle:Default:tinyMceUpload }
+
+
+basic_cms_captcha:
+    path:  /system/captcha
+    defaults: { _controller: BasicCmsBundle:Default:captcha }
+
+
+basic_cms_front_avatar_user:
+    path:  /system/avatar/user
+    defaults: { _controller: BasicCmsBundle:Default:userFrontAjaxAvatar }
+
+
+basic_cms_user_list:    
+    path:  /admin/users/
+    defaults: { _controller: BasicCmsBundle:Default:userList }
+    
+basic_cms_user_create:
+    path:  /admin/users/create
+    defaults: { _controller: BasicCmsBundle:Default:userCreate }
+  
+basic_cms_user_edit:
+    path:  /admin/users/edit
+    defaults: { _controller: BasicCmsBundle:Default:userEdit }
+
+basic_cms_user_ajax:
+    path:  /admin/users/ajax
+    defaults: { _controller: BasicCmsBundle:Default:userAjax }
+
+basic_cms_user_ajaxavatar:
+    path:  /admin/users/ajaxavatar
+    defaults: { _controller: BasicCmsBundle:Default:userAjaxAvatar }
+
+
+basic_cms_role_list:    
+    path:  /admin/roles/
+    defaults: { _controller: BasicCmsBundle:Default:roleList }
+
+basic_cms_role_create:    
+    path:  /admin/roles/create
+    defaults: { _controller: BasicCmsBundle:Default:roleCreate }
+
+basic_cms_role_edit:    
+    path:  /admin/roles/edit
+    defaults: { _controller: BasicCmsBundle:Default:roleEdit }
+
+basic_cms_role_ajax:    
+    path:  /admin/roles/ajax
+    defaults: { _controller: BasicCmsBundle:Default:roleAjax }
+
+basic_cms_role_ajax_change:    
+    path:  /admin/roles/ajaxchange
+    defaults: { _controller: BasicCmsBundle:Default:roleChangeAjax }
+
+
+basic_cms_help:
+    path:  /admin/about/help
+    defaults: { _controller: BasicCmsBundle:Default:help }
+    
+basic_cms_about:
+    path:  /admin/about/
+    defaults: { _controller: BasicCmsBundle:Default:about }
+
+basic_cms_index:
+    path:  /admin/
+    defaults: { _controller: BasicCmsBundle:Default:index }
+
+basic_cms_statistics:
+    path:  /admin/about/statistics
+    defaults: { _controller: BasicCmsBundle:Default:statistics }
+
+basic_cms_logs:
+    path:  /admin/about/loglist/
+    defaults: { _controller: BasicCmsBundle:Default:logsList }
+
+basic_cms_logs_ajax:
+    path:  /admin/about/loglist/ajax
+    defaults: { _controller: BasicCmsBundle:Default:logsAjax }
+
+basic_cms_logs_view:
+    path:  /admin/about/loglist/view
+    defaults: { _controller: BasicCmsBundle:Default:logsView }
+
+
+basic_cms_module_list:
+    path:  /admin/modules/
+    defaults: { _controller: BasicCmsBundle:Module:moduleList }
+
+basic_cms_module_new:
+    path:  /admin/modules/create
+    defaults: { _controller: BasicCmsBundle:Module:moduleCreate }
+
+basic_cms_module_edit:
+    path:  /admin/modules/edit
+    defaults: { _controller: BasicCmsBundle:Module:moduleEdit }
+
+basic_cms_module_ajax:
+    path:  /admin/modules/ajax
+    defaults: { _controller: BasicCmsBundle:Module:moduleAjax }
+
+basic_cms_module_ajax_seopages:
+    path:  /admin/modules/ajax/seopages
+    defaults: { _controller: BasicCmsBundle:Module:moduleAjaxSeoPages }
+
+basic_cms_module_ajax_menupages:
+    path:  /admin/modules/ajax/menupages
+    defaults: { _controller: BasicCmsBundle:Module:moduleAjaxMenuPages }
+
+basic_cms_module_ajax_bannerload:
+    path:  /admin/modules/ajax/bannerload
+    defaults: { _controller: BasicCmsBundle:Module:moduleAjaxBanner }
+
+  
+basic_cms_textpage_list:
+    path:  /admin/textpages/
+    defaults: { _controller: BasicCmsBundle:TextPage:textPageList }
+
+basic_cms_textpage_create:
+    path:  /admin/textpages/create
+    defaults: { _controller: BasicCmsBundle:TextPage:textPageCreate }
+
+basic_cms_textpage_edit:
+    path:  /admin/textpages/edit
+    defaults: { _controller: BasicCmsBundle:TextPage:textPageEdit }
+
+basic_cms_textpage_ajax:
+    path:  /admin/textpages/ajax
+    defaults: { _controller: BasicCmsBundle:TextPage:textPageAjax }
+
+basic_cms_textpage_ajaxavatar:
+    path:  /admin/textpages/ajaxavatar
+    defaults: { _controller: BasicCmsBundle:TextPage:textPageAjaxAvatar }
+
+
+basic_cms_taxonomy_list:
+    path:  /admin/taxonomy/
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyList }
+  
+basic_cms_taxonomy_create:
+    path:  /admin/taxonomy/create
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyCreate }
+  
+basic_cms_taxonomy_edit:
+    path:  /admin/taxonomy/edit
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyEdit }
+  
+basic_cms_taxonomy_edit_ajaxdelete:
+    path:  /admin/taxonomy/edit/ajaxdelete
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyEditAjaxDelete }
+  
+basic_cms_taxonomy_edit_ajaxadd:
+    path:  /admin/taxonomy/edit/ajaxadd
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyEditAjaxAdd }
+
+basic_cms_taxonomy_edit_ajaxsave:
+    path:  /admin/taxonomy/edit/ajaxsave
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyEditAjaxSave }
+
+basic_cms_taxonomy_catedit:
+    path:  /admin/taxonomy/catedit
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyCatEdit }
+
+basic_cms_taxonomy_ajaxavatar:
+    path:  /admin/taxonomy/ajaxavatar
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyAjaxAvatar }
+
+basic_cms_taxonomyshow_create:
+    path:  /admin/taxonomy/createshow
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyShowCreate }
+
+basic_cms_taxonomyshow_edit:
+    path:  /admin/taxonomy/editshow
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyShowEdit }
+
+basic_cms_taxonomy_ajax:
+    path:  /admin/taxonomy/ajax
+    defaults: { _controller: BasicCmsBundle:Taxonomy:taxonomyAjax }
+
+
+basic_cms_sitemap:
+    path:  /admin/sitemap/
+    defaults: { _controller: BasicCmsBundle:Default:siteMap }
+
+basic_cms_path_create:
+    path:  /admin/sitemap/pathcreate
+    defaults: { _controller: BasicCmsBundle:Default:pathCreate }
+
+basic_cms_path_edit:
+    path:  /admin/sitemap/pathedit
+    defaults: { _controller: BasicCmsBundle:Default:pathEdit }
+
+basic_cms_path_ajax:
+    path:  /admin/sitemap/pathajax
+    defaults: { _controller: BasicCmsBundle:Default:pathAjax }
+
+basic_cms_path_getpages:
+    path:  /admin/sitemap/ajaxgetpages
+    defaults: { _controller: BasicCmsBundle:Default:ajaxGetPages }
+
+basic_cms_sitemap_generate:
+    path:  /admin/sitemap/ajaxgenerate
+    defaults: { _controller: BasicCmsBundle:Default:siteMapAjaxGenerate }
+
+basic_cms_locale_list:
+    path:  /admin/locale/
+    defaults: { _controller: BasicCmsBundle:Default:localeList }
+
+basic_cms_locale_create:
+    path:  /admin/locale/create
+    defaults: { _controller: BasicCmsBundle:Default:localeCreate }
+
+basic_cms_locale_edit:
+    path:  /admin/locale/edit
+    defaults: { _controller: BasicCmsBundle:Default:localeEdit }
+
+basic_cms_locale_ajax:
+    path:  /admin/locale/ajax
+    defaults: { _controller: BasicCmsBundle:Default:localeAjax }
+
+basic_cms_errorcfg:
+    path:  /admin/errorcfg
+    defaults: { _controller: BasicCmsBundle:Default:errorCfg }
+
+
+basic_cms_user_authpage_create:
+    path:  /admin/users/authpage/create
+    defaults: { _controller: BasicCmsBundle:Default:userAuthpageCreate }
+
+basic_cms_user_authpage_edit:
+    path:  /admin/users/authpage/edit
+    defaults: { _controller: BasicCmsBundle:Default:userAuthpageEdit }
+
+basic_cms_user_passwordpage_create:
+    path:  /admin/users/passwordpage/create
+    defaults: { _controller: BasicCmsBundle:Default:userPasswordpageCreate }
+
+basic_cms_user_passwordpage_edit:
+    path:  /admin/users/passwordpage/edit
+    defaults: { _controller: BasicCmsBundle:Default:userPasswordpageEdit }
+
+basic_cms_user_registerpage_create:
+    path:  /admin/users/registerpage/create
+    defaults: { _controller: BasicCmsBundle:Default:userRegisterpageCreate }
+
+basic_cms_user_registerpage_edit:
+    path:  /admin/users/registerpage/edit
+    defaults: { _controller: BasicCmsBundle:Default:userRegisterpageEdit }
+
+basic_cms_user_profilepage_create:
+    path:  /admin/users/profilepage/create
+    defaults: { _controller: BasicCmsBundle:Default:userProfilepageCreate }
+
+basic_cms_user_profilepage_edit:
+    path:  /admin/users/profilepage/edit
+    defaults: { _controller: BasicCmsBundle:Default:userProfilepageEdit }
+
+
+basic_cms_sitemap_pageslist:
+    path:  /admin/sitemap/pageslist
+    defaults: { _controller: BasicCmsBundle:Default:siteMapPagesList }
+
+basic_cms_sitemap_searchpage_create:
+    path:  /admin/sitemap/searchpage/create
+    defaults: { _controller: BasicCmsBundle:Default:siteMapSearchpageCreate }
+
+basic_cms_sitemap_searchpage_edit:
+    path:  /admin/sitemap/searchpage/edit
+    defaults: { _controller: BasicCmsBundle:Default:siteMapSearchpageEdit }
+
+basic_cms_sitemap_pageslist_ajax:
+    path:  /admin/sitemap/pageslist/ajax
+    defaults: { _controller: BasicCmsBundle:Default:siteMapPagesAjax }

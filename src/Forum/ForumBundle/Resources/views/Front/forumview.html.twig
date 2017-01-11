@@ -1,0 +1,230 @@
+<style>
+.forumTable th, .forumTable td {
+    border: 1px #000 solid;
+}
+</style>
+<script>
+    function displayToggle(id)
+    {
+        if (document.getElementById(id).style.display == "none") document.getElementById(id).style.display = "block"; else document.getElementById(id).style.display = "none";        
+    }
+</script>
+<div>
+<h1>{{title}}</h1>
+<small>Создано {{createDate | date('d.m.Y')}} пользователем {{createrFullName}}</small>
+<p>{{description | raw}}</p>
+{% if permissions['moderator'] != 0 %}
+<form action="" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="actionobject" value="forum" />
+    <input type="hidden" name="action" value="closetopic" />
+    <input type="hidden" name="actionid" value="{{id}}" />
+    <input type="hidden" name="actionvalue" value="1" />
+    <button type="submit">Закрыть топик</button>
+</form>
+<form action="" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="actionobject" value="forum" />
+    <input type="hidden" name="action" value="importanttopic" />
+    <input type="hidden" name="actionid" value="{{id}}" />
+    <input type="hidden" name="actionvalue" value="1" />
+    <button type="submit">Сделать важным</button>
+</form>
+{% endif %}
+<table class="forumTable">
+    <tr>
+        <th>
+            {{createrLogin}}<br />
+            {{createDate | date('d.m.Y H:i')}} <br />  
+            {% if permissions['moderator'] != 0 %}<a href="#" onclick="displayToggle('moderateMessage0');return false;">модерировать</a>{% endif %}
+            {% if permissions['edit'] != 0 %}<a href="#" onclick="displayToggle('editMessage0');return false;">редактировать</a>{% endif %}
+        </th>
+        <th>
+            {% if isVisible == 0 %}[сообщение скрыто]<br />{% endif %}
+            {{content}}
+            <br />
+            <br />
+            Вложения:<br />
+            {% for attach in attachments %}
+            {% if attach['permissions']['download'] != 0 %}
+            <a href="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}">{{attach['fileName']}} ({{attach['fileSize']}} байт)</a><br/>
+            {% else %}
+            [вам запрещено скачивать] {{attach['fileName']}} ({{attach['fileSize']}} байт)<br/>
+            {% endif %}
+            {% endfor %}
+            <br />
+            <br />
+            {% if moderatorId != null %}
+                <p style="color:red">Сообщение модератора {{moderatorLogin}}: {{moderatorMessage}}</p>
+            {% endif %}
+                
+            <div id="editMessage0" style="display:none">
+                {% if editStatus == 'OK' %}
+                <p>Сообщение отправлено</p>
+                {% endif %}
+                {% if editStatus != '' %}
+                <p>{{editStatus}}</p>
+                {% endif %}
+                <form action="" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="actionobject" value="forum" />
+                    <input type="hidden" name="action" value="edit" />
+                    <input type="hidden" name="actionid" value="{{id}}" />
+                    <input type="hidden" name="actionmessageid" value="0" />
+                    <textarea name="actionfields[text]">{{editMessageValue}}</textarea>
+                    <small>{{editMessageError}}</small>
+                    <p>Прикрепленные файлы</p>
+                    {% for attach in editAttachments %}
+                    <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                    {{attach['fileName']}} ({{attach['fileSize']}} байт)<br/>
+                    {% endfor %}
+                    <input type="file" name="actionfiles[attachments][]" />
+                    <small>{{editAttachmentsError}}</small>
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+                
+            <div id="moderateMessage0" style="display:none">
+                {% if moderateStatus == 'OK' %}
+                <p>Сообщение отправлено</p>
+                {% endif %}
+                {% if moderateStatus != '' %}
+                <p>{{moderateStatus}}</p>
+                {% endif %}
+                <form action="" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="actionobject" value="forum" />
+                    <input type="hidden" name="action" value="moderate" />
+                    <input type="hidden" name="actionid" value="{{id}}" />
+                    <input type="hidden" name="actionmessageid" value="0" />
+                    <textarea name="actionfields[text]">{{moderateTextValue}}</textarea>
+                    <small>{{moderateTextError}}</small>
+                    <label><input type="checkbox" name="actionfields[hide]" value="1" {% if moderateHideValue != 0 %}checked="checked"{% endif %} />Скрыть сообщение</label>
+                    <label><input type="checkbox" name="actionfields[ban]" value="1" {% if moderateBanValue != 0 %}checked="checked"{% endif %} />Забанить автора</label>
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+                
+        </th>
+    </tr>
+{% for message in messages %}    
+    <tr>
+        <td>
+            {{message.createrLogin}}<br />
+            {{message.createDate | date('d.m.Y H:i')}} <br /> 
+            {% if permissions['moderator'] != 0 %}<a href="#" onclick="displayToggle('moderateMessage{{message['id']}}');return false;">модерировать</a>{% endif %}
+            {% if message['permissions']['edit'] != 0 %}<a href="#" onclick="displayToggle('editMessage{{message['id']}}');return false;">редактировать</a>{% endif %}
+        </td>
+        <td>
+            {% if message.isVisible == 0 %}[сообщение скрыто]<br />{% endif %}
+            {{message.content}}
+            <br />
+            <br />
+            Вложения:<br />
+            {% for attach in message.attachments %}
+            {% if attach['permissions']['download'] != 0 %}
+            <a href="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}">{{attach['fileName']}} ({{attach['fileSize']}} байт)</a><br/>
+            {% else %}
+            [вам запрещено скачивать] {{attach['fileName']}} ({{attach['fileSize']}} байт)<br/>
+            {% endif %}
+            {% endfor %}
+            <br />
+            <br />
+            {% if message.moderatorId != null %}
+                <p style="color:red">Сообщение модератора {{message.moderatorLogin}}: {{message.moderatorMessage}}</p>
+            {% endif %}
+                
+            <div id="editMessage{{message['id']}}" style="display:none">
+                {% if message['editStatus'] == 'OK' %}
+                <p>Сообщение отправлено</p>
+                {% endif %}
+                {% if message['editStatus'] != '' %}
+                <p>{{message['editStatus']}}</p>
+                {% endif %}
+                <form action="" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="actionobject" value="forum" />
+                    <input type="hidden" name="action" value="edit" />
+                    <input type="hidden" name="actionid" value="{{id}}" />
+                    <input type="hidden" name="actionmessageid" value="{{message['id']}}" />
+                    <textarea name="actionfields[text]">{{message['editMessageValue']}}</textarea>
+                    <small>{{message['editMessageError']}}</small>
+                    <p>Прикрепленные файлы</p>
+                    {% for attach in message['editAttachments'] %}
+                    <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                    {{attach['fileName']}} ({{attach['fileSize']}} байт)<br/>
+                    {% endfor %}
+                    <input type="file" name="actionfiles[attachments][]" />
+                    <small>{{message['editAttachmentsError']}}</small>
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+                
+            <div id="moderateMessage{{message['id']}}" style="display:none">
+                {% if message['moderateStatus'] == 'OK' %}
+                <p>Сообщение отправлено</p>
+                {% endif %}
+                {% if message['moderateStatus'] != '' %}
+                <p>{{message['moderateStatus']}}</p>
+                {% endif %}
+                <form action="" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="actionobject" value="forum" />
+                    <input type="hidden" name="action" value="moderate" />
+                    <input type="hidden" name="actionid" value="{{id}}" />
+                    <input type="hidden" name="actionmessageid" value="{{message['id']}}" />
+                    <textarea name="actionfields[text]">{{message['moderateTextValue']}}</textarea>
+                    <small>{{message['moderateTextError']}}</small>
+                    <label><input type="checkbox" name="actionfields[hide]" value="1" {% if message['moderateHideValue'] != 0 %}checked="checked"{% endif %} />Скрыть сообщение</label>
+                    <label><input type="checkbox" name="actionfields[ban]" value="1" {% if message['moderateBanValue'] != 0 %}checked="checked"{% endif %} />Забанить автора</label>
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+                
+                
+                
+        </td>
+    </tr>
+{% endfor %}    
+</table>
+{% for i in 0..(pageCount-1) %}
+    <a href="?page={{i}}">{{i+1}}</a>
+{% endfor %}
+{% if permissions['post'] != 0 %}
+<p>Форма отправки сообщения</p>
+{% if status == 'OK' %}
+<p>Сообщение отправлено</p>
+{% endif %}
+<form action="" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="actionobject" value="forum" />
+    <input type="hidden" name="action" value="post" />
+    <input type="hidden" name="actionid" value="{{id}}" />
+    <textarea name="actionfields[text]">{{postMessageValue}}</textarea>
+    <small>{{postMessageError}}</small>
+    <p>Прикрепленные файлы</p>
+    {% for attach in postAttachments %}
+    <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+    {{attach['fileName']}} ({{attach['fileSize']}} байт)<br/>
+    {% endfor %}
+    <input type="file" name="actionfiles[attachments][]" />
+    <small>{{postAttachmentsError}}</small>
+    {% if captchaEnabled != 0 %}
+    <p>
+    Введите строку с картинки
+    <img src="{{captchaPath}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));"/>
+    <input type="text" name="actionfields[captcha]" value="" />
+    <small>{{captchaError}}</small>
+    </p>
+    {% endif %}
+    <button type="submit">Отправить</button>
+</form>
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>

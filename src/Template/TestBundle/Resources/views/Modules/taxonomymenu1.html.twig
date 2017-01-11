@@ -1,0 +1,27 @@
+<ul>
+    {% if (categories|length) > 0 %}
+        {% for i in 0..(categories|length - 1) %}
+            <li>
+                {% if (categories[i]['enabled'] != 0) %}
+                <a href="{{categories[i]['url']}}">{{categories[i]['title']}}</a>
+                {% else %}
+                <span>{{categories[i]['title']}}</span>
+                {% endif %}
+            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] > categories[i]['nesting']))%}
+            <ul>
+            {%else%}
+            </li>
+            {%endif%}
+            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] < categories[i]['nesting']))%}
+                {% for j in 0..(categories[i]['nesting'] - categories[i+1]['nesting'] - 1) %}
+                </ul></li>
+                {% endfor %}
+            {%endif%}
+        {% endfor %}
+        {%if (categories[categories|length-1]['nesting'] > 0)%}
+            {% for j in 0..(categories[categories|length-1]['nesting'] - 1) %}
+            </ul></li>
+            {% endfor %}
+        {%endif%}
+    {% endif %}
+</ul>

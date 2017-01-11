@@ -1,0 +1,16 @@
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="ship[enabled]" value="1" {% if (ship['enabled'] != 0) %}checked="checked"{% endif %} />Включен</label></td>
+                    <td class="cfgError">{{shiperror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Постоянная составляющая наценки</td>
+                    <td><input type="text" name="ship[price]" value="{{ship['price']}}" /></td>
+                    <td class="cfgError">{{shiperror['price']}}</td>
+                </tr>
+                <tr>
+                    <td>Процент наценки</td>
+                    <td><input type="text" name="ship[margin]" value="{{ship['margin']}}" /></td>
+                    <td class="cfgError">{{shiperror['margin']}}</td>
+                </tr>
+            </table>

@@ -1,0 +1,19 @@
+extended_shop_export:
+    path:  /admin/products/export/
+    defaults: { _controller: ExtendedShopExportBundle:Default:export }
+
+extended_shop_export_one_create:
+    path:  /admin/products/export/1/create
+    defaults: { _controller: ExtendedShopExportBundle:Default:exportOneCreate }
+
+extended_shop_export_one_edit:
+    path:  /admin/products/export/1/edit
+    defaults: { _controller: ExtendedShopExportBundle:Default:exportOneEdit }
+
+extended_shop_export_one_ajax:
+    path:  /admin/products/export/1/ajax
+    defaults: { _controller: ExtendedShopExportBundle:Default:exportOneAjax }
+
+extended_shop_export_one_external_link:
+    path:  /system/products/exportxml/generate
+    defaults: { _controller: ExtendedShopExportBundle:Default:exportOneGenerate }

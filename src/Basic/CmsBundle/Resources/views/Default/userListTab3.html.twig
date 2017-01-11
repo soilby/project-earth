@@ -1,0 +1,32 @@
+        {% if (app.user.checkAccess('user_passwordpage') == 1) %}<a class="button" href="#" id="unblockedPass2">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('user_passwordpage') == 1) %}<a class="button" href="#" id="blockedPass2">Выключить</a>{% endif %}
+        {% if (app.user.checkAccess('user_passwordpage') == 1) %}<a class="button" href="#" id="deletePass2">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('user_passwordpage') == 1) %}<a href="{{path('basic_cms_user_passwordpage_create')}}" class="button">Создать страницу восстановления пароля</a>{% endif %}
+        <table class="tableContent" id="passpageList2">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Включено
+                </th>
+                <th>
+                    URL страницы
+                </th>
+            </tr>
+            {% for passwordpage in passwordpages %}
+            <tr>
+                <td><input type="checkbox" name="check[{{passwordpage.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_user_passwordpage_edit')}}?id={{passwordpage.id}}">{{passwordpage.title}}</a>{% if (errors2[passwordpage.id] is defined) %}<p class="error">{{errors2[passwordpage.id]}}</p>{% endif %}</td>
+                <td>{{(passwordpage.enabled != 0 ? 'Да' : 'Нет')}}</td>
+                <td>{{passwordpage.url}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#unblockedPass2').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=2', 'unblockedpass', '#passpageList2 input.check', '#con_tab3');return false;});
+            $('#blockedPass2').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=2', 'blockedpass', '#passpageList2 input.check', '#con_tab3');return false;});
+            $('#deletePass2').click(function () {ajaxActionConfirm('{{path('basic_cms_user_ajax')}}?tab=2', 'deletepass', '#passpageList2 input.check', '#con_tab3','Удалить выбранные страницы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

@@ -1,0 +1,101 @@
+        {% if (app.user.checkAccess('taxonomy_edit') == 1) %}<a class="button" href="#" id="deleteTaxonomy0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('taxonomy_new') == 1) %}<a href="{{path('basic_cms_taxonomy_create')}}{% if taxonomyobject != '' %}?object={{taxonomyobject}}{% endif %}" class="button">Создать новую группу категорий</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="hidden" name="tab" value="0" />
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="taxonomyList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Заголовок &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Заголовок &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Заголовок</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Объект категории &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Объект категории &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Объект категории</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?tab=0&sort0=5">Создана (изменена) &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?tab=0&sort0=4">Создана (изменена) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=4">Создана (изменена)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for taxon in taxons0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{taxon.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_taxonomy_edit')}}?id={{taxon.id}}">{{taxon.title}}</a>{% if (errors0[taxon.id] is defined) %}<p class="error">{{errors0[taxon.id]}}</p>{% endif %}</td>
+                <td>{{taxon.objectName}} ({{taxon.object}})</td>
+                <td>{{taxon.createDate | date('d.m.Y G:i')}}{% if (taxon.modifyDate != taxon.createDate) %} ({{taxon.modifyDate | date('d.m.Y G:i')}}){% endif %}</td>
+                <td>{{taxon.fullName}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#deleteTaxonomy0').click(function () {ajaxActionConfirm('{{path('basic_cms_taxonomy_ajax')}}?tab=0&object={{taxonomyobject}}', 'deletetaxonomy', '#taxonomyList0 input.check', '#con_tab1','Удалить выбранные группы категорий?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

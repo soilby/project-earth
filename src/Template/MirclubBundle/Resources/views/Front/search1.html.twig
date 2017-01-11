@@ -1,0 +1,20 @@
+<div>
+    <h1>{{title}}</h1>
+    <form method="get" action="">
+        <input type="text" name="search" value="{{searchText}}" />
+        <input type="submit" value="OK" />
+    </form>
+    <p>Найдено {{itemCount}} результатов</p>
+    {% for item in searchItems %}
+    <div>
+        <h2>{{item.title}}</h2>
+        <p>{{item.description}}</p>
+    </div>
+    {% endfor %}
+    
+    
+    
+    {% for i in 0..(pageCount-1) %}
+        <a href="?search={{searchText}}&page={{i}}">{{i+1}}</a>
+    {% endfor %}
+</div>

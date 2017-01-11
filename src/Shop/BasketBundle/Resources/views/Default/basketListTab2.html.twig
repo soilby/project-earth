@@ -1,0 +1,29 @@
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="paymentOn2">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="paymentOff2">Выключить</a>{% endif %}
+        <table class="tableContent" id="paymentList1">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Описание
+                </th>
+                <th>
+                    Включен
+                </th>
+            </tr>
+            {% for payment in payments1 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{payment.name}}]" class="check" value="1"></td>
+                <td><a href="{{path('shop_basket_paymentedit')}}?id={{payment.name}}">{{payment.name}}</a>{% if (errors1[payment.name] is defined) %}<p class="error">{{errors1[payment.name]}}</p>{% endif %}</td>
+                <td>{{payment.description}}</td>
+                <td>{{payment.enabled != 0 ? 'Да' : 'Нет'}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#paymentOn2').click(function () {ajaxAction('{{path('shop_basket_paymentajax')}}?tab=1', 'on', '#paymentList1 input.check', '#con_tab2');return false;});
+            $('#paymentOff2').click(function () {ajaxAction('{{path('shop_basket_paymentajax')}}?tab=1', 'off', '#paymentList1 input.check', '#con_tab2');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

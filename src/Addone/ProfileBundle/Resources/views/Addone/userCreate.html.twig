@@ -1,0 +1,9 @@
+<table class="cfgTable">
+    {% for item in parameters %}
+        <tr>
+            <td>{{item.description}}</td>
+            <td><textarea name="profile[{{item.name}}]">{{item.value}}</textarea></td>
+            <td class="cfgError">{{item.error}}</td>
+        </tr>
+    {% endfor %}
+</table>

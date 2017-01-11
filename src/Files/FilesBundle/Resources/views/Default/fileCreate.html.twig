@@ -1,0 +1,343 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание нового файла{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('files_files_file_list')}}">Файлы</a>
+    <span>Создание нового файла</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+    {% if (locales|length > 0) %}
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Локализация</a>
+    {% endif %}
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+4}}" {% if (activetab == loop.index0+4) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="{{path('files_files_file_create')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('file_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('file_list') == 1) %}<a class="button" href="{{path('files_files_file_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="file[enabled]" value="1" {% if (file['enabled'] != 0) %}checked="checked"{% endif %} />Опубликовано</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{fileerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Заголовок<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="file[title]" value="{{file['title']}}" /></td>
+                    <td class="cfgError">{{fileerror['title']}}</td>
+                </tr>
+                <tr>
+                    <td>Аватар<span class="helpContainerButton" data-id="avatar">?</span></td>
+                    <td class="tac">
+                        <input type="hidden" id="avatarInput" name="file[avatar]" value="{{file['avatar']}}" />
+                        <span id="avatarWrap">
+                            {% if (file['avatar'] == '') %}
+                            <img src="/adminimg/noava.jpg" style="max-width:100px;max-height:100px;" />
+                            {% else %}
+                            <a href="{{file['avatar']}}" rel="lightbox"><img src="{{file['avatar']}}" style="max-width:100px;max-height:100px;" /></a>
+                            {% endif %}
+                        </span>
+                        <br />
+                        <a class="button" id="avatarLoad" onclick="return false;" href="#">Изменить</a>
+                        <a class="button" onclick="avatarClear();return false;" href="#">Сброс</a>
+                    </td>
+                    <td class="cfgError" id="avatarError">{{fileerror['avatar']}}</td>
+                </tr>
+                <tr>
+                    <td>Имя файла<span class="helpContainerButton" data-id="fileName">?</span></td>
+                    <td><input type="text" id="contentFileNameInput" name="file[fileName]" value="{{file['fileName']}}" /></td>
+                    <td class="cfgError">{{fileerror['fileName']}}</td>
+                </tr>
+                <tr>
+                    <td>Файл<span class="helpContainerButton" data-id="file">?</span></td>
+                    <td>
+                        <input type="hidden" id="contentFileInput" name="file[contentFile]" value="{{file['contentFile']}}" />
+                        <span id="contentFileWrap">
+                            {% if file['fileSize'] != '' %}
+                                {{file['fileName']}} ({{(file['fileSize'] / 1024) | number_format(0,',',' ')}} Кб)
+                            {% endif %}
+                        </span>
+                        <a class="button" id="contentFileLoad" onclick="return false;" href="#">Загрузить</a>
+                    </td>
+                    <td class="cfgError" id="contentFileError">{{fileerror['contentFile']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="file[onlyAutorized]" value="1" {% if (file['onlyAutorized'] != 0) %}checked="checked"{% endif %} />Доступен только авторизованным пользователям</label><span class="helpContainerButton" data-id="onlyAutorized">?</span></td>
+                    <td class="cfgError">{{fileerror['onlyAutorized']}}</td>
+                </tr>
+                <tr>
+                    <td>META ключи<span class="helpContainerButton" data-id="metaKeywords">?</span></td>
+                    <td><textarea name="file[metakey]" class="metaTextArea">{{file['metakey']}}</textarea></td>
+                    <td class="cfgError">{{fileerror['metakey']}}</td>
+                </tr>
+                <tr>
+                    <td>META описание<span class="helpContainerButton" data-id="metaDescription">?</span></td>
+                    <td><textarea name="file[metadescr]" class="metaTextArea">{{file['metadescr']}}</textarea></td>
+                    <td class="cfgError">{{fileerror['metadescr']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Описание файла:<span class="helpContainerButton" data-id="description">?</span></p>
+            <p class="globalError">{{fileerror['description']}}</p>
+            <br />
+            <textarea name="file[description]" id="fileDescription">{{file['description']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#fileDescription",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('file_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('file_list') == 1) %}<a class="button" href="{{path('files_files_file_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="page[enable]" value="1" {% if (page['enable'] != 0) %}checked="checked"{% endif %} />Включить страницу просмотра</label><span class="helpContainerButton" data-id="seopageEnabled">?</span></td>
+                    <td class="cfgError">{{pageerror['enable']}}</td>
+                </tr>
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('file_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('file_list') == 1) %}<a class="button" href="{{path('files_files_file_list')}}">Отмена</a>{% endif %}
+            </div>
+            {% for locale in locales %}    
+            <table class="cfgTable">
+                <tr>
+                    <td>Заголовок ({{locale['fullName']}})</td>
+                    <td><input type="text" name="fileloc[{{locale['shortName']}}][title]" value="{{fileloc[locale['shortName']]['title']}}" /></td>
+                    <td class="cfgError">{{filelocerror[locale['shortName']]['title']}}</td>
+                </tr>
+                <tr>
+                    <td>META ключи ({{locale['fullName']}})</td>
+                    <td><textarea name="fileloc[{{locale['shortName']}}][metakey]" class="metaTextArea">{{fileloc[locale['shortName']]['metakey']}}</textarea></td>
+                    <td class="cfgError">{{filelocerror[locale['shortName']]['metakey']}}</td>
+                </tr>
+                <tr>
+                    <td>META описание ({{locale['fullName']}})</td>
+                    <td><textarea name="fileloc[{{locale['shortName']}}][metadescr]" class="metaTextArea">{{fileloc[locale['shortName']]['metadescr']}}</textarea></td>
+                    <td class="cfgError">{{filelocerror[locale['shortName']]['metadescr']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Описание файла ({{locale['fullName']}}):</p>
+            <p class="globalError">{{filelocerror[locale['shortName']]['description']}}</p>
+            <br />
+            <textarea name="fileloc[{{locale['shortName']}}][description]" id="fileLocDescription{{locale['shortName']}}">{{fileloc[locale['shortName']]['description']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#fileLocDescription{{locale['shortName']}}",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            {% endfor %}    
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+4}}" {% if (activetab == loop.index0+4) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('file_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('file_list') == 1) %}<a class="button" href="{{path('files_files_file_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+</div>​
+</form>
+<script>
+function avatarClear()
+{
+    $('#avatarWrap').html('<img src="/adminimg/noava.jpg" style="max-width:100px;max-height:100px;" />');
+    $('#avatarInput').val('');
+    $('#avatarError').html('');
+}
+$(function () 
+{
+    new AjaxUpload('#avatarLoad', 
+    {
+        action: '{{path('files_files_file_ajaxavatar')}}',
+        name: 'avatar',
+        inputFilter: 'image/jpeg,image/png,image/gif',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "{file:'', error:'Ошибка загрузки файла'}";
+            var answer = $.parseJSON(response);
+            if(answer.file)
+            {
+                    $('#avatarWrap').html('<a href="'+answer.file+'" rel="lightbox"><img src="'+answer.file+'" style="max-height:100px;max-width:100px;" /></a>');
+                    $('#avatarInput').val(answer.file);
+                    $('#avatarError').html('');
+            } else
+            {
+                    $('#avatarError').html(answer.error);
+            }
+        }
+    });
+});
+    
+$(function () 
+{
+    new AjaxUpload('#contentFileLoad', 
+    {
+        action: '{{path('files_files_file_ajaxfile')}}',
+        name: 'file',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "{file:'', filename:'', filesize:'', error:'Ошибка загрузки файла'}";
+            var answer = $.parseJSON(response);
+            if(answer.file)
+            {
+                    $('#contentFileWrap').html(answer.filename+' ('+answer.filesize+' Кб )');
+                    $('#contentFileInput').val(answer.file);
+                    $('#contentFileError').html('');
+                    if ($('#contentFileNameInput').val() == '') $('#contentFileNameInput').val(answer.filename);
+            } else
+            {
+                    $('#contentFileError').html(answer.error);
+            }
+        }
+    });
+});
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить файл.</div>
+    <div id="helpContainer-title">Задаёт название страницы файла.</div>
+    <div id="helpContainer-avatar">Аватар задаёт изображение файла на сайте.</div>
+    <div id="helpContainer-metaKeywords">МЕТА ключи позволяют задать ключевые слова для данной страницы сайта. Данная информация участвует в оптимизации сайта для поисковых систем (SEO).</div>
+    <div id="helpContainer-metaDescription">МЕТА описание позволяет задать краткое описание для данной страницы сайта. Данная информация участвует в оптимизации сайта для поисковых систем (SEO).</div>
+    <div id="helpContainer-description">Задаёт описание файла.</div>
+    <div id="helpContainer-fileName">Задаёт имя файла, которое будет предложено пользователю для сохранения.</div>
+    <div id="helpContainer-file">Задаёт собственно файл.</div>
+    <div id="helpContainer-onlyAutorized">При включенной опции скачивать данный файл сможет только авторизованный и не заблокированный пользователь.</div>
+    <div id="helpContainer-seopageEnabled">При включении создаёт отдельную страницу сайта для данного объекта.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+</div>
+{% endblock %}       
+
+
+

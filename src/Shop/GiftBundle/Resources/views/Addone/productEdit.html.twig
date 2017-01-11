@@ -1,0 +1,133 @@
+<div id="giftsCfgTable" class="noselect">
+    {% for item in gifts %}
+        <div class="giftItem">
+            <p>{{item['name']}}</p>
+            <div class="giftWrap"><img src="{{(item['avatar'] == '' ? '/adminimg/noava.jpg' : item['avatar'])}}" /></div>
+            <label><input type="checkbox" name="temp" class="giftEnabled" onclick="updateGiftIerarhy();" autocomplate="off" {% if (item['enabled'] != 0) %}checked="checked"{% endif %}>Опубликован</label>
+            <button onclick="deleteGift(this);return false;">Удалить</button>
+            <input type="hidden" name="temp" class="giftId" value="{{item['id']}}" />
+        </div>
+    {% endfor %}
+</div>
+<div id="giftFromWrap">
+</div>
+<button id="giftAdd">Добавить подарок к товару</button>
+<div class="popupCfgWindow" id="popupGiftCfgWindow">
+    <div id="giftPopup">
+    </div>
+</div>
+<script>
+    window.moveelement = null;
+    function updateGiftIerarhy()
+    {
+        var index = 0;
+        $('#giftFromWrap').html('');
+        $('#giftsCfgTable').children('div.giftItem').each(function (i, element)
+        {
+            var enabled = ($(element).find('input.giftEnabled').is(':checked') == false ? 0 : 1);
+            var avatar = $(element).find('img').attr('src');
+            var name = $(element).find('p').html();
+            var id = $(element).find('input.giftId').val();
+            $('#giftFromWrap').append('<input type="hidden" name="gifts['+index+'][id]" value="'+id+'" /><input type="hidden" name="gifts['+index+'][enabled]" value="'+enabled+'" />'+
+                                      '<input type="hidden" name="gifts['+index+'][name]" value="'+name+'" /><input type="hidden" name="gifts['+index+'][avatar]" value="'+avatar+'" />');
+            index++;
+        });
+        $('#giftsCfgTable div.giftItem').unbind('mousedown').unbind('mouseenter');
+        $('#giftsCfgTable div.giftItem').mousedown(function()
+        {
+            window.moveelement = $(this).closest('div.giftItem');
+            $(window.moveelement).parent().find('div.giftWrap').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().find('div.giftItem');
+                    var indexnew = elements.index($(this).closest('div.giftItem'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+            return false;
+        });
+    }
+    updateGiftIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateGiftIerarhy();});
+    
+    function addProductToGiftCfgTable(name,avatar,id)
+    {
+        $('#giftsCfgTable').append(
+        '        <div class="giftItem">'+
+        '            <p>'+name+'</p>'+
+        '            <div class="giftWrap"><img src="'+(avatar == '' ? '/adminimg/noava.jpg' : htmlentities(avatar))+'" /></div>'+
+        '            <label><input type="checkbox" name="temp" class="giftEnabled" onclick="updateGiftIerarhy();" autocomplate="off" checked="checked">Опубликован</label>'+
+        '            <button onclick="deleteGift(this);return false;">Удалить</button>'+
+        '            <input type="hidden" name="temp" class="giftId" value="'+id+'" />'+
+        '        </div>');
+        $('#giftsCfgTable input, #giftsCfgTable button').not('.uniformOff').uniform();
+        updateGiftIerarhy();
+    }
+    
+    function loadProductsToGiftPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('shop_gift_ajaxproducts')}}',
+            data: "page="+page+"&search="+($('#searchFromGiftProducts').length > 0 ? $('#searchFromGiftProducts').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                $('#popupGiftCfgWindow').show();
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadProductsToGiftPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadProductsToGiftPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['products'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'addProductToGiftCfgTable(\''+addslashes(answer['products'][key]['title'])+'\',\''+addslashes(answer['products'][key]['avatar'])+'\','+parseInt(answer['products'][key]['id'])+');'+
+'$(\'#popupGiftCfgWindow\').hide();return false;'+
+'" href="#">'+htmlentities(answer['products'][key]['title'])+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#giftPopup').html(
+'                    <div class="pb20">Выберите продукт:'+
+'                    <span class="flr"><input type="text" name="searchFromGiftProducts" id="searchFromGiftProducts" value="'+($('#searchFromGiftProducts').length > 0 ? htmlentities($('#searchFromGiftProducts').val()) : '')+'"/><button onclick="loadProductsToGiftPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupGiftCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#giftPopup input, #giftPopup button, #giftPopup a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+    
+    $(function ()
+    {
+        $('#giftAdd').click(function () {
+            loadProductsToGiftPopup(0);
+            return false;
+        });
+    });
+    
+    function deleteGift(that)
+    {
+        $(that).closest('div.giftItem').remove();
+        updateGiftIerarhy();
+        return false;
+    }
+    
+</script>

@@ -1,0 +1,4 @@
+services:
+    addone.product.gallery:
+        class: Shop\GalleryBundle\GalleryManager
+        arguments: ['@service_container']

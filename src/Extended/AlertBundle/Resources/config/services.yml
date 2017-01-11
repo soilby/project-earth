@@ -1,0 +1,10 @@
+parameters:
+    extendedalert.configuration:
+        bundles:
+            - object.project
+            - object.chat
+
+services:
+    addone.user.alert:
+        class: Extended\AlertBundle\UserAlertManager
+        arguments: ['@service_container', "%extendedalert.configuration%"]

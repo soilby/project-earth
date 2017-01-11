@@ -1,0 +1,28 @@
+<ul>
+    {% for item in menu %}
+        {% if (item['enabled'] != 0) %}
+        <li>
+        {% if (item['access'] != 0) %}
+            <a href="{{item['url']}}">{{item['name']}}</a>
+        {% else %}
+            <p>{{item['name']}}</p>
+        {% endif %}
+            {% if (item['items'] is defined) %}
+                <ul class="secondStage">
+                {% for item2 in item['items'] %}
+                    {% if (item2['enabled'] != 0) %}
+                    <li>
+                    {% if (item2['access'] != 0) %}
+                        <a href="{{item2['url']}}">{{item2['name']}}</a>
+                    {% else %}
+                        <p>{{item2['name']}}</p>
+                    {% endif %}
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
+        {% endif %}
+    {% endfor %}
+</ul>

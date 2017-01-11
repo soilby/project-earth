@@ -1,0 +1,34 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Просмотр заказов{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Просмотр заказов</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    {% if (app.user.checkAccess('basket_orderlist') == 1) %}
+    <a href="#" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Список заказов</a>
+    {% endif %}
+    {% if (app.user.checkAccess('basket_orderlist') == 1) %}
+    <a href="#" id="tab2" {% if (tab == 1) %}class="active"{% endif %}>Список моих заказов</a>
+    {% endif %}
+</div>
+<div id="tabsContent">
+    {% if (app.user.checkAccess('basket_orderlist') == 1) %}
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "ShopBasketBundle:Default:orderListTab1.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('basket_orderlist') == 1) %}
+    <div id="con_tab2" {% if (tab == 1) %}class="active"{% endif %}>
+        {% include "ShopBasketBundle:Default:orderListTab2.html.twig" %}
+    </div>
+    {% endif %}
+</div>​
+{% endblock %}       
+
+
+

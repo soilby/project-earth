@@ -1,0 +1,3 @@
+shop_gallery_ajaximage:
+    path:  /admin/products/gallery/ajaximage
+    defaults: { _controller: ShopGalleryBundle:Default:galerryAjaxImage }

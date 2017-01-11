@@ -1,0 +1,95 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Просмотр письма от формы{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('form_form_list')}}">Формы</a>
+    <span>Просмотр письма от формы &laquo;{{form['formName']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Поля формы</a>
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+3}}" {% if (activetab == loop.index0+3) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('form_list') == 1) or (app.user.checkAccess('form_letterlist') == 1)) %}<a class="button" href="{{path('form_form_list')}}">Назад</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Название формы<span class="helpContainerButton" data-id="name">?</span></td>
+                    <td class="cfgValue">{{form['formName']}}</td>
+                </tr>
+                <tr>
+                    <td>Отправка на E-Mail<span class="helpContainerButton" data-id="email">?</span></td>
+                    <td class="cfgValue">{{form['formEmail']}}</td>
+                </tr>
+                <tr>
+                    <td>Дата создания письма<span class="helpContainerButton" data-id="createDate">?</span></td>
+                    <td class="cfgValue">{{form['createDate'] | date('d.m.Y G:i')}}</td>
+                </tr>
+                <tr>
+                    <td>IP адрес пользователя<span class="helpContainerButton" data-id="ipaddress">?</span></td>
+                    <td class="cfgValue">{{form['ipAddress']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль пользователя<span class="helpContainerButton" data-id="locale">?</span></td>
+                    <td class="cfgValue">{{form['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Страница, с которой отправлено письмо<span class="helpContainerButton" data-id="url">?</span></td>
+                    <td class="cfgValue">{{form['url']}} ({{form['urlDescription']}})</td>
+                </tr>
+                <tr>
+                    <td>Данные о просмотре<span class="helpContainerButton" data-id="viewed">?</span></td>
+                    <td class="cfgValue">{{(form['viewed'] != 0 ? (form['viewUser']~' '~(form['viewDate'] | date('d.m.Y G:i'))) : 'Еще не просматривалось')}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('form_list') == 1) or (app.user.checkAccess('form_letterlist') == 1)) %}<a class="button" href="{{path('form_form_list')}}">Назад</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                {% for field in fields %}
+                <tr>
+                    <td style="padding-left:{{2 * (field['nesting'] | default(0))}}ex;">{{field['name'] | default('')}}</td>
+                    <td class="cfgValue"><pre>{{field['value'] | default('')}}</pre></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+3}}" {% if (activetab == loop.index0+3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('form_list') == 1) or (app.user.checkAccess('form_letterlist') == 1)) %}<a class="button" href="{{path('form_form_list')}}">Назад</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+</div>​
+</form>
+<div id="helpContainer">
+    <div id="helpContainer-name">Имя формы, через которую было отправлено данное сообщение.</div>
+    <div id="helpContainer-email">E-mail, на который отправляются письма, отправленные через данную форму.</div>
+    <div id="helpContainer-createDate">Дата и время отправки данного сообщения.</div>
+    <div id="helpContainer-ipaddress">IP адрес пользователя, отправившего данное сообщение</div>
+    <div id="helpContainer-locale">Локаль, в которой находился пользователь, при отправке данного сообщения. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-url">Страница сайта, с которой было отправлено данное сообщение.</div>
+    <div id="helpContainer-viewed">Кем и когда было просмотрено сообщение (учитывается только просмотр через административную часть сайта).</div>
+</div>
+{% endblock %}       
+
+
+

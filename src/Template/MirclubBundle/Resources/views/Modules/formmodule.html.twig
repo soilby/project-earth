@@ -1,0 +1,79 @@
+<h2 class="text-center">{{title}}</h2>
+{% if status == 'OK' %}
+    <p class="alert alert-success" id="formModule{{title | md5}}">{% if currentLocale == 'en' %}Message sent{% else %}Сообщение отправлено{% endif %}</p>
+{% else %}
+    <div id="formModule{{title | md5}}">
+        <form action="?#formModule{{title | md5}}" method="post" class="col-md-6 col-md-offset-3 col-sm-12 form-horizontal">
+            <input type="hidden" name="actionobject" value="form" />
+            <input type="hidden" name="action" value="sendform" />
+            <input type="hidden" name="actionid" value="{{id}}" />
+            {% for field in fields %}
+                {% if (field['type'] == 'text') %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">{{field['name']}}</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" placeholder="{{field['name']}}" name="actionfields[{{field['id']}}]" value="{{field['value']}}" />
+                            {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+                {% if (field['type'] == 'textarea') %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">{{field['name']}}</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" placeholder="{{field['name']}}" name="actionfields[{{field['id']}}]">{{field['value']}}</textarea>
+                            {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+                {% if (field['type'] == 'select') %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">{{field['name']}}</label>
+                        <div class="col-sm-8">
+                            <select name="actionfields[{{field['id']}}]" class="form-control" >
+                                {% for item in field['items'] %}
+                                    <option value="{{item}}" {% if (field['value'] == item) %}selected="selected"{% endif %}>{{item}}</option>
+                                {% endfor %}
+                            </select>
+                            {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+                {% if (field['type'] == 'radio') %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">{{field['name']}}</label>
+                        <div class="col-sm-8">
+                            {% for item in field['items'] %}
+                                <div class="radio"><label><input type="radio" name="actionfields[{{field['id']}}]" value="{{item}}" {% if (field['value'] == item) %}checked="checked"{% endif %} />{{item}}</label></div>
+                                    {% endfor %}
+                                    {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+                {% if (field['type'] == 'checkbox') %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">{{field['name']}}</label>
+                        <div class="col-sm-8">
+                            <div class="checkbox"><label><input type="checkbox" name="actionfields[{{field['id']}}]" value="1" {% if (field['value'] != 0) %}checked="checked"{% endif %} />{{field['name']}}</label>{% if field['error'] != '' %}<span class="error">{{field['error']}}</span>{% endif %}</div>
+                            {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% if captchaEnabled != 0 %}
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">
+                        {% if currentLocale == 'en' %}Enter text from the image{% else %}Введите строку с картинки{% endif %}
+                        <br />
+                        <img src="{{captchaPath}}&rand={{random()}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand=' + Math.floor(Math.random() * 2000000000));"/>
+                    </label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" placeholder="{% if currentLocale == 'en' %}Enter text from the image{% else %}Введите строку с картинки{% endif %}" name="actionfields[captcha]" value="" />
+                        {% if captchaError != '' %}<p class="form-error">{% if currentLocale == 'en' %}Field is not valid{% else %}Поле заполнено неверно{% endif %}</p>{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            <p class="text-center"><button class="btn btn-primary" type="submit">{% if currentLocale == 'en' %}Submit{% else %}Отправить{% endif %}</button></p>
+        </form>
+    </div>
+{% endif %}

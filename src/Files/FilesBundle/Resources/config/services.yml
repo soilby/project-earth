@@ -1,0 +1,4 @@
+services:
+    object.file:
+        class: Files\FilesBundle\FileManager
+        arguments: ['@service_container']

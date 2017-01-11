@@ -1,0 +1,98 @@
+<div id="customHtmlTextWrap" {% if (parameters['variables'] | length) > 0 %}style="display:none"{% endif %}>
+    <div class="clearR mb15"></div>
+    <p>Текст для вывода:</p>
+    <p class="globalError">{{parameterserror['html']}}</p>
+    <br />
+    <textarea name="parameters[html]" id="customHtml">{{parameters['html']}}</textarea>
+    <br />
+    <a class="button" href="#" onclick="customHtmlUpdateVariables();$('#customHtmlTextWrap').hide();$('#customHtmlVarsWrap').show();return false;">Редактировать переменные</a>
+</div>
+<div id="customHtmlVarsWrap" {% if (parameters['variables'] | length) == 0 %}style="display:none"{% endif %}>
+    <table class="cfgTable">
+        {% for var in parameters['variables'] %}
+        <tr>
+            <td>{{var['name']}}<input class="customHtmlVarsName" type="hidden" name="parameters[variables][{{loop.index0}}][name]" value="{{var['name']}}" /></td>
+            <td><input class="customHtmlVarsInput" type="text" name="parameters[variables][{{loop.index0}}][value]" value="{{var['value']}}" /></td>
+            <td class="cfgError"></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a class="button" href="#" onclick="$('#customHtmlTextWrap').show();$('#customHtmlVarsWrap').hide();return false;">Редактировать текст</a>
+</div>
+{#<div>
+    <a class="miniLinkButton" href="#" onclick="tinymce.triggerSave(false, false);tinymce.execCommand('mceFocus', false, 'customHtml');tinymce.execCommand('mceRemoveEditor', false, 'customHtml');return false;">Выключить редактор</a>
+</div>#}
+<script>
+function customHtmlUpdateVariables()
+{
+    var text = '';
+    if ((typeof(tinymce) != 'undefined') && (tinymce.get('customHtml') != null)) text = tinymce.get('customHtml').getContent(); else text = $('textarea#customHtml').val();
+    var variables = text.match(/\{\{([A-z0-9А-яЁё\s\?\|'!@"№#\$;%:\^&\*\(\)\.,=-_\+]+)\}\}/g);
+    var savevalues = {};
+    $('#customHtmlVarsWrap tr').each(function(index,element) {
+        savevalues[$(element).find('.customHtmlVarsName').val()] = $(element).find('.customHtmlVarsInput').val();
+    });
+    $('#customHtmlVarsWrap>table').html('');
+    var index = 0;
+    for (var key in variables)
+    {
+        variables[key] = variables[key].substr(2, variables[key].length - 4);
+        var name = '';
+        var input = '';
+        if (variables[key].indexOf('??') > 0)
+        {
+            name = variables[key].substr(0, variables[key].indexOf('??'));
+            var value = '';
+            if (savevalues[name]) value = savevalues[name];
+            variables[key] = variables[key].substr(variables[key].indexOf('??')+2);
+            var variants = variables[key].match(/([A-z0-9А-яЁё\s'!@"№#\$;%:\^&\*\(\)\.,=-_\+]+)/g);
+            for (var vkey in variants)
+                if (variants[vkey].length > 0)
+                {    
+                    if (variants[vkey].indexOf('==') > 0)
+                    {
+                        input += '<option value="'+variants[vkey].substr(0, variants[vkey].indexOf('=='))+'" '+
+                                  (variants[vkey].substr(0, variants[vkey].indexOf('==')) == value ? 'selected="selected"' : '')+
+                                  '>'+variants[vkey].substr(variants[vkey].indexOf('==')+2)+'</option>';
+                    } else
+                    {
+                        input += '<option value="'+variants[vkey]+'" '+
+                                  (variants[vkey] == value ? 'selected="selected"' : '')+
+                                  '>'+variants[vkey]+'</option>';
+                    }
+                }
+            if (input == '') input = '<input class="customHtmlVarsInput" type="text" name="parameters[variables]['+index+'][value]" value="'+value+'" />'; else
+                input = '<select class="customHtmlVarsInput" name="parameters[variables]['+index+'][value]">'+input+'</select>';
+        } else
+        {
+            name = variables[key];
+            var value = '';
+            if (savevalues[name]) value = savevalues[name];
+            input = '<input class="customHtmlVarsInput" type="text" name="parameters[variables]['+index+'][value]" value="'+value+'" />';
+        }
+        $('#customHtmlVarsWrap>table').append('<tr>\
+            <td>'+name+'<input class="customHtmlVarsName" type="hidden" name="parameters[variables]['+index+'][name]" value="'+name+'" /></td>\
+            <td>'+input+'</td>\
+            <td class="cfgError"></td>\
+        </tr>')
+        index++;
+    }
+    $('#customHtmlVarsWrap input, #customHtmlVarsWrap select').not('.uniformOff').uniform();
+}
+customHtmlUpdateVariables();    
+tinymce.init({
+    selector: "textarea#customHtml",
+    language : 'ru',
+    height: 400,
+    convert_urls: false,
+    verify_html : false,
+    plugins: [
+        "advlist autolink lists image charmap print preview anchor",
+        "searchreplace visualblocks code fullscreen",
+        "media table contextmenu paste textcolor",
+        "jbimages link"
+    ],
+    toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+});
+</script>
+

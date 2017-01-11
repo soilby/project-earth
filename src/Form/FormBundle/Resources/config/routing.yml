@@ -1,0 +1,20 @@
+form_form_list:
+    path:  /admin/forms/
+    defaults: { _controller: FormFormBundle:Default:formList }
+
+form_form_create:
+    path:  /admin/forms/create
+    defaults: { _controller: FormFormBundle:Default:formCreate }
+
+form_form_edit:
+    path:  /admin/forms/edit
+    defaults: { _controller: FormFormBundle:Default:formEdit }
+
+form_form_ajax:
+    path:  /admin/forms/ajax
+    defaults: { _controller: FormFormBundle:Default:formAjax }
+
+form_form_viewletter:
+    path:  /admin/forms/viewletter
+    defaults: { _controller: FormFormBundle:Default:formLetterView }
+

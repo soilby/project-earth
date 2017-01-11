@@ -1,0 +1,183 @@
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="parameters[isClosed]" value="1" {% if (parameters['isClosed'] != 0) %}checked="checked"{% endif %} />Выключить публикацию сообщений</label><span class="helpContainerButton" data-id="isClosed">?</span></td>
+                    <td class="cfgError">{{parameterserror['isClosed']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="parameters[onlyAutorizedView]" value="1" {% if (parameters['onlyAutorizedView'] != 0) %}checked="checked"{% endif %} />Для просмотра требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedView">?</span></td>
+                    <td class="cfgError">{{parameterserror['onlyAutorizedView']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="parameters[onlyAutorizedImage]" value="1" {% if (parameters['onlyAutorizedImage'] != 0) %}checked="checked"{% endif %} />Для просмотра изображений требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedImage">?</span></td>
+                    <td class="cfgError">{{parameterserror['onlyAutorizedImage']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="parameters[onlyAutorizedDownload]" value="1" {% if (parameters['onlyAutorizedDownload'] != 0) %}checked="checked"{% endif %} />Для просмотра вложений требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedDownload">?</span></td>
+                    <td class="cfgError">{{parameterserror['onlyAutorizedDownload']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="parameters[onlyAutorizedPost]" value="1" {% if (parameters['onlyAutorizedPost'] != 0) %}checked="checked"{% endif %} />Для публикации комментария требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedPost">?</span></td>
+                    <td class="cfgError">{{parameterserror['onlyAutorizedPost']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="parameters[captchaEnabled]" value="1" {% if (parameters['captchaEnabled'] != 0) %}checked="checked"{% endif %} />Включить капчу для публикации комментария</label><span class="helpContainerButton" data-id="captchaEnabled">?</span></td>
+                    <td class="cfgError">{{parameterserror['captchaEnabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Разрешенные теги<span class="helpContainerButton" data-id="allowTags">?</span></td>
+                    <td><textarea name="parameters[allowTags]" class="metaTextArea">{{parameters['allowTags']}}</textarea></td>
+                    <td class="cfgError">{{parameterserror['allowTags']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="parameters[allowStyleProp]" value="1" {% if (parameters['allowStyleProp'] != 0) %}checked="checked"{% endif %} />Разрешить стилизацию тегов с помощью свойства style</label><span class="helpContainerButton" data-id="allowStyleProp">?</span></td>
+                    <td class="cfgError">{{parameterserror['allowStyleProp']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="parameters[replaceUrls]" value="1" {% if (parameters['replaceUrls'] != 0) %}checked="checked"{% endif %} />Заменять пути URL на перенаправления</label><span class="helpContainerButton" data-id="replaceUrls">?</span></td>
+                    <td class="cfgError">{{parameterserror['replaceUrls']}}</td>
+                </tr>
+                <tr>
+                    <td>Кол-во комментариев на странице<span class="helpContainerButton" data-id="messageInPage">?</span></td>
+                    <td><input type="text" name="parameters[messageInPage]" value="{{parameters['messageInPage']}}" /></td>
+                    <td class="cfgError">{{parameterserror['messageInPage']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+                <p>Модераторы комментариев:<span class="helpContainerButton" data-id="moderators">?</span></p>
+                <ul class="cfgSimpleList" id="forumModerators">
+                    {% for moder in moderators %}
+                    <li>{{moder.login}} / {{moder.fullName}} (<a href="#" onclick="$(this).parent('li').remove();return false;">удалить</a>)<input type="hidden" name="parameters[moderators][]" value="{{moder.id}}" />{% if moder.error != '' %}<p class="globalError">{{moder.error}}</p>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+                <button onclick="loadUsersToPopup(0);$('#popupCommentsCfgWindow').show();return false;">Добавить модератора</button>
+            </div>
+            <div class="mb20">
+            <p>Текст перед комментариями:<span class="helpContainerButton" data-id="preContent">?</span></p>
+            <p class="globalError">{{parameterserror['preContent']['default']}}</p>
+            <br />
+            <textarea name="parameters[preContent][default]" id="preContent">{{parameters['preContent']['default']}}</textarea>
+            </div>
+            <div class="mb20">
+            <p>Текст после комментариев:<span class="helpContainerButton" data-id="postContent">?</span></p>
+            <p class="globalError">{{parameterserror['postContent']['default']}}</p>
+            <br />
+            <textarea name="parameters[postContent][default]" id="postContent">{{parameters['postContent']['default']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#preContent,textarea#postContent",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            {% for locale in locales %}
+                <div class="mb20">
+                <p>Текст перед комментариями ({{locale.fullName}}):<span class="helpContainerButton" data-id="preContent">?</span></p>
+                <p class="globalError">{{parameterserror['preContent'][locale.shortName]}}</p>
+                <br />
+                <textarea name="parameters[preContent][{{locale.shortName}}]" id="preContent{{[locale.shortName]}}">{{parameters['preContent'][locale.shortName]}}</textarea>
+                </div>
+                <div class="mb20">
+                <p>Текст после комментариев ({{locale.fullName}}):<span class="helpContainerButton" data-id="postContent">?</span></p>
+                <p class="globalError">{{parameterserror['postContent'][locale.shortName]}}</p>
+                <br />
+                <textarea name="parameters[postContent][{{locale.shortName}}]" id="postContent{{[locale.shortName]}}">{{parameters['postContent'][locale.shortName]}}</textarea>
+                </div>
+                <script>
+                tinymce.init({
+                    selector: "textarea#preContent{{[locale.shortName]}},textarea#postContent{{[locale.shortName]}}",
+                    language : 'ru',
+                    height: 400,
+                    convert_urls: false,
+                    verify_html : false,
+                    plugins: [
+                        "advlist autolink lists image charmap print preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "media table contextmenu paste textcolor",
+                        "jbimages link"
+                    ],
+                    toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+                });
+                </script>
+            {% endfor %}
+<div class="popupCfgWindow" id="popupCommentsCfgWindow">
+    <div id="usersItemPopup">
+    </div>
+</div>
+<script>
+    function loadUsersToPopupAddModerator(login, fullName, id)
+    {
+        $('#forumModerators').append('<li>'+login+' / '+fullName+' (<a href="#" onclick="$(this).parent(\'li\').remove();return false;">удалить</a>)<input type="hidden" name="parameters[moderators][]" value="'+id+'" /></li>');
+    }
+
+
+
+    function loadUsersToPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('forum_forum_topic_ajaxloadusers')}}',
+            data: "page="+page+"&search="+($('#searchFromUsers').length > 0 ? $('#searchFromUsers').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['users'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'loadUsersToPopupAddModerator(\''+addslashes(answer['users'][key]['login'])+'\',\''+addslashes(answer['users'][key]['fullName'])+'\',\''+addslashes(answer['users'][key]['id'])+'\');'+
+'$(\'#popupCommentsCfgWindow\').hide();return false;'+
+'" href="#">'+answer['users'][key]['login']+' / '+answer['users'][key]['fullName']+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#usersItemPopup').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromUsers" id="searchFromUsers" value="'+($('#searchFromUsers').length > 0 ? htmlentities($('#searchFromUsers').val()) : '')+'"/><button onclick="loadUsersToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupCommentsCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#usersItemPopup input, #usersItemPopup button, #usersItemPopup a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+
+</script>
+<div class="helpContainerAdd">
+    <div id="helpContainer-isClosed">Разрешает/запрещает публикацию комментариев к странице.</div>
+    <div id="helpContainer-onlyAutorizedView">При включенном значении только авторизованные пользователи смогут просматривать форум.</div>
+    <div id="helpContainer-onlyAutorizedImage">При включенном значении только авторизованные пользователи смогут просматривать вложения к сообщениям, являющиеся изображениями.</div>
+    <div id="helpContainer-onlyAutorizedDownload">При включенном значении только авторизованные пользователи смогут скачивать вложения к сообщениям, не являющиеся изображениями.</div>
+    <div id="helpContainer-onlyAutorizedPost">При включенном значении только авторизованные пользователи смогут публиковать сообщения в форум.</div>
+    <div id="helpContainer-captchaEnabled">Включает защиту капчей, что позволяет обезопасить сайт от роботов (спам-роботов или роботов для перебора паролей).</div>
+    <div id="helpContainer-allowTags">Поле позволяет задать HTML-теги, разрешенные для использования в форуме. Теги перечисляются через запятую.</div>
+    <div id="helpContainer-allowStyleProp">Позволяет включить дополнительную стилизацию HTML-тегов с помощью свойства style.</div>
+    <div id="helpContainer-replaceUrls">При включенном значении все ссылки в сообщении будут заменяться на JavaScript. Это позволяет исключить индексацию данных ссылок поисковыми машинами. Рекомендуется включать данную опцию.</div>
+    <div id="helpContainer-messageInPage">Задаёт количество сообщений на одной странице форума.</div>
+    <div id="helpContainer-moderators">Задаёт модераторов данного форума. При этом итоговый перечень модераторов будет содержать супер-администраторов сайта, модератов, назначенных для категории, в которую входит данный форум, и модераторов из этого списка.</div>
+    <div id="helpContainer-preContent">Позволяет вывести пользовательский текст перед модулем комментариев.</div>
+    <div id="helpContainer-postContent">Позволяет вывести пользовательский текст после модуля комментариев.</div>
+</div>
+

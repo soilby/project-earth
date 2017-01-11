@@ -1,0 +1,216 @@
+			<h1>{{title}}</h1>
+                        <style>
+                            .note {
+                                color: #555;
+                                font-size: 11px;
+                                font-style: italic;
+                                font-weight: normal;
+                            }
+                        </style>
+                    {% if registerStep == 0 %}
+                        {% if status == 'OK' %}
+                            <div class="row">
+                            <form action="?" method="post" enctype="multipart/form-data" class="col-md-6 col-md-offset-3 col-sm-12 form-horizontal" id="register-form">
+                                    <input type="hidden" name="actionobject" value="user" />
+                                    <input type="hidden" name="action" value="register" />
+                                    <input type="hidden" name="actionid" value="{{id}}" />
+                                    <input type="hidden" name="actionfields[avatar]" value="" />
+                                    <div class="form-group">
+                        <label class="col-sm-4 control-label" data-field="login">{% if currentLocale == 'en' %}Login{% else %}Логин{% endif %}</label>
+                        <div class="col-sm-8">
+                            <input id="register-login" type="text" class="form-control" placeholder="{% if currentLocale == 'en' %}Login{% else %}Логин{% endif %}" name="aactionfields[login]" value="{{login}}" />
+                            {% if currentLocale == 'en' %}
+                                                            {% if loginError != '' %}<p class="form-error">Error{% if loginError == 'preg' %}: login must contain from 5 to 30 letters or numbers{% endif %}{% if loginError == 'exist' %}: login already exists{% endif %}</p>{% endif %}
+														{% else %}
+                                                            {% if loginError != '' %}<p class="form-error">Ошибка{% if loginError == 'preg' %}: логин должен содержать от 5 до 30 латинский букв или цифр{% endif %}{% if loginError == 'exist' %}: логин уже существует{% endif %}</p>{% endif %}
+														{% endif %}
+                        </div>
+                    </div>
+                          <div class="form-group">
+            <label class="col-sm-4 control-label" data-field="password">{% if currentLocale == 'en' %}Password{% else %}Пароль{% endif %}</label>
+            <div class="col-sm-8">
+                <input id="register-password" type="password" class="form-control" placeholder="{% if currentLocale == 'en' %}Password{% else %}Пароль{% endif %}" name="actionfields[password]" value="" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Password repeat{% else %}Повторение пароля{% endif %}</label>
+            <div class="col-sm-8">
+                <input id="register-password-repeat" type="password" class="form-control" placeholder="{% if currentLocale == 'en' %}Password repeat{% else %}Повторение пароля{% endif %}" name="actionfields[passwordRepeat]" value="" />
+                {% if passwordError == 'repeat' %}
+                    <p class="form-error">{% if currentLocale == 'en' %}Passwords do not match{% else %}Пароли не совпадают{% endif %}</p>
+                {% endif %}
+                {% if passwordError == 'preg' %}
+                    <p class="form-error">{% if currentLocale == 'en' %}Password must contain from 5 to 30 letters or numbers{% else %}Пароль должен содержать от 5 до 30 латинский букв или цифр{% endif %}</p>
+                {% endif %}
+            </div>
+        </div>           
+            <div class="form-group">
+            <label class="col-sm-4 control-label" data-field="email">E-mail</label>
+            <div class="col-sm-8">
+                <input id="register-email" type="text" class="form-control" placeholder="E-mail" name="actionfields[email]" value="{{email}}" />
+                {% if currentLocale == 'en' %}
+                    {% if emailError != '' %}<p class="form-error">Error{% if emailError == 'preg' %}: e-mail address is not entered correctly{% endif %}{% if emailError == 'exist' %}: e-mail address is already in use by another user{% endif %}</p>{% endif %}
+                {% else %}
+                    {% if emailError != '' %}<p class="form-error">Ошибка{% if emailError == 'preg' %}: адрес электронной почты введён некорректно{% endif %}{% if emailError == 'exist' %}: адрес электронной почты уже используется другим пользователем{% endif %}</p>{% endif %}
+                {% endif %}
+            </div>
+        </div>                        
+             <div class="form-group">
+        <label class="col-sm-4 control-label" data-field="fullName">{% if currentLocale == 'en' %}First and last name{% else %}Имя и фамилия{% endif %}</label>
+        <div class="col-sm-8">
+            <input id="register-fullname" type="text" class="form-control" placeholder="{% if currentLocale == 'en' %}First and last name{% else %}Имя и фамилия{% endif %}" name="actionfields[fullName]" value="{{fullName}}" />
+            {% if currentLocale == 'en' %}
+                {% if fullNameError != '' %}<p class="form-error">Error{% if fullNameError == 'preg' %}: name must contain between 5 and 99 allowed characters{% endif %}{% if fullNameError == 'exist' %}: user with the same name already exists{% endif %}</p>{% endif %}
+            {% else %}
+                {% if fullNameError != '' %}<p class="form-error">Ошибка{% if fullNameError == 'preg' %}: имя должно содержать от 5 до 99 разрешенных символов{% endif %}{% if fullNameError == 'exist' %}: пользователь с таким именем уже существует{% endif %}</p>{% endif %}
+            {% endif %}
+        </div>
+    </div>                       
+                                    
+                                    
+                                    
+                                    
+						
+                                                {% if profile is defined %}
+                                                {% for parameter in profile %}
+                                                    <div class="form-group">
+                    <label class="col-sm-4 control-label" data-field="{{parameter['name']}}">{{parameter['description']}}</label>
+                    <div class="col-sm-8">
+                        {% if parameter['name'] == 'reason_register' or parameter['name'] == 'communication_register' %}
+                            <textarea class="form-control" id="register-profile-{{parameter['name']}}" name="actionfields[profile][{{parameter['name']}}]" placeholder="{{parameter['description']}}">{{parameter['value']}}</textarea>
+                            {% else %}
+                                
+                        <input id="register-profile-{{parameter['name']}}" type="text" class="form-control" placeholder="{{parameter['description']}}" name="actionfields[profile][{{parameter['name']}}]" value="{{parameter['value']}}" />
+                        {% endif %}
+                        {% if parameter['error'] != '' %}<p class="form-error">{% if currentLocale == 'en' %}Error: field is not valid{% else %}Ошибка: поле заполнено неверно{% endif %}</p>{% endif %}
+                    </div>
+                </div>
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                {% endfor %}
+                                                {% endif %}
+                                                {% if captchaEnabled != 0 %}
+                                                    
+                                                    <div class="form-group">
+                    <label class="col-sm-4 control-label">
+                        {% if currentLocale == 'en' %}Enter text from the image{% else %}Введите строку с картинки{% endif %}
+                        <br />
+                        <img src="{{captchaPath}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));"/>
+                    </label>
+                    <div class="col-sm-8">
+                        <input id="register-captcha" type="text" class="form-control" placeholder="{% if currentLocale == 'en' %}Enter text from the image{% else %}Введите строку с картинки{% endif %}" name="actionfields[captcha]" value="" />
+                        {% if captchaError != '' %}<p class="form-error">{% if currentLocale == 'en' %}Field is not valid{% else %}Поле заполнено неверно{% endif %}</p>{% endif %}
+                    </div>
+                </div>
+                                                    
+                                                {% endif %}
+                                                <p class="text-center"><button class="btn btn-primary" type="submit">{% if currentLocale == 'en' %}Register{% else %}Зарегистрироваться{% endif %}</button></p>
+				</form>
+                            </div>
+                                <style>
+                                    .register-symb-counter {
+                                        color: #333333;
+                                        font-size: 12px;
+                                        left: 100%;
+                                        margin-left: 5px;
+                                        position: absolute;
+                                        top: 50%;
+                                        margin-top: -10px;
+                                        font-weight: bold;
+                                    }
+                                </style>
+                                <script>
+                                    $(function () {
+                                        var notes = {
+                                            'login': '{{(currentLocale == 'en' ? 'Must contain from 5 to 30 letters or numbers' : 'Должен содержать от 5 до 30 латинский букв или цифр')}}',
+                                            'password': '{{(currentLocale == 'en' ? 'Must contain from 5 to 30 letters or numbers' : 'Должен содержать от 5 до 30 латинский букв или цифр')}}',
+                                            'email': '{{(currentLocale == 'en' ? 'Always be sure that specified an incorrect e-mail address , as on this post will receive a letter to confirm your registration' : 'Обязательно убедитесь, что указали правильный адрес электронной почты, т.к. на эту почту придёт письмо для подтверждения регистрации')}}',
+                                            'fullName': '{{(currentLocale == 'en' ? 'Must contain between 5 and 99 allowed characters' : 'Должно содержать от 5 до 99 разрешенных символов')}}',
+                                            'reason_register': '{{(currentLocale == 'en' ? 'Must contain more than 100 characters' : 'Добжно содержать более 100 символов')}}',
+                                            'communication_register': '{{(currentLocale == 'en' ? 'In this field, enter additional ways to contact you , such as social network or Skype or phone, e-mail address if it appear inoperative . This will help you complete the registration' : 'В этом поле введите дополнительные способы связаться с Вами, например социальная сеть или скайп или телефон, если адрес электронной почты окажиться нерабочим. Это позволит помочь Вам пройти регистрацию на нашем сайте.')}}',
+                                        };
+                                        $('label[data-field]').each(function () {
+                                            var note = notes[$(this).data('field')];
+                                            if (note != undefined) {
+                                                $(this).append('<p class="note">'+note+'</p>');
+                                            }
+                                        });
+                                        var regular_expressions = {
+                                            'register-login': /^[A-Za-z0-9\-]{5,30}$/i,
+                                            'register-password': /^[A-Za-z0-9\-]{5,30}$/i,
+                                            'register-password-repeat': '#register-password',
+                                            'register-email': /^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i,
+                                            'register-fullname': /^[-0-9A-zА-яЁё\s\`]{3,99}$/i,
+                                            'register-profile-reason_register': /^[\s\S]{100,}$/i,
+                                            'register-captcha': /^[0-9A-z]{6}$/i,
+                                        }
+                                        var need_symbols = {
+                                            'register-login': 5,
+                                            'register-password': 5,
+                                            'register-fullname': 3,
+                                            'register-profile-reason_register': 100,
+                                            'register-captcha': 6,
+                                        }
+                                        $('#register-login, #register-password, #register-password-repeat, #register-email, #register-fullname, #register-profile-reason_register, #register-captcha').after('<span class="register-symb-counter"></span>');
+                                        $('#register-login, #register-password, #register-password-repeat, #register-email, #register-fullname, #register-profile-reason_register, #register-captcha').keyup(function () {
+                                            var min = need_symbols[$(this).attr('id')];
+                                            $(this).next('.register-symb-counter').text($(this).val().length + (min != undefined ? '/'+min : ''));
+                                            var regexp = regular_expressions[$(this).attr('id')];
+                                            var result = true;
+                                            if ((typeof regexp == 'string') && (regexp.substr(0,1) == '#')) {
+                                                result = ($(this).val() == $(regexp).val());
+                                            } else if (typeof regexp != 'undefined') {
+                                                result = regexp.test($(this).val());
+                                            }
+                                            if (result == false) {
+                                                $(this).closest('.form-group').addClass('has-error').removeClass('has-success');
+                                            } else {
+                                                $(this).closest('.form-group').removeClass('has-error').addClass('has-success');
+                                            }
+                                        });
+                                        $('#register-login, #register-password, #register-password-repeat, #register-email, #register-fullname, #register-profile-reason_register, #register-captcha').each(function () {
+                                            var min = need_symbols[$(this).attr('id')];
+                                            $(this).next('.register-symb-counter').text($(this).val().length + (min != undefined ? '/'+min : ''));
+                                        });
+                                        $('#register-form').submit(function () {
+                                            var error = false;
+                                            $('#register-form input, #register-form textarea').each(function () {
+                                                if (!$(this).attr('id')) {
+                                                    return true;
+                                                }
+                                                var regexp = regular_expressions[$(this).attr('id')];
+                                                var result = true;
+                                                if ((typeof regexp == 'string') && (regexp.substr(0,1) == '#')) {
+                                                    result = ($(this).val() == $(regexp).val());
+                                                } else if (typeof regexp != 'undefined') {
+                                                    result = regexp.test($(this).val());
+                                                }
+                                                if (result == false) {
+                                                    error = true;
+                                                    $(this).closest('.form-group').addClass('has-error').removeClass('has-success');
+                                                } else {
+                                                    $(this).closest('.form-group').removeClass('has-error').addClass('has-success');
+                                                }
+                                            });
+                                            return !error;
+                                        });
+                                    });
+                                </script>
+                        {% else %}
+                            <p>{% if currentLocale == 'en' %}An authorized user can not register{% else %}Авторизованный пользователь не может регистрироваться{% endif %}</p>
+                        {% endif %}
+                    {% endif %}
+                    {% if registerStep == 1 %}
+                            <p>{% if currentLocale == 'en' %}Dear {{registredUser.fullName}}! We sent you E-mail with a link to confirm your E-mail.{% else %}Уважаемый {{registredUser.fullName}}! Вам на E-mail отправлено письмо со ссылкой для подтверждения E-mail.{% endif %}</p>
+                    {% endif %}        
+                    {% if registerStep == 2 %}
+                            {% if status == 'OK' %}
+                                <p>{% if currentLocale == 'en' %}Dear {{registredUser.fullName}}! You are registered on the site. Your login {{registredUser.login}}.{% else %}Уважаемый {{registredUser.fullName}}! Вы зарегистрированы на сайте. Ваш логин {{registredUser.login}}.{% endif %}</p>
+                            {% else %}
+                                <p>{% if currentLocale == 'en' %}Error! Incorrect link.{% else %}Ошибка! Некорректная ссылка.{% endif %}</p>
+                            {% endif %}
+                    {% endif %}        

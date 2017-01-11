@@ -1,0 +1,152 @@
+        {% if (app.user.checkAccess('textpage_editsite') == 1) %}<a class="button" href="#" id="saveOrdering1">Сохранить порядок</a>{% endif %}
+        {% if (app.user.checkAccess('textpage_editsite') == 1) %}<a class="button" href="#" id="unblockedTextPage1">Опубликовать</a>{% endif %}
+        {% if (app.user.checkAccess('textpage_editsite') == 1) %}<a class="button" href="#" id="blockedTextPage1">Скрыть</a>{% endif %}
+        {% if (app.user.checkAccess('textpage_editsite') == 1) %}<a class="button" href="#" id="deleteTextPage1">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('textpage_new') == 1) %}<a href="{{path('basic_cms_textpage_create')}}?pagetype=1" class="button">Создать страницу сайта</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm1">
+            <input type="hidden" name="tab" value="1" />
+            {% if (taxonomyenabled != 0) %}
+            <select name="taxonomy1" class="quickSearch uniformOff">
+                <option value="0" {% if taxonomy1 == 0 %}selected="selected"{% endif %}>Все категории</option>
+                {% for category in taxonomyinfo1['categories'] %}
+                    <option value="{{category['id']}}" {% if taxonomy1 == category['id'] %}selected="selected"{% endif %}>{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658; {% endfor %}{% endif %}{{category['title']}}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+            <input type="text" name="search1" value="{{search1}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="textList1">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort1 == 0) %}
+                        <a href="?tab=1&sort1=1">Заголовок &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 1) %}
+                        <a href="?tab=1&sort1=0">Заголовок &#9660;</a>
+                    {% else %}
+                        <a href="?tab=1&sort1=0">Заголовок</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort1 == 2) %}
+                        <a href="?tab=1&sort1=3">Опубликовано &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 3) %}
+                        <a href="?tab=1&sort1=2">Опубликовано &#9660;</a>
+                    {% else %}
+                        <a href="?tab=1&sort1=2">Опубликовано</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort1 == 4) %}
+                        <a href="?tab=1&sort1=5">Создана (изменена) &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 5) %}
+                        <a href="?tab=1&sort1=4">Создана (изменена) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=1&sort1=4">Создана (изменена)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort1 == 6) %}
+                        <a href="?tab=1&sort1=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 7) %}
+                        <a href="?tab=1&sort1=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=1&sort1=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                {% if taxonomyenabled != 0 %}
+                <th>
+                    Категории
+                </th>
+                {% endif %}
+                <th>
+                    {% if (sort1 == 8) %}
+                        <a href="?tab=1&sort1=9">Порядок &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 9) %}
+                        <a href="?tab=1&sort1=8">Порядок &#9660;</a>
+                    {% else %}
+                        <a href="?tab=1&sort1=8">Порядок</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for textpage in textpages1 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{textpage.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_textpage_edit')}}?id={{textpage.id}}">{{textpage.title}}</a>{% if (errors1[textpage.id] is defined) %}<p class="error">{{errors1[textpage.id]}}</p>{% endif %}</td>
+                <td>{{textpage.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{textpage.createDate | date('d.m.Y G:i')}}{% if (textpage.modifyDate != textpage.createDate) %} ({{textpage.modifyDate | date('d.m.Y G:i')}}){% endif %}</td>
+                <td>{{textpage.fullName}}</td>
+                {% if taxonomyenabled != 0 %}
+                <td>
+                    {% if (taxonomyinfo1['links'][textpage.id] | length) == 1 %}
+                        {% for taxid, taxtitle in taxonomyinfo1['links'][textpage.id] %}
+                        <a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a>
+                        {% endfor %}
+                    {% endif %}
+                    {% if (taxonomyinfo1['links'][textpage.id] | length) > 1 %}
+                        {% for taxid, taxtitle in taxonomyinfo1['links'][textpage.id] %}
+                            {% if loop.index0 == 0 %}
+                            <a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a><p class="hintLabel"><span class="miniNote">и еще {{(taxonomyinfo1['links'][textpage.id] | length) - 1}} категорий</span><span class="hintWrap">
+                            {% else %}
+                            {% if loop.index0 != 1 %}, {% endif %}<a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a>
+                            {% endif %}
+                        {% endfor %}
+                        </span></p>
+                    {% endif %}
+                </td>
+                {% endif %}
+                <td><input type="text" class="ordering" name="ordering[{{textpage.id}}]" value="{{textpage.ordering}}" />{% if (errorsorder1[textpage.id] is defined) %}<p class="error">{{errorsorder1[textpage.id]}}</p>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount1 > 1) %}
+            {% set to = page1 + 1 %}
+            {% set from = page1 - 1 %}
+            {% if (to >= pagecount1) %}
+                {% set to = pagecount1 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=1&page1=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page1 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=1&page1={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount1 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount1 - 1)) %}
+                <a class="button" href="?tab=1&page1={{pagecount1 - 1}}">{{pagecount1}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#saveOrdering1').click(function () {ajaxAction('{{path('basic_cms_textpage_ajax')}}?tab=1', 'ordering', '#textList1 input.ordering', '#con_tab2');return false;});
+            $('#blockedTextPage1').click(function () {ajaxAction('{{path('basic_cms_textpage_ajax')}}?tab=1', 'blocked', '#textList1 input.check', '#con_tab2');return false;});
+            $('#unblockedTextPage1').click(function () {ajaxAction('{{path('basic_cms_textpage_ajax')}}?tab=1', 'unblocked', '#textList1 input.check', '#con_tab2');return false;});
+            $('#deleteTextPage1').click(function () {ajaxActionConfirm('{{path('basic_cms_textpage_ajax')}}?tab=1', 'delete', '#textList1 input.check', '#con_tab2','Удалить выбранные страницы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+            $('select.quickSearch').chosen({no_results_text: 'Нет результатов для ', width: '300px'});
+        </script>

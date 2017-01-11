@@ -1,0 +1,78 @@
+        <a class="button" href="#" id="saveOrdering">Сохранить порядок</a>
+        <a class="button" href="#" id="deleteSelected">Удалить выбранные</a>
+        <a href="{{path('shop_parameter_create')}}" class="button">Создать новое поле</a>
+        <div class="goToRight">
+        <form id="navigationForm">
+            <input type="hidden" name="page0" value="{{page0}}" id="page0" />
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="parameterList">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Техническое имя
+                </th>
+                <th>
+                    Описание
+                </th>
+                <th>
+                    Тип поля
+                </th>
+                <th>
+                    Порядок
+                </th>
+            </tr>
+            
+            {% for parameter in parameters %}
+            <tr>
+                <td><input type="checkbox" class="delete" name="check[{{parameter.id}}]" value="1" /></td>
+                <td><a href="{{path('shop_parameter_edit')}}?id={{parameter.id}}">{{parameter.name}}</a></td>
+                <td>{{parameter.description}}</td>
+                <td>
+                    {% if (parameter.type == 'text') %}Текстовое поле{% endif %}
+                    {% if (parameter.type == 'textarea') %}Многострочный текст{% endif %}
+                    {% if (parameter.type == 'html') %}HTML текст{% endif %}
+                    {% if (parameter.type == 'select') %}Выпадающий список{% endif %}
+                    {% if (parameter.type == 'checkbox') %}Флажок{% endif %}
+                </td>
+                <td><input type="text" class="ordering" name="ordering[{{parameter.id}}]" value="{{parameter.ordering}}" />{% if (errortext[parameter.id] is defined) %}<p class="error">{{errortext[parameter.id]}}</p>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?page0=0" onclick="$('#page0').val(0);location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?page0={{i}}" onclick="$('#page0').val({{i}});location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?page0={{pagecount0 - 1}}" onclick="$('#page0').val({{pagecount0 - 1}});location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#saveOrdering').click(function () {ajaxAction('{{path('shop_parameter_ajax')}}', 'ordering', '#parameterList input.ordering', '#con_tab1');return false;});
+            $('#deleteSelected').click(function () {ajaxActionConfirm('{{path('shop_parameter_ajax')}}', 'delete', '#parameterList input.delete', '#con_tab1','Удалить выбранные параметры?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

@@ -1,0 +1,113 @@
+<style>
+    .mirclubFormButton {
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo1NERDRDFDN0QyRkExMUU0QjRGMkU5NUE3OUZEQUI1NSIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo1NERDRDFDOEQyRkExMUU0QjRGMkU5NUE3OUZEQUI1NSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjU0RENEMUM1RDJGQTExRTRCNEYyRTk1QTc5RkRBQjU1IiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU0RENEMUM2RDJGQTExRTRCNEYyRTk1QTc5RkRBQjU1Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+x6AKQAAAIwZJREFUeNrcfQmUHdV1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) no-repeat 10px center #ffffff;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0px;
+        color: #000000 !important;
+        padding: 0 20px 0 100px;
+        line-height: 80px;
+        border: solid #c7c7c7 1px;
+        text-decoration: none !important;
+        display:inline-block;
+        box-sizing: content-box;
+        -moz-box-sizing: content-box;  
+        font-weight: bold;
+        font-size: 12px;
+        font-family: Verdana;
+        text-align: center;
+        margin: 0 5px;
+    }
+
+    .mirclubFormButton:hover {
+        background-color: #edeaed;
+        text-decoration: none;
+    }
+
+</style>
+{% if currentUser != null %}
+    <p style="text-align:center;margin:10px 0;{% if status == 'OK' %}display:none;{% endif %}"><a href="#" class="mirclubFormButton" onclick="$('#formModule{{title | md5}}').slideDown(300);$(this).closest('p').slideUp(300);return false;">{{title}}</a></p>
+    <div id="formModule{{title | md5}}" {% if status != 'OK' %}style="display:none;"{% endif %}>
+        <h2 class="text-center">{{title}}</h2>
+        {% if status == 'OK' %}
+            <p class="alert alert-success">{% if currentLocale == 'en' %}Message sent{% else %}Сообщение отправлено{% endif %}</p>
+        {% else %}
+            <div>
+                <form action="?#formModule{{title | md5}}" method="post" class="col-md-6 col-md-offset-3 col-sm-12 form-horizontal">
+                    <input type="hidden" name="actionobject" value="form" />
+                    <input type="hidden" name="action" value="sendform" />
+                    <input type="hidden" name="actionid" value="{{id}}" />
+                    {% for field in fields %}
+                        {% if (field['type'] == 'text') %}
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{field['name']}}</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" placeholder="{{field['name']}}" name="actionfields[{{field['id']}}]" value="{{field['value']}}" />
+                                    {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if (field['type'] == 'textarea') %}
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{field['name']}}</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" placeholder="{{field['name']}}" name="actionfields[{{field['id']}}]">{{field['value']}}</textarea>
+                                    {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if (field['type'] == 'select') %}
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{field['name']}}</label>
+                                <div class="col-sm-8">
+                                    <select name="actionfields[{{field['id']}}]" class="form-control" >
+                                        {% for item in field['items'] %}
+                                            <option value="{{item}}" {% if (field['value'] == item) %}selected="selected"{% endif %}>{{item}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if (field['type'] == 'radio') %}
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{field['name']}}</label>
+                                <div class="col-sm-8">
+                                    {% for item in field['items'] %}
+                                        <div class="radio"><label><input type="radio" name="actionfields[{{field['id']}}]" value="{{item}}" {% if (field['value'] == item) %}checked="checked"{% endif %} />{{item}}</label></div>
+                                            {% endfor %}
+                                            {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if (field['type'] == 'checkbox') %}
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{field['name']}}</label>
+                                <div class="col-sm-8">
+                                    <div class="checkbox"><label><input type="checkbox" name="actionfields[{{field['id']}}]" value="1" {% if (field['value'] != 0) %}checked="checked"{% endif %} />{{field['name']}}</label>{% if field['error'] != '' %}<span class="error">{{field['error']}}</span>{% endif %}</div>
+                                    {% if field['error'] != '' %}<p class="form-error">{{field['error']}}</p>{% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if captchaEnabled != 0 %}
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">
+                                {% if currentLocale == 'en' %}Enter text from the image{% else %}Введите строку с картинки{% endif %}
+                                <br />
+                                <img src="{{captchaPath}}&rand={{random()}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand=' + Math.floor(Math.random() * 2000000000));"/>
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" placeholder="{% if currentLocale == 'en' %}Enter text from the image{% else %}Введите строку с картинки{% endif %}" name="actionfields[captcha]" value="" />
+                                {% if captchaError != '' %}<p class="form-error">{% if currentLocale == 'en' %}Field is not valid{% else %}Поле заполнено неверно{% endif %}</p>{% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <p class="text-center"><button class="btn btn-primary" type="submit">{% if currentLocale == 'en' %}Submit{% else %}Отправить{% endif %}</button></p>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <p class="text-center"><a href="#" class="mirclubFormButton" onclick="$('#formModule{{title | md5}}').show();return false;">{{title}}</a></p>
+    <p id="formModule{{title | md5}}" class="alert alert-danger">{{(currentLocale == 'en' ? 'To add messages you need to register on the site.' : 'Для добавления сообщений необходимо зарегистрироваться на сайте.')}}</p>{% endif %}

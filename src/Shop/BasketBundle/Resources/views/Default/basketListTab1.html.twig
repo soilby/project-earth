@@ -1,0 +1,32 @@
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="unblockedBaskets0">Опубликовать</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="blockedBaskets0">Скрыть</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="deleteBaskets0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a href="{{path('shop_basket_create')}}" class="button">Создать страницу корзины</a>{% endif %}
+        <table class="tableContent" id="basketList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Включена
+                </th>
+                <th>
+                    URL
+                </th>
+            </tr>
+            {% for basket in baskets0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{basket.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('shop_basket_edit')}}?id={{basket.id}}">{{basket.name}}</a>{% if (errors0[basket.id] is defined) %}<p class="error">{{errors0[basket.id]}}</p>{% endif %}</td>
+                <td>{{basket.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{basket.url}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#blockedBaskets0').click(function () {ajaxAction('{{path('shop_basket_ajax')}}?tab=0', 'blocked', '#basketList0 input.check', '#con_tab1');return false;});
+            $('#unblockedBaskets0').click(function () {ajaxAction('{{path('shop_basket_ajax')}}?tab=0', 'unblocked', '#basketList0 input.check', '#con_tab1');return false;});
+            $('#deleteBaskets0').click(function () {ajaxActionConfirm('{{path('shop_basket_ajax')}}?tab=0', 'delete', '#basketList0 input.check', '#con_tab1','Удалить выбранные страницы корзины?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

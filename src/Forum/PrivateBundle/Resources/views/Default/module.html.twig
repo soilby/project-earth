@@ -1,0 +1,17 @@
+<table class="cfgTable">
+    <tr>
+        <td>Страница личных сообщений<span class="helpContainerButton" data-id="modulepageid">?</span></td>
+        <td>
+            <select name="parameters[pageId]">
+                {% for page in privatepages %}
+                    <option value="{{page['id']}}" {% if (parameters['pageId'] == page['id']) %}checked="checked"{% endif %}>{{page['title']}} {% if (page['enabled'] == 0) %}(выключена){% endif %}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="cfgError">{{parameterserror['pageId']}}</td>
+    </tr>
+</table>
+<div class="helpContainerAdd">
+    <div id="helpContainer-modulepageid">Задаёт страницу личных сообщений, к которой привязан модуль.</div>
+</div>
+

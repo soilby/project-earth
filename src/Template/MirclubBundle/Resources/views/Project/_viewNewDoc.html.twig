@@ -1,0 +1,27 @@
+{% if premissions.config != 0 %}
+    <div class="documentNewForm" style="margin-bottom: 20px;">
+        {% if createStatus == 'OK' %}
+            <p class="alert alert-success">{% if currentLocale == 'en' %}New document is created{% else %}Новый документ создан{% endif %}</p>
+        {% endif %}
+        <form action="?" method="post" enctype="multipart/form-data" id="mirclub-document-create-form" class="form-inline">
+            <input type="hidden" name="actionobject" value="project" />
+            <input type="hidden" name="action" value="create" />
+            <input type="hidden" name="actionid" value="{{id}}" />
+            {% if currentLocale == 'en' %}New document {% else %}Новый документ {% endif %}
+            <input type="text" name="actionfields[title]" value="{{createTitle}}" id="mirclub-document-create-title" class="form-control" />
+            <button type="submit" class="btn btn-default" id="mirclub-document-create-btn">{% if currentLocale == 'en' %}Create{% else %}Создать{% endif %}</button>
+            {% if createTitleError != '' %}<p class="form-error">{% if currentLocale == 'en' %}Field is not valid{% else %}Поле заполнено неверно{% endif %}</p>{% endif %}
+            <input type="hidden" name="actionfields[content]" value="" />
+        </form>
+        {% if knowledgeEnabled is defined %}
+            <script>
+                $(function () {
+                    $('#mirclub-document-create-btn').click(function () {
+                        mirKnowledgeManager.formMode('#mirclub-document-create-form', $('#mirclub-document-create-title').val());
+                        return false;
+                    });
+                });
+            </script>
+        {% endif %}
+    </div>
+{% endif %}

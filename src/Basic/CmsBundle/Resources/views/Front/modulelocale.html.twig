@@ -1,0 +1,12 @@
+<div>
+<h1>Смена локали</h1>
+    <p>
+        <select onchange="location.href='?actionobject=module&action=changelocale&actionlocale='+this.value;">
+        {% for locale in locales %}
+            <option value="{{locale['shortName']}}" {% if locale['active'] != 0 %}selected="selected"{% endif %}>{{locale['fullName']}}</option>
+        {% endfor %}
+        </select>
+    </p>
+</div>
+
+

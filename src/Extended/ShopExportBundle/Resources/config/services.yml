@@ -1,0 +1,5 @@
+services:
+    addone.product.export:
+        class: Extended\ShopExportBundle\ExportManager
+        arguments: ['@service_container']
+    

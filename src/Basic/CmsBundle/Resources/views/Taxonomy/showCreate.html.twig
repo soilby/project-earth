@@ -1,0 +1,639 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание нового представления{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_taxonomy_list')}}">Категории</a>
+    <span>Создание нового представления</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+    {% if (locales|length > 0) %}
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Локализация</a>
+    {% endif %}
+    <a href="#" onclick="return false;" id="tab4" {% if (activetab == 4) %}class="active"{% endif %}>Параметры отображения</a>
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+5}}" {% if (activetab == loop.index0+5) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="{{path('basic_cms_taxonomyshow_create')}}?object={{taxonomyobject}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_newshow') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="tax[enabled]" value="1" {% if (tax['enabled'] != 0) %}checked="checked"{% endif %} />Опубликовано</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{taxerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Заголовок<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="tax[title]" value="{{tax['title']}}" /></td>
+                    <td class="cfgError">{{taxerror['title']}}</td>
+                </tr>
+                <tr>
+                    <td>Аватар<span class="helpContainerButton" data-id="avatar">?</span></td>
+                    <td class="tac">
+                        <input type="hidden" id="avatarInput" name="tax[avatar]" value="{{tax['avatar']}}" />
+                        <span id="avatarWrap">
+                            {% if (tax['avatar'] == '') %}
+                            <img src="/adminimg/noava.jpg" style="max-width:100px;max-height:100px;" />
+                            {% else %}
+                            <a href="{{tax['avatar']}}" rel="lightbox"><img src="{{tax['avatar']}}" style="max-width:100px;max-height:100px;" /></a>
+                            {% endif %}
+                        </span>
+                        <br />
+                        <a class="button" id="avatarLoad" onclick="return false;" href="#">Изменить</a>
+                        <a class="button" onclick="avatarClear();return false;" href="#">Сброс</a>
+                    </td>
+                    <td class="cfgError" id="avatarError">{{taxerror['avatar']}}</td>
+                </tr>
+                <tr>
+                    <td>META ключи<span class="helpContainerButton" data-id="metaKeywords">?</span></td>
+                    <td><textarea name="tax[metakey]" class="metaTextArea">{{tax['metakey']}}</textarea></td>
+                    <td class="cfgError">{{taxerror['metakey']}}</td>
+                </tr>
+                <tr>
+                    <td>META описание<span class="helpContainerButton" data-id="metaDescription">?</span></td>
+                    <td><textarea name="tax[metadescr]" class="metaTextArea">{{tax['metadescr']}}</textarea></td>
+                    <td class="cfgError">{{taxerror['metadescr']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Описание страницы:<span class="helpContainerButton" data-id="description">?</span></p>
+            <p class="globalError">{{taxerror['description']}}</p>
+            <br />
+            <textarea name="tax[description]" id="taxDescription">{{tax['description']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#taxDescription",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_newshow') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="page[enable]" value="1" {% if (page['enable'] != 0) %}checked="checked"{% endif %} />Включить страницу просмотра</label><span class="helpContainerButton" data-id="seopageEnabled">?</span></td>
+                    <td class="cfgError">{{pageerror['enable']}}</td>
+                </tr>
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_newshow') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            {% for locale in locales %}    
+            <table class="cfgTable">
+                <tr>
+                    <td>Заголовок ({{locale['fullName']}})</td>
+                    <td><input type="text" name="taxloc[{{locale['shortName']}}][title]" value="{{taxloc[locale['shortName']]['title']}}" /></td>
+                    <td class="cfgError">{{taxlocerror[locale['shortName']]['title']}}</td>
+                </tr>
+                <tr>
+                    <td>META ключи ({{locale['fullName']}})</td>
+                    <td><textarea name="taxloc[{{locale['shortName']}}][metakey]" class="metaTextArea">{{taxloc[locale['shortName']]['metakey']}}</textarea></td>
+                    <td class="cfgError">{{taxlocerror[locale['shortName']]['metakey']}}</td>
+                </tr>
+                <tr>
+                    <td>META описание ({{locale['fullName']}})</td>
+                    <td><textarea name="taxloc[{{locale['shortName']}}][metadescr]" class="metaTextArea">{{taxloc[locale['shortName']]['metadescr']}}</textarea></td>
+                    <td class="cfgError">{{taxlocerror[locale['shortName']]['metadescr']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Описание страницы ({{locale['fullName']}}):</p>
+            <p class="globalError">{{taxlocerror[locale['shortName']]['description']}}</p>
+            <br />
+            <textarea name="taxloc[{{locale['shortName']}}][description]" id="taxLocDescription{{locale['shortName']}}">{{taxloc[locale['shortName']]['description']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#taxLocDescription{{locale['shortName']}}",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            {% endfor %}    
+        </div>
+        <div id="con_tab4" {% if (activetab == 4) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_newshow') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Поле сортировки<span class="helpContainerButton" data-id="sortField">?</span></td>
+                    <td>
+                        <select name="pageparams[sortField]">
+                            <option value="" {% if (pageparams['sortField'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for objectparam, objectparamcfg in objectparameters %}
+                                <option value="{{objectparam}}" {% if (pageparams['sortField'] == objectparam) %}selected="selected"{% endif %}>{{objectparamcfg['name']}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageparamserror['sortField']}}</td>
+                </tr>
+                <tr>
+                    <td>Направление сортировки<span class="helpContainerButton" data-id="sortDirection">?</span></td>
+                    <td>
+                        <select name="pageparams[sortDirection]">
+                            <option value="0" {% if (pageparams['sortDirection'] == 0) %}selected="selected"{% endif %}>По возрастанию</option>
+                            <option value="1" {% if (pageparams['sortDirection'] != 0) %}selected="selected"{% endif %}>По убыванию</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageparamserror['sortDirection']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="pageparams[sortGetOn]" value="1" {% if (pageparams['sortGetOn'] != 0) %}checked="checked"{% endif %} />Принимать параметры сортировки из GET-параметра sort</label><span class="helpContainerButton" data-id="getSort">?</span></td>
+                    <td class="cfgError">{{pageparamserror['sortGetOn']}}</td>
+                </tr>
+                <tr>
+                    <td>Количество материалов на странице<span class="helpContainerButton" data-id="countInPage">?</span></td>
+                    <td><input type="text" name="pageparams[countValue]" value="{{pageparams['countValue']}}" /></td>
+                    <td class="cfgError">{{pageparamserror['countValue']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="pageparams[countGetOn]" value="1" {% if (pageparams['countGetOn'] != 0) %}checked="checked"{% endif %} />Принимать количество материалов из GET-параметра countinpage</label><span class="helpContainerButton" data-id="getCountInPage">?</span></td>
+                    <td class="cfgError">{{pageparamserror['countGetOn']}}</td>
+                </tr>
+                <tr>
+                    <td>Номер страницы для отображения (начиная с 0)<span class="helpContainerButton" data-id="page">?</span></td>
+                    <td><input type="text" name="pageparams[pageValue]" value="{{pageparams['pageValue']}}" /></td>
+                    <td class="cfgError">{{pageparamserror['pageValue']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="pageparams[pageGetOn]" value="1" {% if (pageparams['pageGetOn'] != 0) %}checked="checked"{% endif %} />Принимать номер страницы из GET-параметра page</label><span class="helpContainerButton" data-id="getPage">?</span></td>
+                    <td class="cfgError">{{pageparamserror['pageGetOn']}}</td>
+                </tr>
+                <tr>
+                    <td>Поля материала для вывода<span class="helpContainerButton" data-id="fields">?</span></td>
+                    <td>
+                        {% for objectparam, objectparamcfg in objectparameters %}
+                            <label><input type="checkbox" name="pageparams[fields][]" value="{{objectparam}}" {% if (objectparam in pageparams['fields']) %}checked="checked"{% endif %} />{{objectparamcfg['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageparamserror['fields']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="pageparams[categoryGetSeo]" value="1" {% if (pageparams['categoryGetSeo'] != 0) %}checked="checked"{% endif %} />Определять категорию по текущей странице</label><span class="helpContainerButton" data-id="categoryGetSeo">?</span></td>
+                    <td class="cfgError">{{pageparamserror['categoryGetSeo']}}</td>
+                </tr>
+            </table>
+            <div class="mt20 categoryTree">
+                <p>Выбранные категории:<span class="helpContainerButton" data-id="categories">?</span></p>
+                <ul>
+                    {% if (categories|length) > 0 %}
+                        {% for i in 0..(categories|length - 1) %}
+                            <li><input type="checkbox" name="selcategories[]" value="{{categories[i]['id']}}" autocomplate="off" {% if (categories[i]['id'] in selcategories) %}checked="checked"{% endif %} />
+                                <span {% if (categories[i]['enabled'] == 0) %}class="disabled"{% endif %}>{{categories[i]['name']}}</span>
+                            {% if (categories[i]['error'] != '') %}<span class="ml20 globalError">{{categories[i]['error']}}</span>{% endif %}
+                            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] > categories[i]['nesting']))%}
+                            <ul>
+                            {%else%}
+                            </li>
+                            {%endif%}
+                            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] < categories[i]['nesting']))%}
+                                {% for j in 0..(categories[i]['nesting'] - categories[i+1]['nesting'] - 1) %}
+                                </ul></li>
+                                {% endfor %}
+                            {%endif%}
+                        {% endfor %}
+                        {%if (categories[categories|length-1]['nesting'] > 0)%}
+                            {% for j in 0..(categories[categories|length-1]['nesting'] - 1) %}
+                            </ul></li>
+                            {% endfor %}
+                        {%endif%}
+                    {% endif %}
+                </ul>
+            </div>
+            <p class="mt20">Настройки фильтров:<span class="helpContainerButton" data-id="filters">?</span></p>
+            <table class="taxonomyFilterTable" id="taxonomyFilterTable">
+                <tr>
+                    <th>Параметр</th>
+                    <th>Условие</th>
+                    <th>Значение для сравнения по умолчанию</th>
+                    <th>GET-параметр значения для сравнения</th>
+                    <th>Удалить</th>
+                </tr>
+                {% set filterparamcount = 0 %}
+                {% for filterparam in filterparams %}
+                    {% if (objectparameters[filterparam['parameter']] is defined) %}
+                        {% if (objectparameters[filterparam['parameter']]['type'] == 'text') %}
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="filterparams[{{loop.index0}}][parameter]" value="{{filterparam['parameter']}}" />{{objectparameters[filterparam['parameter']]['name']}}
+                                </td>
+                                <td>
+                                    <select name="filterparams[{{loop.index0}}][compare]">
+                                        <option value="eq" {% if (filterparam['compare'] == 'eq') %}selected="selected"{% endif %}>Равно</option>
+                                        <option value="noeq" {% if (filterparam['compare'] == 'noeq') %}selected="selected"{% endif %}>Не равно</option>
+                                        <option value="like" {% if (filterparam['compare'] == 'like') %}selected="selected"{% endif %}>Содержит</option>
+                                    </select>
+                                    <p class="globalError">{{filterparam['compareerror'] | default('')}}</p>
+                                </td>
+                                <td>
+                                    <input type="text" name="filterparams[{{loop.index0}}][value]" value="{{filterparam['value']}}" />
+                                    <p class="globalError">{{filterparam['valueerror'] | default('')}}</p>
+                                    <br /><label><input type="checkbox" name="filterparams[{{loop.index0}}][getoff]" value="1" {% if (filterparam['getoff'] != 0) %}checked="checked"{%endif %} />Отключить</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="filterparams[{{loop.index0}}][get]" value="{{filterparam['get']}}" />
+                                    <p class="globalError">{{filterparam['geterror'] | default('')}}</p>
+                                </td>
+                                <td>
+                                    <button onclick="$(this).closest('tr').remove();return false;">Удалить</button>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% if (objectparameters[filterparam['parameter']]['type'] == 'int') %}
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="filterparams[{{loop.index0}}][parameter]" value="{{filterparam['parameter']}}" />{{objectparameters[filterparam['parameter']]['name']}}
+                                </td>
+                                <td>
+                                    <select name="filterparams[{{loop.index0}}][compare]">
+                                        <option value="eq" {% if (filterparam['compare'] == 'eq') %}selected="selected"{% endif %}>Равно</option>
+                                        <option value="noeq" {% if (filterparam['compare'] == 'noeq') %}selected="selected"{% endif %}>Не равно</option>
+                                        <option value="lo" {% if (filterparam['compare'] == 'lo') %}selected="selected"{% endif %}>Меньше</option>
+                                        <option value="hi" {% if (filterparam['compare'] == 'hi') %}selected="selected"{% endif %}>Больше</option>
+                                        <option value="loeq" {% if (filterparam['compare'] == 'loeq') %}selected="selected"{% endif %}>Меньше или равно</option>
+                                        <option value="hieq" {% if (filterparam['compare'] == 'hieq') %}selected="selected"{% endif %}>Больше или равно</option>
+                                    </select>
+                                    <p class="globalError">{{filterparam['compareerror'] | default('')}}</p>
+                                </td>
+                                <td>
+                                    <input type="text" name="filterparams[{{loop.index0}}][value]" value="{{filterparam['value']}}" />
+                                    <p class="globalError">{{filterparam['valueerror'] | default('')}}</p>
+                                    <br /><label><input type="checkbox" name="filterparams[{{loop.index0}}][getoff]" value="1" {% if (filterparam['getoff'] != 0) %}checked="checked"{%endif %} />Отключить</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="filterparams[{{loop.index0}}][get]" value="{{filterparam['get']}}" />
+                                    <p class="globalError">{{filterparam['geterror'] | default('')}}</p>
+                                </td>
+                                <td>
+                                    <button onclick="$(this).closest('tr').remove();return false;">Удалить</button>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% if (objectparameters[filterparam['parameter']]['type'] == 'date') %}
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="filterparams[{{loop.index0}}][parameter]" value="{{filterparam['parameter']}}" />{{objectparameters[filterparam['parameter']]['name']}}
+                                </td>
+                                <td>
+                                    <select name="filterparams[{{loop.index0}}][compare]">
+                                        <option value="eq" {% if (filterparam['compare'] == 'eq') %}selected="selected"{% endif %}>Равно</option>
+                                        <option value="noeq" {% if (filterparam['compare'] == 'noeq') %}selected="selected"{% endif %}>Не равно</option>
+                                        <option value="lo" {% if (filterparam['compare'] == 'lo') %}selected="selected"{% endif %}>Меньше</option>
+                                        <option value="hi" {% if (filterparam['compare'] == 'hi') %}selected="selected"{% endif %}>Больше</option>
+                                        <option value="loeq" {% if (filterparam['compare'] == 'loeq') %}selected="selected"{% endif %}>Меньше или равно</option>
+                                        <option value="hieq" {% if (filterparam['compare'] == 'hieq') %}selected="selected"{% endif %}>Больше или равно</option>
+                                    </select>
+                                    <p class="globalError">{{filterparam['compareerror'] | default('')}}</p>
+                                </td>
+                                <td>
+                                    <input type="text" name="filterparams[{{loop.index0}}][value]" value="{{filterparam['value']}}" />
+                                    <p class="globalError">{{filterparam['valueerror'] | default('')}}</p>
+                                    <br /><label><input type="checkbox" name="filterparams[{{loop.index0}}][getoff]" value="1" {% if (filterparam['getoff'] != 0) %}checked="checked"{%endif %} />Отключить</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="filterparams[{{loop.index0}}][get]" value="{{filterparam['get']}}" />
+                                    <p class="globalError">{{filterparam['geterror'] | default('')}}</p>
+                                </td>
+                                <td>
+                                    <button onclick="$(this).closest('tr').remove();return false;">Удалить</button>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% if (objectparameters[filterparam['parameter']]['type'] == 'bool') %}
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="filterparams[{{loop.index0}}][parameter]" value="{{filterparam['parameter']}}" />{{objectparameters[filterparam['parameter']]['name']}}
+                                </td>
+                                <td>
+                                    <input type="hidden" name="filterparams[{{loop.index0}}][compare]" value="eq" />
+                                    <p class="globalError">{{filterparam['compareerror'] | default('')}}</p>
+                                </td>
+                                <td>
+                                    <select name="filterparams[{{loop.index0}}][value]">
+                                        <option value="1" {% if (filterparam['value'] != 0) %}selected="selected"{% endif %}>Да</option>
+                                        <option value="0" {% if (filterparam['value'] == 0) %}selected="selected"{% endif %}>Нет</option>
+                                    </select>
+                                    <p class="globalError">{{filterparam['valueerror'] | default('')}}</p>
+                                    <br /><label><input type="checkbox" name="filterparams[{{loop.index0}}][getoff]" value="1" {% if (filterparam['getoff'] != 0) %}checked="checked"{%endif %} />Отключить</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="filterparams[{{loop.index0}}][get]" value="{{filterparam['get']}}" />
+                                    <p class="globalError">{{filterparam['geterror'] | default('')}}</p>
+                                </td>
+                                <td>
+                                    <button onclick="$(this).closest('tr').remove();return false;">Удалить</button>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% set filterparamcount = loop.index0 %}
+                    {% endif %}
+                {% endfor %}
+            </table>
+            <select name="filterToAdd" id="filterToAdd">
+                {% for objectparam, objectparamcfg in objectparameters %}
+                     <option value="{{objectparam}}">{{objectparamcfg['name']}}</option>
+                {% endfor %}
+            </select>
+            <button id="filterToAddButton">Добавить фильтр</button>
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+5}}" {% if (activetab == loop.index0+5) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_newshow') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+</div>​
+</form>
+<script>
+window.filterparamcount = {{filterparamcount + 1}};    
+$('#filterToAddButton').click(function ()
+{
+    var objectparam = $('#filterToAdd').val();
+    var paramtype = '';
+    var paramname = '';
+    var index = window.filterparamcount;
+    window.filterparamcount++;
+    {% for objectparam, objectparamcfg in objectparameters %}
+    if (objectparam == '{{objectparam}}') {paramtype = '{{objectparamcfg['type']}}';paramname = '{{objectparamcfg['name']}}';}
+    {% endfor %}
+    if (paramtype == 'text')
+    {
+        $('#taxonomyFilterTable').append('<tr><td><input type="hidden" name="filterparams['+index+'][parameter]" value="'+objectparam+'" />'+paramname+'</td>'+
+                    '<td>'+
+                    '<select name="filterparams['+index+'][compare]">'+
+                        '<option value="eq">Равно</option>'+
+                        '<option value="noeq">Не равно</option>'+
+                        '<option value="like">Содержит</option>'+
+                    '</select>'+
+                    '</td>'+
+                    '<td>'+
+                        '<input type="text" name="filterparams['+index+'][value]" value="" />'+
+                        '<br /><label><input type="checkbox" name="filterparams['+index+'][getoff]" value="1" />Отключить</label>'+
+                    '</td>'+
+                    '<td>'+
+                        '<input type="text" name="filterparams['+index+'][get]" value="" />'+
+                    '</td>'+
+                    '<td>'+
+                        '<button onclick="$(this).closest(\'tr\').remove();return false;">Удалить</button>'+
+                    '</td>'+
+                '</tr>');
+        $('#taxonomyFilterTable input, #taxonomyFilterTable select, #taxonomyFilterTable button').not('.uniformOff').uniform();
+    }
+    if (paramtype == 'int')
+    {
+        $('#taxonomyFilterTable').append('<tr><td><input type="hidden" name="filterparams['+index+'][parameter]" value="'+objectparam+'" />'+paramname+'</td>'+
+                    '<td>'+
+                    '<select name="filterparams['+index+'][compare]">'+
+                        '<option value="eq">Равно</option>'+
+                        '<option value="noeq">Не равно</option>'+
+                        '<option value="lo">Больше</option>'+
+                        '<option value="hi">Меньше</option>'+
+                        '<option value="loeq">Больше или равно</option>'+
+                        '<option value="hieq">Меньше или равно</option>'+
+                    '</select>'+
+                    '</td>'+
+                    '<td>'+
+                        '<input type="text" name="filterparams['+index+'][value]" value="" />'+
+                        '<br /><label><input type="checkbox" name="filterparams['+index+'][getoff]" value="1" />Отключить</label>'+
+                    '</td>'+
+                    '<td>'+
+                        '<input type="text" name="filterparams['+index+'][get]" value="" />'+
+                    '</td>'+
+                    '<td>'+
+                        '<button onclick="$(this).closest(\'tr\').remove();return false;">Удалить</button>'+
+                    '</td>'+
+                '</tr>');
+        $('#taxonomyFilterTable input, #taxonomyFilterTable select, #taxonomyFilterTable button').not('.uniformOff').uniform();
+    }
+    if (paramtype == 'date')
+    {
+        $('#taxonomyFilterTable').append('<tr><td><input type="hidden" name="filterparams['+index+'][parameter]" value="'+objectparam+'" />'+paramname+'</td>'+
+                    '<td>'+
+                    '<select name="filterparams['+index+'][compare]">'+
+                        '<option value="eq">Равно</option>'+
+                        '<option value="noeq">Не равно</option>'+
+                        '<option value="lo">Больше</option>'+
+                        '<option value="hi">Меньше</option>'+
+                        '<option value="loeq">Больше или равно</option>'+
+                        '<option value="hieq">Меньше или равно</option>'+
+                    '</select>'+
+                    '</td>'+
+                    '<td>'+
+                        '<input type="text" name="filterparams['+index+'][value]" value="" />'+
+                        '<br /><label><input type="checkbox" name="filterparams['+index+'][getoff]" value="1" />Отключить</label>'+
+                    '</td>'+
+                    '<td>'+
+                        '<input type="text" name="filterparams['+index+'][get]" value="" />'+
+                    '</td>'+
+                    '<td>'+
+                        '<button onclick="$(this).closest(\'tr\').remove();return false;">Удалить</button>'+
+                    '</td>'+
+                '</tr>');
+        $('#taxonomyFilterTable input, #taxonomyFilterTable select, #taxonomyFilterTable button').not('.uniformOff').uniform();
+    }
+    if (paramtype == 'bool')
+    {
+        $('#taxonomyFilterTable').append('<tr><td><input type="hidden" name="filterparams['+index+'][parameter]" value="'+objectparam+'" />'+paramname+'</td>'+
+                    '<td>'+
+                        '<input type="hidden" name="filterparams['+index+'][compare]" value="eq" />'+
+                    '</td>'+
+                    '<td>'+
+                    '<select name="filterparams['+index+'][value]">'+
+                        '<option value="1">Да</option>'+
+                        '<option value="0">Нет</option>'+
+                    '</select>'+
+                        '<br /><label><input type="checkbox" name="filterparams['+index+'][getoff]" value="1" />Отключить</label>'+
+                    '</td>'+
+                    '<td>'+
+                        '<input type="text" name="filterparams['+index+'][get]" value="" />'+
+                    '</td>'+
+                    '<td>'+
+                        '<button onclick="$(this).closest(\'tr\').remove();return false;">Удалить</button>'+
+                    '</td>'+
+                '</tr>');
+        $('#taxonomyFilterTable input, #taxonomyFilterTable select, #taxonomyFilterTable button').not('.uniformOff').uniform();
+    }
+    return false;
+});
+    
+function avatarClear()
+{
+    $('#avatarWrap').html('<img src="/adminimg/noava.jpg" style="max-width:100px;max-height:100px;" />');
+    $('#avatarInput').val('');
+    $('#avatarError').html('');
+}
+$(function () 
+{
+    new AjaxUpload('#avatarLoad', 
+    {
+        action: '{{path('basic_cms_taxonomy_ajaxavatar')}}',
+        name: 'avatar',
+        inputFilter: 'image/jpeg,image/png,image/gif',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "{file:'', error:'Ошибка загрузки файла'}";
+            var answer = $.parseJSON(response);
+            if(answer.file)
+            {
+                    $('#avatarWrap').html('<a href="'+answer.file+'" rel="lightbox"><img src="'+answer.file+'" style="max-height:100px;max-width:100px;" /></a>');
+                    $('#avatarInput').val(answer.file);
+                    $('#avatarError').html('');
+            } else
+            {
+                    $('#avatarError').html(answer.error);
+            }
+        }
+    });
+});
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить преставление.</div>
+    <div id="helpContainer-title">Задаёт название представления.</div>
+    <div id="helpContainer-avatar">Аватар задаёт изображение представления на сайте.</div>
+    <div id="helpContainer-categories">Данная настройка указывает, из каких категорий будут отобраны объекты в вывод.</div>
+    <div id="helpContainer-categoryGetSeo">При включении данной опции в вывод будут включены объекты, находящиеся в категории из просматриваемой пользователем страницы.</div>
+    <div id="helpContainer-metaKeywords">МЕТА ключи позволяют задать ключевые слова для данной страницы сайта. Данная информация участвует в оптимизации сайта для поисковых систем (SEO).</div>
+    <div id="helpContainer-metaDescription">МЕТА описание позволяет задать краткое описание для данной страницы сайта. Данная информация участвует в оптимизации сайта для поисковых систем (SEO).</div>
+    <div id="helpContainer-description">Задаёт описание представления.</div>
+    <div id="helpContainer-sortField">Задаёт поле, по которому выводимые объекты будут отсортированы.</div>
+    <div id="helpContainer-sortDirection">Задаёт направление сортировки.</div>
+    <div id="helpContainer-getSort">При включении данной опции пользователь сможет менять настройки сортировки через GET-параметр sort.</div>
+    <div id="helpContainer-getCountInPage">При включении данной опции пользователь сможет менять количетсво объектов на одной странице через GET-параметр countinpage.</div>
+    <div id="helpContainer-countInPage">Количество объектов, отображаемых на одной странице представления.</div>
+    <div id="helpContainer-getPage">При включении данной опции пользователь сможет менять текущую страницу через GET-параметр page.</div>
+    <div id="helpContainer-page">Номер страницы для отображения.</div>
+    <div id="helpContainer-fields">Параметры объекта, которые будут выведены. Данная опция позволяет выводить только нужную информацию, при этом сократить время выполнения запроса.</div>
+    <div id="helpContainer-filters">Фильтры позволяют вывести в представление объекты, отвечающие определённым характеристикам.</div>
+    <div id="helpContainer-seopageEnabled">При включении создаёт отдельную страницу сайта для представления.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+</div>
+{% endblock %}       
+
+
+

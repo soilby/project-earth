@@ -1,0 +1,15 @@
+shop_parameter_list:
+    path:  /admin/products/parameters/
+    defaults: { _controller: ShopParameterBundle:Default:parameterList }
+
+shop_parameter_create:
+    path:  /admin/products/parameters/create
+    defaults: { _controller: ShopParameterBundle:Default:parameterCreate }
+
+shop_parameter_edit:
+    path:  /admin/products/parameters/edit
+    defaults: { _controller: ShopParameterBundle:Default:parameterEdit }
+
+shop_parameter_ajax:
+    path:  /admin/products/parameters/ajax
+    defaults: { _controller: ShopParameterBundle:Default:parameterAjax }

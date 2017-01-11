@@ -1,0 +1,100 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Импорт продукции{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Импорт продукции</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Импорт из yml-файла</a>
+    <a href="#" onclick="return false;" id="tab2">Импорт из WinShop</a>
+    <a href="#" onclick="return false;" id="tab3">Импорт из Excel</a>
+    {#<a href="#" onclick="return false;" id="tab2">Страница</a>#}
+</div>
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <p>Импорт из Yandex Market XML файла</p>
+            <button id="import1LoadFile" onclick="return false;">Выбрать файл</button>
+            <div id="import1ImportData">
+            </div>
+        </div>
+        <div id="con_tab2">
+            <p>Импорт из WinShop</p>
+            <button id="import2LoadFile" onclick="return false;">Выбрать файл</button>
+            <div id="import2ImportData">
+            </div>
+        </div>
+        <div id="con_tab3">
+            <p>Импорт из Ecxel</p>
+            <button id="import3LoadFile" onclick="return false;">Выбрать файл</button>
+            <div id="import3ImportData">
+            </div>
+        </div>
+        {#<div id="con_tab2">
+        </div>#}
+</div>​
+<script>
+$(function () 
+{
+    new AjaxUpload('#import1LoadFile', 
+    {
+        action: '{{path('extended_shop_import_one_loadfile')}}',
+        name: 'file',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "<p>Ошибка ответа от сервера</p>";
+            $('#import1ImportData').html(response);
+        }
+    });
+    new AjaxUpload('#import2LoadFile', 
+    {
+        action: '{{path('extended_shop_import_two_loadfile')}}',
+        name: 'file',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "<p>Ошибка ответа от сервера</p>";
+            $('#import2ImportData').html(response);
+        }
+    });
+    new AjaxUpload('#import3LoadFile', 
+    {
+        action: '{{path('extended_shop_import_three_loadfile')}}',
+        name: 'file',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "<p>Ошибка ответа от сервера</p>";
+            $('#import3ImportData').html(response);
+        }
+    });
+    
+    
+    
+    
+    
+    
+    
+});
+
+</script>    
+{% endblock %}       
+
+
+

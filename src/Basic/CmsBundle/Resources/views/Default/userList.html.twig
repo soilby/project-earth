@@ -1,0 +1,38 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Список пользователей{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Пользователи</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="$('#tab').val(0);return false;" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Пользователи</a>
+    <a href="#" onclick="$('#tab').val(1);return false;" id="tab2" {% if (tab == 1) %}class="active"{% endif %}>Страницы авторизации</a>
+    <a href="#" onclick="$('#tab').val(2);return false;" id="tab3" {% if (tab == 2) %}class="active"{% endif %}>Страницы восстановления пароля</a>
+    <a href="#" onclick="$('#tab').val(3);return false;" id="tab4" {% if (tab == 3) %}class="active"{% endif %}>Страницы регистрации</a>
+    <a href="#" onclick="$('#tab').val(4);return false;" id="tab5" {% if (tab == 4) %}class="active"{% endif %}>Страницы изменения профиля</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:Default:userListTab1.html.twig" %}
+    </div>
+    <div id="con_tab2" {% if (tab == 1) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:Default:userListTab2.html.twig" %}
+    </div>
+    <div id="con_tab3" {% if (tab == 2) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:Default:userListTab3.html.twig" %}
+    </div>
+    <div id="con_tab4" {% if (tab == 3) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:Default:userListTab4.html.twig" %}
+    </div>
+    <div id="con_tab5" {% if (tab == 4) %}class="active"{% endif %}>
+        {% include "BasicCmsBundle:Default:userListTab5.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

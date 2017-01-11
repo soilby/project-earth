@@ -1,0 +1,8 @@
+<div>
+<h1>{{title}}</h1>
+<small>Создано {{createDate | date('d.m.Y')}} пользователем {{createrFullName}}</small>
+<p>
+    {{ (isVideo != 0 ? 'Видео' : 'Фото') }}
+    <a href="{{content}}"><img src="{{avatar}}" /><br />{{description | raw}}</a>
+</p>
+</div>

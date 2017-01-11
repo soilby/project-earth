@@ -1,0 +1,33 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание нового модуля{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_module_list')}}">Модули</a>
+    <span>Создание нового модуля</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="$('#tab').val(0);return false;" id="tab1" class="active">Типы модуля</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" class="active">
+        <p>Выберите тип нового модуля:</p><br />
+        <form action="{{path('basic_cms_module_new')}}" method="get">
+            <input type="hidden" name="object" id="objectVal" value="" />
+            {% for objectkey,typearray in moduletypes %}
+                {% for typekey,typename in typearray %}
+                    <p><label><input autocomplete="off" type="radio" name="type" value="{{typekey}}" onclick="$('#objectVal').val('{{objectkey}}')">{{typename}}</label></p>
+                {% endfor %}
+            {% endfor %}
+            <br />
+            <button type="submit">Далее</button>
+        </form>
+    </div>
+</div>​
+{% endblock %}       
+
+
+

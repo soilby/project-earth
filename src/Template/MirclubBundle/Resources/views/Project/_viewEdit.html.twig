@@ -1,0 +1,117 @@
+    <h1>{{document.localeTitle}} (версия от {{document.createDate | date('d.m.Y H:i')}} <span class="mirclubTransliteration">{{document.createrFullName}}</span>)</h1>
+    <div>
+        {% if document.diffContent is defined %}
+            <p style="float:right" class="checkbox"><label><input autocomplete="off" type="checkbox" value="1" onclick="$('.documentContent').toggle();" />Сравнение с предыдущей версией</label></p>
+        {% endif %}
+        <p>
+        {% if documentView != 2 %}
+            <a href="?document=0" class="btn btn-default">Назад</a>
+        {% else %}
+            <a href="?document={{document.parentId}}" class="btn btn-default">Назад</a>
+        {% endif %}
+        {% if (documentPremissions.write != 0) and (documentView != 2) %}
+            <a href="?document={{document.parentId}}&version=new" class="btn btn-default">Редактировать документ</a>
+            <small>Создаётся новая версия документа на основе последней версии. Предыдущая версия сохраняется неизменной.</small>
+        {% endif %}
+        </p>
+    </div>
+    {% if documentView != 2 %}
+        {% if document.editStatus == 'OK' %}
+            <p class="alert alert-success">Документ сохранён</p>
+        {% endif %}
+        {% if document.diffContent is defined %}
+            {% for locale in locales %}
+                <div class="documentContent tinymceContent diffContent" style="display:none;">{{document.diffContent[locale['shortName']] | raw}}</div>
+            {% endfor %}
+            <div class="documentContent tinymceContent diffContent" style="display:none;">{{document.diffContent['default'] | raw}}</div>
+        {% endif %}
+        {% for locale in locales %}
+            <div class="documentContent tinymceContent">{{document.content[locale['shortName']] | raw}}</div>
+        {% endfor %}
+        <div class="documentContent tinymceContent">{{document.content['default'] | raw}}</div>
+    {% else %}
+        {% if documentPremissions.write != 0 %}
+            <div class="documentEditContent">
+                <style>
+                    #mirclub-document-edit-form label {
+                        text-align: left;
+                    }
+                </style>
+                <form action="?document={{document.parentId}}" method="post" enctype="multipart/form-data" id="mirclub-document-edit-form" class="form-horizontal">
+                    <input type="hidden" name="actionobject" value="project" />
+                    <input type="hidden" name="action" value="edit" />
+                    <input type="hidden" name="actionid" value="{{document.parentId}}" />
+                    {% for locale in locales %}
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Заголовок ({{locale['fullName']}})</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control mirclub-document-edit-title" data-locale="{{locale['shortName']}}" name="actionfields[title][{{locale['shortName']}}]" value="{{document.editTitle[locale['shortName']]}}" />
+                                {% if (document.editTitleError[locale['shortName']] | default('')) != '' %}<p class="form-error">Поле заполнено неверно</p>{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Заголовок (Русский)</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control mirclub-document-edit-title" name="actionfields[title][default]" value="{{document.editTitle['default']}}" data-locale="default" />
+                                {% if (document.editTitleError['default'] | default('')) != '' %}<p class="form-error">Поле заполнено неверно</p>{% endif %}
+                            </div>
+                        </div>
+                    {% if documentPremissions.master != 0 %}
+                        <div class="checkbox"><label><input type="checkbox" name="actionfields[isMaster]" value="1" {% if document.editIsMaster == 1 %}checked="checked"{% endif %} />Оффициальная версия</label></div>
+                    {% endif %}
+                    {% for locale in locales %}
+                        <div class="form-group">
+                            <label class="col-sm-12 control-label">Текст ({{locale['fullName']}})</label>
+                            <div class="col-sm-12">
+                                <textarea class="documentTextArea form-control" name="actionfields[content][{{locale['shortName']}}]">{{document.editContent[locale['shortName']]}}</textarea>
+                                {% if (document.editContentError[locale['shortName']] | default('')) != '' %}<p class="form-error">Поле заполнено неверно</p>{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                        <div class="form-group">
+                            <label class="col-sm-12 control-label">Текст (Русский)</label>
+                            <div class="col-sm-12">
+                                <textarea id="documentTextArea" class="documentTextArea form-control" name="actionfields[content][default]">{{document.editContent['default']}}</textarea>
+                                {% if (document.editContentError['default'] | default('')) != '' %}<p class="form-error">Поле заполнено неверно</p>{% endif %}
+                            </div>
+                        </div>
+                    <p><button type="submit" class="btn btn-primary" id="mirclub-document-edit-btn">Сохранить</button></p>
+                </form>
+                <script>
+                    tinymce.init({
+                    selector: "textarea.documentTextArea",
+                            language : 'ru',
+                            height: 400,
+                            convert_urls: false,
+                            verify_html : false,
+                            content_css: "/css/tinymce.css",
+                            sxmProjectDocumentId :{{document.id}},
+                            plugins: [
+                                    "advlist autolink lists image charmap print preview anchor",
+                                    "searchreplace visualblocks code fullscreen",
+                                    "media table contextmenu paste textcolor",
+                                    "jbimages link"
+                            ],
+                            toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages | sxmfilemgr"
+                    });
+                </script>
+                {% if knowledgeEnabled is defined %}
+                    <script>
+                                $(function () {
+                                    $('#mirclub-document-edit-btn').click(function () {
+                                        var title = {};
+                                        $('.mirclub-document-edit-title').each(function () {
+                                            if ($(this).data('locale')) {
+                                                title[$(this).data('locale')] = $(this).val();
+                                            }
+                                        });
+                                        mirKnowledgeManager.formMode('#mirclub-document-edit-form', title, {{knowledgeInfo['types']['document']}}, {{document.parentId}});
+                                                return false;
+                                    });
+                                });
+                    </script>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endif %}

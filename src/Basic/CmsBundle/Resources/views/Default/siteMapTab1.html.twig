@@ -1,0 +1,58 @@
+        {% if (app.user.checkAccess('site_map') == 1) %}<a class="button" href="#" id="deletePath0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('site_map') == 1) %}<a href="{{path('basic_cms_path_create')}}" class="button">Создать новый путь</a>{% endif %}
+        <table class="tableContent" id="pathList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Страница
+                </th>
+                <th>
+                    Заданный путь
+                </th>
+            </tr>
+            {% for path in paths0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{path.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_path_edit')}}?id={{path.id}}">{{path.description}}</a>{% if (errors0[path.id] is defined) %}<p class="error">{{errors0[path.id]}}</p>{% endif %}</td>
+                <td>
+                    {% for item in path['pathitems'] %}
+                        [{{item['description']}}]
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#deletePath0').click(function () {ajaxActionConfirm('{{path('basic_cms_path_ajax')}}?tab=0', 'delete', '#pathList0 input.check', '#con_tab1','Удалить выбранные пути?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

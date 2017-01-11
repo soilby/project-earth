@@ -1,0 +1,75 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Оповещения пользователей{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Оповещения пользователей</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    {% for objectTypesName, objectTypesDescription in objectTypes %}
+    <a href="#" onclick="return false;" id="tab{{loop.index}}" {% if activetab == objectTypesName %}class="active"{% endif %}>{{objectTypesDescription}}</a>
+    {% endfor %}
+</div>
+<form action="{{path('extended_alert_config')}}" method="post">
+<div id="tabsContent">
+    {% for objectTypesName, objectTypesDescription in objectTypes %}
+        <div id="con_tab{{loop.index}}" {% if (activetab == objectTypesName) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                <button type="submit">Сохранить</button>
+            </div>
+                <table class="cfgTable">
+                    <tr>
+                        <td>Заголовок письма</td>
+                        <td><input type="text" name="title[{{objectTypesName}}][default]" value="{{parameters[objectTypesName]['title']['default']}}" /></td>
+                        <td class="cfgError">{{errors[objectTypesName]['title']['default'] | default('')}}</td>
+                    </tr>
+                </table>
+                <div class="mb20">
+                <p>Содержание письма:</p>
+                <p class="globalError">{{errors[objectTypesName]['body']['default'] | default('')}}</p>
+                <br />
+                <textarea name="body[{{objectTypesName}}][default]" class="bodyTextarea">{{parameters[objectTypesName]['body']['default']}}</textarea>
+                </div>
+                <p class="miniNote">{{objectTypesMiniNote[objectTypesName] | default('')}}</p>
+            {% for locale in locales %}
+                <table class="cfgTable">
+                    <tr>
+                        <td>Заголовок письма ({{locale['fullName']}})</td>
+                        <td><input type="text" name="title[{{objectTypesName}}][{{locale['shortName']}}]" value="{{parameters[objectTypesName]['title'][locale['shortName']]}}" /></td>
+                        <td class="cfgError">{{errors[objectTypesName]['title'][locale['shortName']] | default('')}}</td>
+                    </tr>
+                </table>
+                <div class="mb20">
+                <p>Содержание письма ({{locale['fullName']}}):</p>
+                <p class="globalError">{{errors[objectTypesName]['body'][locale['shortName']] | default('')}}</p>
+                <br />
+                <textarea name="body[{{objectTypesName}}][{{locale['shortName']}}]" class="bodyTextarea">{{parameters[objectTypesName]['body'][locale['shortName']]}}</textarea>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+                <script>
+                tinymce.init({
+                    selector: "textarea.bodyTextarea",
+                    language : 'ru',
+                    height: 400,
+                    convert_urls: false,
+                    verify_html : false,
+                    plugins: [
+                        "advlist autolink lists image charmap print preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "media table contextmenu paste textcolor",
+                        "jbimages link"
+                    ],
+                    toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+                });
+                </script>
+</div>​
+</form>
+{% endblock %}       
+
+
+

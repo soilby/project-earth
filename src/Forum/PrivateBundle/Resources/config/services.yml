@@ -1,0 +1,4 @@
+services:
+    addone.forum.private:
+        class: Forum\PrivateBundle\PrivateManager
+        arguments: ['@service_container']

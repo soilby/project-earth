@@ -1,0 +1,4 @@
+services:
+    addone.product.gift:
+        class: Shop\GiftBundle\GiftManager
+        arguments: ['@service_container']

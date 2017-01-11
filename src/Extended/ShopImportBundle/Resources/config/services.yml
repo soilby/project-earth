@@ -1,0 +1,5 @@
+services:
+    addone.product.import:
+        class: Extended\ShopImportBundle\ImportManager
+        arguments: ['@service_container']
+    

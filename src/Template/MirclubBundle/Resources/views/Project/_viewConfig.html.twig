@@ -1,0 +1,147 @@
+{% if currentLocale == 'en' %} 
+    {% set texts = {'master':'Master','submaster':'Apprentices','pupil':'Pupil','watcher':'Observer','masters':'Masters','submasters':'Apprentices','pupils':'Pupils','watchers':'Observers','fullAccess':'Full access','readOnly':'Read only'} %}
+{% else %}
+    {% set texts = {'master':'Мастер','submaster':'Подмастерья','pupil':'Ученик','watcher':'Наблюдатель','masters':'Мастера','submasters':'Подмастерья','pupils':'Ученики','watchers':'Наблюдатели','fullAccess':'Полный доступ','readOnly':'Только чтение'} %}
+{% endif %}
+{% if premissions.config != 0 %}
+    <p class="checkbox"><label><input type="checkbox" name="temp" id="projectLockDocuments" {% if isLocked != 0 %}checked="checked"{% endif %} />{% if currentLocale == 'en' %}Temporarily lock documents for editing{% else %}Временно заблокировать документы для редактирования{% endif %}</label></p>
+    <script>
+        $(function () {
+            $('#projectLockDocuments').click(function () {
+                var checked = ($(this).is(':checked') ? 1 : 0);
+                location.href = '?actionobject=project&action=lockproject&actionid={{id}}&actionstate=' + checked;
+            });
+        });
+    </script>
+    <p><a class="btn btn-default" href="/editworkshop.html?id={{id}}">{% if currentLocale == 'en' %}Edit workshop data{% else %}Редактировать данные мастерской{% endif %}</a></p>
+    <p>{% if currentLocale == 'en' %}Participants of the workshop (you can edit the participants){% else %}Участники мастерской (вы можете редактировать участников){% endif %}:</p>
+    <p>
+        {% set out = 0 %}
+        {% for user in projectUsers %}{% if user.projectRole == 3 %}{% if out %}, {% else %}{{texts['masters']}}: {% endif %}{% set out = 1 %}<a href="#" data-toggle="modal" data-target="#popupProjectRole{{user.id}}"><span class="mirclubTransliteration">{{user.fullName}}</span> ({{(user.readOnly ? texts['readOnly'] : texts['fullAccess'])}})</a>{% endif %}{% endfor %}
+    </p>
+    <p class="pl20">
+        {% set out = 0 %}
+        {% for user in projectUsers %}{% if user.projectRole == 2 %}{% if out %}, {% else %}{{texts['submasters']}}: {% endif %}{% set out = 1 %}<a href="#" data-toggle="modal" data-target="#popupProjectRole{{user.id}}"><span class="mirclubTransliteration">{{user.fullName}}</span> ({{(user.readOnly ? texts['readOnly'] : texts['fullAccess'])}})</a>{% endif %}{% endfor %}
+    </p>
+    <p class="pl20">
+        {% set out = 0 %}
+        {% for user in projectUsers %}{% if user.projectRole == 1 %}{% if out %}, {% else %}{{texts['pupils']}}: {% endif %}{% set out = 1 %}<a href="#" data-toggle="modal" data-target="#popupProjectRole{{user.id}}"><span class="mirclubTransliteration">{{user.fullName}}</span> ({{(user.readOnly ? texts['readOnly'] : texts['fullAccess'])}})</a>{% endif %}{% endfor %}
+    </p>
+    <p class="pl20">
+        {% set out = 0 %}
+        {% for user in projectUsers %}{% if user.projectRole == 0 %}{% if out %}, {% else %}{{texts['watchers']}}: {% endif %}{% set out = 1 %}<a href="#" data-toggle="modal" data-target="#popupProjectRole{{user.id}}"><span class="mirclubTransliteration">{{user.fullName}}</span> ({{(user.readOnly ? texts['readOnly'] : texts['fullAccess'])}})</a>{% endif %}{% endfor %}
+    </p>
+    {% for user in projectUsers %}
+        <div class="modal fade" id="popupProjectRole{{user.id}}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="?" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="actionobject" value="project" />
+                        <input type="hidden" name="action" value="moderaterole" />
+                        <input type="hidden" name="actionid" value="{{id}}" />
+                        <input type="hidden" name="actionuserid" value="{{user.id}}" />
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">{% if currentLocale == 'en' %}Setting up access to the workshop{% else %}Настройка доступа к мастерской{% endif %}</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <p>{% if currentLocale == 'en' %}User{% else %}Пользователь{% endif %} <span class="mirclubTransliteration">{{user.fullName}}</span></p>
+                            <div class="form-group">
+                                <label>{% if currentLocale == 'en' %}Workshop role{% else %}Роль в мастерской{% endif %}</label>
+                                <select name="actionfields[role]" class="form-control">
+                                    <option value="0" {% if (user.projectRole == 0) %}selected="selected"{% endif %}>{{texts['watcher']}}</option>
+                                    <option value="1" {% if (user.projectRole == 1) %}selected="selected"{% endif %}>{{texts['pupil']}}</option>
+                                    <option value="2" {% if (user.projectRole == 2) %}selected="selected"{% endif %}>{{texts['submaster']}}</option>
+                                    <option value="3" {% if (user.projectRole == 3) %}selected="selected"{% endif %}>{{texts['master']}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>{% if currentLocale == 'en' %}Access to documents{% else %}Доступ к документам{% endif %}</label>
+                                <select name="actionfields[readOnly]" class="form-control">
+                                    <option value="1" {% if (user.readOnly == 1) %}selected="selected"{% endif %}>{{texts['readOnly']}}</option>
+                                    <option value="0" {% if (user.readOnly == 0) %}selected="selected"{% endif %}>{{texts['fullAccess']}}</option>
+                                </select>
+                            </div>
+                            <div class="checkbox"><label><input type="checkbox" name="actionfields[remove]" value="1" />{% if currentLocale == 'en' %}Remove user from workshop{% else %}Удалить пользователя из мастерской{% endif %}</label></div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" type="submit">{% if currentLocale == 'en' %}Save{% else %}Сохранить{% endif %}</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">{% if currentLocale == 'en' %}Cancel{% else %}Отмена{% endif %}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% if projectRequests | length > 0 %}
+        <p class="pl20">
+            <strong>{% if currentLocale == 'en' %} Applications for participation in the workshop {% else %}Заявки на участие в мастерской{% endif %}:</strong>
+            {% for user in projectRequests %}
+                <a href="#" data-toggle="modal" data-target="#popupRequest{{user.id}}"><span class="mirclubTransliteration">{{user.fullName}}</span></a>
+            <div class="modal fade" id="popupRequest{{user.id}}">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form action="?" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="actionobject" value="project" />
+                            <input type="hidden" name="action" value="moderaterequest" />
+                            <input type="hidden" name="actionid" value="{{user.id}}" />
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">{% if currentLocale == 'en' %} Processing of applications for participation {% else %}Обработка заявки на участие{% endif %}</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label>{% if currentLocale == 'en' %} Accompanying message of user {% else %}Сопроводительное сообщение пользователя{% endif %}</label>
+                                    <textarea class="form-control" readonly="readonly" name="tmp">{{user.message}}</textarea>
+                                </div>                        
+                                <div class="radio"><label><input type="radio" name="actionfields[accept]" value="1" checked="checked" />{% if currentLocale == 'en' %} Accept the application {% else %}Принять заявку{% endif %}</label></div>
+                                <div class="radio"><label><input type="radio" name="actionfields[accept]" value="0" checked="checked" />{% if currentLocale == 'en' %} Reject the application {% else %}Отклонить заявку{% endif %}</label></div>
+                                <div class="form-group">
+                                    <label>{% if currentLocale == 'en' %} Workshop role {% else %}Роль в мастерской{% endif %}</label>
+                                    <select name="actionfields[role]" class="form-control">
+                                        <option value="0" {% if (user.projectRole == 0) %}selected="selected"{% endif %}>{{texts['watcher']}}</option>
+                                        <option value="1" {% if (user.projectRole == 1) %}selected="selected"{% endif %}>{{texts['pupil']}}</option>
+                                        <option value="2" {% if (user.projectRole == 2) %}selected="selected"{% endif %}>{{texts['submaster']}}</option>
+                                        <option value="3" {% if (user.projectRole == 3) %}selected="selected"{% endif %}>{{texts['master']}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>{% if currentLocale == 'en' %} Access to documents {% else %}Доступ к документам{% endif %}</label>
+                                    <select name="actionfields[readOnly]" class="form-control">
+                                        <option value="1" selected="selected">{{texts['readOnly']}}</option>
+                                        <option value="0" selected="selected">{{texts['fullAccess']}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" type="submit">{% if currentLocale == 'en' %} Apply {% else %}Применить{% endif %}</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">{% if currentLocale == 'en' %} Cancel {% else %}Отмена{% endif %}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </p>
+    {% endif %}
+{% else %}
+    <p class="pt20">{% if currentLocale == 'en' %} Participants of the workshop {% else %}Участники мастерской{% endif %}:</p>
+    <p class="pl20">
+        {% set out = 0 %}
+        {% for user in projectUsers %}{% if user.projectRole == 3 %}{% if out %}, {% else %}{{texts['masters']}}: {% endif %}{% set out = 1 %}<span class="mirclubTransliteration">{{user.fullName}}</span>{% endif %}{% endfor %}
+    </p>
+    <p class="pl20">
+        {% set out = 0 %}
+        {% for user in projectUsers %}{% if user.projectRole == 2 %}{% if out %}, {% else %}{{texts['submasters']}}: {% endif %}{% set out = 1 %}<span class="mirclubTransliteration">{{user.fullName}}</span>{% endif %}{% endfor %}
+    </p>
+    <p class="pl20">
+        {% set out = 0 %}
+        {% for user in projectUsers %}{% if user.projectRole == 1 %}{% if out %}, {% else %}{{texts['pupils']}}: {% endif %}{% set out = 1 %}<span class="mirclubTransliteration">{{user.fullName}}</span>{% endif %}{% endfor %}
+    </p>
+    <p class="pl20">
+        {% set out = 0 %}
+        {% for user in projectUsers %}{% if user.projectRole == 0 %}{% if out %}, {% else %}{{texts['watchers']}}: {% endif %}{% set out = 1 %}<span class="mirclubTransliteration">{{user.fullName}}</span>{% endif %}{% endfor %}
+    </p>
+{% endif %}

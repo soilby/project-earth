@@ -1,0 +1,9 @@
+<div>
+    {% for item in breadcrumbs %}
+        {% if (item['active'] == 0) %}
+        <a href="{{item['url']}}">{{item['title']}}</a> &DoubleRightArrow;
+        {% else %}
+        <span>{{item['title']}}</span>
+        {% endif %}
+    {% endfor %}
+</div>

@@ -1,0 +1,7 @@
+{% if (banners|length) > 0 %}
+    {% for banner in banners %}
+        {% if (banner.enabled != 0) %}
+            <p><a href="{{banner.url}}"><img src="{{banner.image}}" title="{{banner.name}}" /></a></p>
+        {% endif %}
+    {% endfor %}
+{% endif %}

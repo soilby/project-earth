@@ -1,0 +1,68 @@
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, u, dl, dt, dd, ol, ul, li, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
+padding:0;margin:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent;}
+html {overflow-y:scroll !important;}
+
+body, input, select, textarea, button {
+font:12px "Open Sans", Arial, "Geneva CY", sans-serif;
+/*color:#333*/;}
+
+h1, h2, h3, h4, h5, h6 {font-size:120%;}
+form {display:block;}
+fieldset {margin:0;background:transparent;font-size:100%;}
+legend {padding:0 3px;margin-left:10px;}
+input,select,button,textarea{margin:0;}
+input, select {vertical-align:baseline}
+input[type="checkbox"],input[type="radio"] {margin-right:2px;vertical-align:middle}
+input[type=button],input[type=submit],input[type=reset],label,button {cursor:pointer}
+nav ul, #nav ul, ul#nav {list-style:none;}
+hr {display:block;height:1px;padding:0;margin:1em 0;border:0;border-top:1px solid #ccc;}
+table {width:100%;border-collapse:collapse;border-spacing:0;font-size:inherit;}
+a {padding:0;margin:0;border:0;font-size:100%;text-decoration:none;vertical-align:baseline;cursor:pointer;background:transparent;}a:hover,a:active {outline:none;}/*Делаем фокус доступным (accessible): people.opera.com/patrickl/experiments/keyboard/test*/
+/*a img,img{border:0;text-decoration:none}*/
+abbr{border-bottom:1px dashed #000;text-transform:uppercase}abbr[title]{cursor:help;}
+dfn{font-style:italic;}dfn[title]{cursor:help;}
+cite,em,dfn{font-style:italic}
+strong,b,th{font-weight:bold;}
+td,td img {vertical-align:top;}
+ins{background-color:#ff9;color:#000;text-decoration:none;text-decoration:underline;}
+mark {background-color:#ff9;color:#000;font-style:italic;font-weight:bold;}
+del{text-decoration:line-through}
+small, sup, sub{font-size:85%} sub{vertical-align:sub;} sup{vertical-align:super;}
+blockquote,q {quotes:none;}
+blockquote:before,blockquote:after,q:before,q:after {content:'';content:none; }
+article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary {display:block;}
+
+/*user styles*/
+.clearfix:before, .clearfix:after {content: "\0020"; display:block; height:0; visibility: hidden}.clearfix:after {clear:both}
+.clear{clear:both} .clearB{clear:both} .clearL{clear:left} .clearR{clear:right}
+.fll{float:left !important} .flr{float:right !important}
+.tac{text-align:center !important}.tal{text-align:left !important} .tar{text-align:right !important}
+.vam{vertical-align:middle !important} .vat{vertical-align:top !important} .vab{vertical-align:bottom !important} .vabs{vertical-align:baseline !important}
+.fwb{font-weight:bold !important} .fwn{font-weight:normal !important}
+.fsi{font-style:italic !important} .fsn{font-style:normal !important}
+.tdn{text-decoration: none;} .tdu{text-decoration: underline;} .tdo{text-decoration: overline;} .tdl {text-decoration: line-through;}
+.inline{display:inline !important} .block {display:block !important} .inline-block {display:inline-block !important}
+.di{display:inline !important} .db{display:block !important} .dib{display:inline-block !important} .dn{display:none !important}
+.bdn{border:none !important} .bdtn{border-top:none !important} .bdrn{border-right:none !important} .bdbn{border-bottom:none !important} .bdbn{border-bottom:none !important}
+.posr{position:relative !important} .poss{position:static !important} .posa{position:absolute !important}
+.bgn{background:none !important}
+.curp{cursor:pointer !important} .cura{cursor:auto !important} .curt{cursor:text !important} .curt{cursor:default !important}
+.hidden{display:none;visibility:hidden}
+.ovv{overflow: visible !important;} .ovh{overflow: hidden !important;} .ova{overflow: auto !important;} .ovs{overflow: scroll !important;}
+
+.m30{margin:30px !important;} .mt30{margin-top:30px !important} .mr30{margin-right:30px !important} .mb30{margin-bottom:30px !important} .ml30{margin-left:30px !important}
+.m25{margin:25px !important;}.mt25{margin-top:25px !important} .mr25{margin-right:25px !important} .mb25{margin-bottom:25px !important} .ml25{margin-left:25px !important}
+.m20{margin:20px !important;}.mt20{margin-top:20px !important} .mr20{margin-right:20px !important} .mb20{margin-bottom:20px !important} .ml20{margin-left:20px !important}
+.m15{margin:15px !important;}.mt15{margin-top:15px !important} .mr15{margin-right:15px !important} .mb15{margin-bottom:15px !important} .ml15{margin-left:15px !important}
+.m10{margin:10px !important;}.mt10{margin-top:10px !important} .mr10{margin-right:10px !important} .mb10{margin-bottom:10px !important} .ml10{margin-left:10px !important}
+.m5{margin:5px !important;}.mt5{margin-top:5px !important} .mr5{margin-right:5px !important} .mb5{margin-bottom:5px !important} .ml5{margin-left:5px !important}
+.mn{margin:0! important} .mtn{margin-top:0 !important} .mrn{margin-right:0 !important} .mbn{margin-bottom:0 !important} .mln{margin-left:0 !important}
+
+.p30{padding:30px !important;} .pt30{padding-top:30px !important} .pr30{padding-right:30px !important} .pb30{padding-bottom:30px !important} .pl30{padding-left:30px !important}
+.p25{padding:25px !important;}.pt25{padding-top:25px !important} .pr25{padding-right:25px !important} .pb25{padding-bottom:25px !important} .pl25{padding-left:25px !important}
+.p20{padding:20px !important;}.pt20{padding-top:20px !important} .pr20{padding-right:20px !important} .pb20{padding-bottom:20px !important} .pl20{padding-left:20px !important}
+.p15{padding:15px !important;}.pt15{padding-top:15px !important} .pr15{padding-right:15px !important} .pb15{padding-bottom:15px !important} .pl15{padding-left:15px !important}
+.p10{padding:10px !important;}.pt10{padding-top:10px !important} .pr10{padding-right:10px !important} .pb10{padding-bottom:10px !important} .pl10{padding-left:10px !important}
+.p5{padding:5px !important;}.pt5{padding-top:5px !important} .pr5{padding-right:5px !important} .pb5{padding-bottom:5px !important} .pl5{padding-left:5px !important}
+.pn{padding:0! important} .ptn{padding-top:0 !important} .prn{padding-right:0 !important} .pbn{padding-bottom:0 !important} .pln{padding-left:0 !important}
+.noselect{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}

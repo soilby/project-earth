@@ -1,0 +1,4 @@
+services:
+    object.knowledge:
+        class: Extended\KnowledgeBundle\KnowledgeManager
+        arguments: ['@service_container']

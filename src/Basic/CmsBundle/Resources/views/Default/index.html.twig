@@ -1,0 +1,160 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Управление сайтом{% endblock %}
+{% block content %}
+<div class="indexBlock">
+    <div class="indexBlockItem dontsplit" style="background-image:url(/adminimg/index/statistic.jpg)">
+        <h3>
+        <a href="{{path('basic_cms_statistics')}}">Статистика</a>
+        </h3>
+        <p class="mb15">
+            <label><input type="radio" name="basiccmsuniq" autocomplete="off" value="1" checked="checked" onclick="$('#basicCmsStatisticUniq').show();$('#basicCmsStatisticNouniq').hide();" />Уникальных</label>
+            <label><input type="radio" name="basiccmsuniq" autocomplete="off" value="0" onclick="$('#basicCmsStatisticUniq').hide();$('#basicCmsStatisticNouniq').show();" />Всех пользователей</label>
+        </p>
+        <div id="basicCmsStatisticUniq">
+            <p>Посещений за этот месяц: {{statistic.thisMonthUniq}}</p>
+            <p>Посещений за прошлый месяц: {{statistic.prevMonthUniq}}</p>
+            <p>Всего посещений: {{statistic.allVisitsUniq}}</p>
+            <br />
+            <br />
+            <p>График посещений за последние 7 дней:</p>
+            <table class="statisticWrap">
+                <tr>
+                    {% for i in 6..0 %}
+                    <td><div class="statisticBar{% if (statistic['weekgraf'][i]['name'] == 6) or (statistic['weekgraf'][i]['name'] == 7) %} orange{% endif %}" style="height:{{statistic['weekgraf'][i]['countUniq'] * 150 // statistic['weekgraf']['maxUniq']}}px;"></div></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for i in 6..0 %}
+                    <td>
+                    {% if statistic['weekgraf'][i]['name'] == 1 %}ПН{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 2 %}ВТ{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 3 %}СР{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 4 %}ЧТ{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 5 %}ПТ{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 6 %}СБ{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 7 %}ВС{% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for i in 6..0 %}
+                    <td>{{statistic['weekgraf'][i]['countUniq'] | number_format(0,',',' ')}}</td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+        <div id="basicCmsStatisticNouniq" style="display:none">
+            <p>Посещений за этот месяц: {{statistic.thisMonth}}</p>
+            <p>Посещений за прошлый месяц: {{statistic.prevMonth}}</p>
+            <p>Всего посещений: {{statistic.allVisits}}</p>
+            <br />
+            <br />
+            <p>График посещений за последние 7 дней:</p>
+            <table class="statisticWrap">
+                <tr>
+                    {% for i in 6..0 %}
+                    <td><div class="statisticBar{% if (statistic['weekgraf'][i]['name'] == 6) or (statistic['weekgraf'][i]['name'] == 7) %} orange{% endif %}" style="height:{{statistic['weekgraf'][i]['count'] * 150 // statistic['weekgraf']['max']}}px;"></div></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for i in 6..0 %}
+                    <td>
+                    {% if statistic['weekgraf'][i]['name'] == 1 %}ПН{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 2 %}ВТ{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 3 %}СР{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 4 %}ЧТ{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 5 %}ПТ{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 6 %}СБ{% endif %}
+                    {% if statistic['weekgraf'][i]['name'] == 7 %}ВС{% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for i in 6..0 %}
+                    <td>{{statistic['weekgraf'][i]['count'] | number_format(0,',',' ')}}</td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+        {% if logfront | length > 0 %}
+        <br />
+        <h3>
+        <a href="{{path('basic_cms_logs')}}">Последние события</a>
+        </h3>
+        <table class="statisticLogWrap">
+            {% for item in logfront %}
+            <tr>
+                <td class="statisticLogWrapDate">{{item.logDate | date("d.m.Y G:i")}}</td>
+                <td class="statisticLogWrapText{% if item.viewed == 1 %} viewed{% endif %}"><a href="{{path('basic_cms_logs_view')}}?id={{item.id}}">{{item.text}}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+{% for item in menu %}
+    {% if (item['enabled'] != 0) %}
+    <div class="indexBlockItem dontsplit" style="background-image:url(/adminimg/index/{{item['name'] | md5}}.jpg)">
+        <h3>
+    {% if (item['access'] != 0) %}
+        <a href="{{item['url']}}">{{item['name']}}</a>
+    {% else %}
+        <span>{{item['name']}}</span>
+    {% endif %}
+        </h3>
+        {% if (item['items'] is defined) %}
+            <ul>
+            {% for item2 in item['items'] %}
+                {% if (item2['enabled'] != 0) %}
+                <li>
+                {% if (item2['access'] != 0) %}
+                    <a href="{{item2['url']}}">{{item2['name']}}</a>
+                {% endif %}
+                </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    {% endif %}
+{% endfor %}
+</div>
+<div class="clearfix"></div>
+<script>
+$(function () {
+    function processColMove()
+    {
+        $('.indexBlock div.indexBlockCol div.indexBlockItem').each(function () {
+            $(this).appendTo('.indexBlock');
+        });
+        $('.indexBlock div.indexBlockCol').remove();
+        var cols = Math.floor($('.indexBlock').width() / 514);
+        for (var i = 0; i < cols; i++)
+        {
+            $('div.indexBlock').append('<div class="indexBlockCol"></div>');
+        }
+        var overheight = 0;
+        $('.indexBlock div.indexBlockItem').each(function () {
+            overheight += $(this).height();
+        });
+        var plusheight = 0;
+        $('.indexBlock div.indexBlockItem').each(function () {
+            var index = Math.floor(plusheight / (overheight / cols));
+            if ((index >= 0) && (index < $('.indexBlock div.indexBlockCol').length))
+            {
+                var colel = $('.indexBlock div.indexBlockCol').eq(index);
+                if (colel != null) $(this).appendTo(colel);
+                plusheight += $(this).height();
+            }
+        });
+    }
+    processColMove();
+    $(window).resize(function () {processColMove();});
+});
+</script>
+{% endblock %}       
+
+
+

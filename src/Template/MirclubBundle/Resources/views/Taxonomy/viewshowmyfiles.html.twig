@@ -1,0 +1,55 @@
+                        <h1>{{title}}</h1>
+                {% if items | length > 0 %}
+                    <div class="row">
+                            {% for item in items %}
+				<div class="col-sm-6 col-md-3 col-lg-2">
+            			<div class="earth-files-item">
+                                    <p>{{item['title'] | default('')}}</p>
+                                    <p><a href="/myfilesedit.html?fileid={{item['id']}}" class="btn btn-default">Редактировать</a></p>
+                                    <p class="description"><a href="{{path('files_files_front_filedownload')}}?id={{item['id']}}">{{item['fileName'] | default('')}}</a></p>
+				</div>
+        			</div>
+                            {% endfor %}
+                    </div>
+                {% endif %}
+                {% if (items | length == 0) %}
+                        <p>Нет файлов</p>
+                {% endif %}
+		{% if pageCount > 1 %}
+                        <ul class="pagination">
+                        {% if (pageCount > 1) %}
+                            {% set to = page + 1 %}
+                            {% set from = page - 1 %}
+                            {% if (to >= pageCount) %}
+                                {% set to = pageCount - 1 %}
+                            {% endif %}
+                            {% if (from < 0) %}
+                                {% set from = 0 %}
+                            {% endif %}
+                            {% if (from > 0) %}
+                                <li><a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page=0">1</a></li>
+                            {% endif %}
+                            {% if (from > 1) %}
+                                <li><a class="disabled">...</a></li>
+                            {% endif %}
+                            {% for i in from..to %}
+                                {% if i == page %}
+                                <li class="active"><a href="#">{{i+1}}</a></li>
+                                {% else %}
+                                <li><a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page={{i}}">{{i+1}}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if (to < (pageCount - 2)) %}
+                                <li><a class="disabled">...</a></li>
+                            {% endif %}
+                            {% if (to < (pageCount - 1)) %}
+                                <li><a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page={{pageCount - 1}}">{{pageCount}}</a></li>
+                            {% endif %}
+                        {% endif %}
+                        </ul>
+                {% endif %}
+                <p>
+                    <br />
+                    <a href="/myfilescreate.html" class="btn btn-default">Закачать файл</a>
+                </p>
+

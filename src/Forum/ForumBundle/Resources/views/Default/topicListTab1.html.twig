@@ -1,0 +1,162 @@
+        {% if (app.user.checkAccess('forum_edit') == 1) %}<a class="button" href="#" id="unblockedForum0">Опубликовать</a>{% endif %}
+        {% if (app.user.checkAccess('forum_edit') == 1) %}<a class="button" href="#" id="blockedForum0">Скрыть</a>{% endif %}
+        {% if (app.user.checkAccess('forum_edit') == 1) %}<a class="button" href="#" id="deleteForum0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('forum_new') == 1) %}<a href="{{path('forum_forum_topic_create')}}" class="button">Создать новый форум</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="hidden" name="tab" value="0" />
+            {% if (taxonomyenabled != 0) %}
+            <select name="taxonomy0" class="quickSearch uniformOff">
+                <option value="0" {% if taxonomy0 == 0 %}selected="selected"{% endif %}>Все категории</option>
+                {% for category in taxonomyinfo0['categories'] %}
+                    <option value="{{category['id']}}" {% if taxonomy0 == category['id'] %}selected="selected"{% endif %}>{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658; {% endfor %}{% endif %}{{category['title']}}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="forumList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Заголовок &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Заголовок &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Заголовок</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Опубликовано &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Опубликовано &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Опубликовано</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?tab=0&sort0=5">Создано (изменено) &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?tab=0&sort0=4">Создано (изменено) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=4">Создано (изменено)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                {% if taxonomyenabled != 0 %}
+                <th>
+                    Категории
+                </th>
+                {% endif %}
+                <th>
+                    {% if (sort0 == 8) %}
+                        <a href="?tab=0&sort0=9">Дата последнего сообщения &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 9) %}
+                        <a href="?tab=0&sort0=8">Дата последнего сообщения &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=8">Дата последнего сообщения</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 10) %}
+                        <a href="?tab=0&sort0=11">Кол-во ответов &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 11) %}
+                        <a href="?tab=0&sort0=10">Кол-во ответов &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=10">Кол-во ответов</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for forum in forums0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{forum.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('forum_forum_topic_edit')}}?id={{forum.id}}">{{forum.title}}</a>{% if (errors0[forum.id] is defined) %}<p class="error">{{errors0[forum.id]}}</p>{% endif %}</td>
+                <td>{{forum.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{forum.createDate | date('d.m.Y G:i')}}{% if (forum.modifyDate != forum.createDate) %} ({{forum.modifyDate | date('d.m.Y G:i')}}){% endif %}</td>
+                <td>{{forum.fullName}}</td>
+                {% if taxonomyenabled != 0 %}
+                <td>
+                    {% if (taxonomyinfo0['links'][forum.id] | length) == 1 %}
+                        {% for taxid, taxtitle in taxonomyinfo0['links'][forum.id] %}
+                        <a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a>
+                        {% endfor %}
+                    {% endif %}
+                    {% if (taxonomyinfo0['links'][forum.id] | length) > 1 %}
+                        {% for taxid, taxtitle in taxonomyinfo0['links'][forum.id] %}
+                            {% if loop.index0 == 0 %}
+                            <a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a><p class="hintLabel"><span class="miniNote">и еще {{(taxonomyinfo0['links'][forum.id] | length) - 1}} категорий</span><span class="hintWrap">
+                            {% else %}
+                            {% if loop.index0 != 1 %}, {% endif %}<a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a>
+                            {% endif %}
+                        {% endfor %}
+                        </span></p>
+                    {% endif %}
+                </td>
+                {% endif %}
+                <td>{{forum.lastMessageDate | date('d.m.Y G:i')}}</td>
+                <td><a href="{{path('forum_forum_messages_list')}}?id={{forum.id}}">{{forum.messageCount | number_format(0,',',' ')}}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#blockedForum0').click(function () {ajaxAction('{{path('forum_forum_topic_ajax')}}?tab=0', 'blockedforum', '#forumList0 input.check', '#con_tab1');return false;});
+            $('#unblockedForum0').click(function () {ajaxAction('{{path('forum_forum_topic_ajax')}}?tab=0', 'unblockedforum', '#forumList0 input.check', '#con_tab1');return false;});
+            $('#deleteForum0').click(function () {ajaxActionConfirm('{{path('forum_forum_topic_ajax')}}?tab=0', 'deleteforum', '#forumList0 input.check', '#con_tab1','Удалить выбранные форумы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+            $('select.quickSearch').chosen({no_results_text: 'Нет результатов для ', width: '300px'});
+        </script>

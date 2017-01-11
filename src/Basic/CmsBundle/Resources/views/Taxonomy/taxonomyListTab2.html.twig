@@ -1,0 +1,107 @@
+        {% if (app.user.checkAccess('taxonomy_editshow') == 1) %}<a class="button" href="#" id="unblockedTaxonomy1">Опубликовать</a>{% endif %}
+        {% if (app.user.checkAccess('taxonomy_editshow') == 1) %}<a class="button" href="#" id="blockedTaxonomy1">Скрыть</a>{% endif %}
+        {% if (app.user.checkAccess('taxonomy_editshow') == 1) %}<a class="button" href="#" id="deleteTaxonomy1">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('taxonomy_newshow') == 1) %}<a href="{{path('basic_cms_taxonomyshow_create')}}{% if taxonomyobject != '' %}?object={{taxonomyobject}}{% endif %}" class="button">Создать новое представление</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm1">
+            <input type="hidden" name="tab" value="1" />
+            <input type="text" name="search1" value="{{search1}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="taxonomyList1">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort1 == 0) %}
+                        <a href="?tab=1&sort1=1">Заголовок &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 1) %}
+                        <a href="?tab=1&sort1=0">Заголовок &#9660;</a>
+                    {% else %}
+                        <a href="?tab=1&sort1=0">Заголовок</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>Опубликовано</th>
+                <th>
+                    {% if (sort1 == 2) %}
+                        <a href="?tab=1&sort1=3">Объект представления &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 3) %}
+                        <a href="?tab=1&sort1=2">Объект представления &#9660;</a>
+                    {% else %}
+                        <a href="?tab=1&sort1=2">Объект представления</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort1 == 4) %}
+                        <a href="?tab=1&sort1=5">Создана (изменена) &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 5) %}
+                        <a href="?tab=1&sort1=4">Создана (изменена) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=1&sort1=4">Создана (изменена)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort1 == 6) %}
+                        <a href="?tab=0&sort1=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort1 == 7) %}
+                        <a href="?tab=0&sort1=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort1=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for show in shows1 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{show.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_taxonomyshow_edit')}}?id={{show.id}}">{{show.title}}</a>{% if (errors1[show.id] is defined) %}<p class="error">{{errors1[show.id]}}</p>{% endif %}</td>
+                <td>{{show.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{show.objectName}} ({{show.object}})</td>
+                <td>{{show.createDate | date('d.m.Y G:i')}}{% if (show.modifyDate != show.createDate) %} ({{show.modifyDate | date('d.m.Y G:i')}}){% endif %}</td>
+                <td>{{show.fullName}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount1 > 1) %}
+            {% set to = page1 + 1 %}
+            {% set from = page1 - 1 %}
+            {% if (to >= pagecount1) %}
+                {% set to = pagecount1 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=1&page1=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page1 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=1&page1={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount1 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount1 - 1)) %}
+                <a class="button" href="?tab=1&page1={{pagecount1 - 1}}">{{pagecount1}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#blockedTaxonomy1').click(function () {ajaxAction('{{path('basic_cms_taxonomy_ajax')}}?tab=1&object={{taxonomyobject}}', 'blockedshow', '#taxonomyList1 input.check', '#con_tab2');return false;});
+            $('#unblockedTaxonomy1').click(function () {ajaxAction('{{path('basic_cms_taxonomy_ajax')}}?tab=1&object={{taxonomyobject}}', 'unblockedshow', '#taxonomyList1 input.check', '#con_tab2');return false;});
+            $('#deleteTaxonomy1').click(function () {ajaxActionConfirm('{{path('basic_cms_taxonomy_ajax')}}?tab=1&object={{taxonomyobject}}', 'deleteshow', '#taxonomyList1 input.check', '#con_tab2','Удалить выбранные представления?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

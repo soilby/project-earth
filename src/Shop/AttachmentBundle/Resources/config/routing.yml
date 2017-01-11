@@ -1,0 +1,11 @@
+shop_attachment_ajaxadd:
+    path:  /admin/products/attachment/ajaxadd
+    defaults: { _controller: ShopAttachmentBundle:Default:attachmentAjaxAdd }
+
+shop_attachment_ajaxremove:
+    path:  /admin/products/attachment/ajaxremove
+    defaults: { _controller: ShopAttachmentBundle:Default:attachmentAjaxRemove }
+
+shop_attachment_download:
+    path:  /system/products/attachmentdownload
+    defaults: { _controller: ShopAttachmentBundle:Default:attachmentDownload }

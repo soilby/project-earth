@@ -1,0 +1,13 @@
+<h1>Новое сообщение формы &laquo;{{title}}&raquo;</h1>
+<br />
+<p>Следующая информация была заполнена:<p>
+<table>
+{% for field in fields %}    
+    <tr>
+        <td><pre>{{field['name']}}</pre></td>
+        <td><pre>{{field['value']}}</pre></td>
+    </tr>
+{% endfor %}
+</table>
+<br />
+<p><a href="{{url}}">Перейти к просмотру письма</a></p>

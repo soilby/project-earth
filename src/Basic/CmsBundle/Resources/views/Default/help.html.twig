@@ -1,0 +1,51 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Руководство{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Руководство</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if helppage == '' %}class="active"{% endif %}>Содержание</a>
+    {% if helppage != '' %}<a href="#" onclick="return false;" id="tab2" class="active">Руководство</a>{% endif %}
+</div>
+<div id="tabsContent">
+        <div id="con_tab1" {% if helppage == '' %}class="active"{% endif %}>
+            <div class="helpInfo">
+            {% set chapter = 1 %}
+            {% for object in help %}
+                {% if object['pages'] | length > 0 %}
+                <h1>{{chapter}}. {{object['description']}}</h1>
+                    {% for pageaddr,pagename in object['pages'] %}
+                    <p><a href="{{path('basic_cms_help')}}?page={{pageaddr}}" {% if helppage == pageaddr %}class="active"{% endif %}>{{chapter}}.{{loop.index}}. {{pagename}}</a></p>
+                    {% endfor %}
+                {% set chapter = chapter + 1 %}
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+        {% if helppage != '' %}
+        <div id="con_tab2" class="active">
+            <div class="helpContent">
+            {% set chapter = 1 %}
+            {% for object in help %}
+                {% if object['pages'] | length > 0 %}
+                    {% for pageaddr,pagename in object['pages'] %}
+                        {% if helppage == pageaddr %}<h1>{{chapter}}.{{loop.index}}. {{pagename}}</h1>{% endif %}
+                    {% endfor %}
+                {% set chapter = chapter + 1 %}
+                {% endif %}
+            {% endfor %}
+            {% if helpcontent == '' %}<p>К сожалению данная страница пока не описана в справочной системе.</p>{% endif %}
+            {{helpcontent | raw}}
+            </div>
+        </div>
+        {% endif %}
+</div>​
+{% endblock %}       
+
+
+

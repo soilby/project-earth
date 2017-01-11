@@ -1,0 +1,129 @@
+        {% if (app.user.checkAccess('user_editall') == 1) %}<a class="button" href="#" id="unblockedUser0">Разблокировать</a>{% endif %}
+        {% if (app.user.checkAccess('user_editall') == 1) %}<a class="button" href="#" id="blockedUser0">Заблокировать</a>{% endif %}
+        {% if (app.user.checkAccess('user_editall') == 1) %}<a class="button" href="#" id="deleteUser0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('user_new') == 1) %}<a href="{{path('basic_cms_user_create')}}" class="button">Создать пользователя</a>{% endif %}
+        <div class="goToRight">
+        <form id="navigationForm0">
+            {#<input type="hidden" name="tab" value="{{tab}}" id="tab" />#}
+            <input type="hidden" name="page0" value="{{page0}}" id="page0" />
+            {#<input type="hidden" name="page1" value="{{page1}}" id="page1" />
+            <input type="hidden" name="page2" value="{{page2}}" id="page2" />#}
+            <input type="hidden" name="sort0" value="{{sort0}}" id="sort0" />
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="userList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 0) %}
+                        <a href="?sort0=1" onclick="$('#sort0').val(1);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Логин &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 1) %}
+                        <a href="?sort0=0" onclick="$('#sort0').val(0);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Логин &#9660;</a>
+                    {% else %}
+                        <a href="?sort0=0" onclick="$('#sort0').val(0);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Логин</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?sort0=3" onclick="$('#sort0').val(3);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Имя &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?sort0=2" onclick="$('#sort0').val(2);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Имя &#9660;</a>
+                    {% else %}
+                        <a href="?sort0=2" onclick="$('#sort0').val(2);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Имя</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    E-mail
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?sort0=5" onclick="$('#sort0').val(5);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Дата регистрации (последнего визита) &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?sort0=4" onclick="$('#sort0').val(4);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Дата регистрации (последнего визита) &#9660;</a>
+                    {% else %}
+                        <a href="?sort0=4" onclick="$('#sort0').val(4);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Дата регистрации (последнего визита)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?sort0=7" onclick="$('#sort0').val(7);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Роль &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?sort0=6" onclick="$('#sort0').val(6);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Роль &#9660;</a>
+                    {% else %}
+                        <a href="?sort0=6" onclick="$('#sort0').val(6);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Роль</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 8) %}
+                        <a href="?sort0=9" onclick="$('#sort0').val(9);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Статус &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 9) %}
+                        <a href="?sort0=8" onclick="$('#sort0').val(8);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Статус &#9660;</a>
+                    {% else %}
+                        <a href="?sort0=8" onclick="$('#sort0').val(8);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">Статус</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td><input type="checkbox" name="check[{{user.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_user_edit')}}?id={{user.id}}">{{user.login}}</a>{% if (errors0[user.id] is defined) %}<p class="error">{{errors0[user.id]}}</p>{% endif %}</td>
+                <td>{{user.fullName}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.regDate | date("d.m.Y G:i")}}{% if (user.visitDate != null) %} ({{user.visitDate | date("d.m.Y G:i")}}){% endif %}</td>
+                <td>{{user.rolename}}</td>
+                <td>
+                    {% if (user.blocked == 0)%}Не подтверждён{% endif %}
+                    {% if (user.blocked == 1)%}Заблокирован{% endif %}
+                    {% if (user.blocked == 2)%}Разблокирован{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?page0=0" onclick="$('#page0').val(0);location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?page0={{i}}" onclick="$('#page0').val({{i}});location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?page0={{pagecount0 - 1}}" onclick="$('#page0').val({{pagecount0 - 1}});location.href = location.pathname+'?'+$('#navigationForm0').serialize();return false;">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#unblockedUser0').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=0', 'unblocked', '#userList0 input.check', '#con_tab1');return false;});
+            $('#blockedUser0').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=0', 'blocked', '#userList0 input.check', '#con_tab1');return false;});
+            $('#deleteUser0').click(function () {ajaxActionConfirm('{{path('basic_cms_user_ajax')}}?tab=0', 'delete', '#userList0 input.check', '#con_tab1','Удалить выбранных пользователей?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

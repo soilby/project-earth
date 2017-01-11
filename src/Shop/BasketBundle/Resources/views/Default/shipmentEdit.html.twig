@@ -1,0 +1,29 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование способа доставки{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('shop_basket_list')}}">Настройки корзины</a>
+    <span>Редактирование способа доставки</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Основные данные</a>
+</div>
+<form action="{{path('shop_basket_shipmentedit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('basket_configedit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('basket_configview') == 1) %}<a class="button" href="{{path('shop_basket_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab | raw}}
+        </div>
+</div>​
+</form>
+{% endblock %}       
+
+
+

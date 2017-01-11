@@ -1,0 +1,80 @@
+                        <h1>{{title}}</h1>
+			<div class="tinymceContent">
+                            {{description | raw}}
+			</div>
+			<div class="row">
+                            {% for item in categories %}
+                                {% if item['nesting'] == 0 %}
+				<div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="earth-village-item">
+					<a href="{{item['url'] | default('')}}">
+						<p>{{item['title'] | default('')}}</p>
+						<img src="{{ (item['avatar'] is defined) and (item['avatar'] != '') ? item['avatar'] : (id == 19 ? '/img/villagen.jpg' : '/img/villageh.jpg') }}" />
+					</a>
+                                    </div>
+				</div>
+                                {% endif %}
+                            {% endfor %}
+			</div>
+                        <style>
+                            .villageBlogPost {
+                                border: 1px solid #ccc;
+                                border-radius: 5px;
+                                padding: 10px;
+                                margin: 5px 0;
+                            }
+                            .villageBlogPost .title {
+                                font-size: 16px;
+                                margin-bottom:0;
+                            }
+                            .villageBlogPost .info {
+                                font-size: 11px;
+                                font-style: italic;
+                                color: #777;
+                            }
+                            .villageBlogWrap {
+                                border: 1px solid #aaa;
+                                padding: 15px;
+                                margin-bottom: 15px;
+                            }
+                        </style>
+                    <div class="villageBlogWrap">
+                        {% if items | length > 0 %}
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <p><a href="#" onclick="$('.villageBlogPost .description, .villageBlogPost .content').toggle();return false;">{{currentLocale == 'en' ? 'Show/hide all posts' : 'Показать/скрыть все посты'}}</a></p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="villageBlog">
+                            {% for item in items %}
+                                <div class="villageBlogPost">
+                                    <p class="title">{{item.title | default('')}}</p>
+                                    <p class="info">
+                                        {% if currentLocale == 'en' %}
+                                            Posted at {{(item.createDate | default('now')) | date('d.m.Y H:i')}} by user {{item.createrFullName | default('Unknown')}}
+                                        {% else %} 
+                                            Опубликовано в {{(item.createDate | default('now')) | date('d.m.Y H:i')}} пользователем {{item.createrFullName | default('Unknown')}}
+                                        {% endif %}
+                                    </p>
+                                    <div class="description">
+                                        {% if ((item.description | default('')) | striptags) != '' %}
+                                            {{item.description | default('') | raw}}
+                                        {% else %}
+                                            {{((item.content | default('')) | striptags | textlimit(200)) | raw}}
+                                        {% endif %}
+                                        <p><a href="#" onclick="$(this).closest('.description').hide().closest('.villageBlogPost').find('.content').show();return false;">{{currentLocale == 'en' ? 'Show full text...' : 'Показать весь текст...'}}</a></p>
+                                    </div>
+                                    <div class="content" style="display:none">
+                                        {{item.description | default('') | raw}}
+                                        {% if ((item.description | default('')) | striptags) != '' %}<p><br /></p>{% endif %}
+                                        {{item.content | default('') | raw}}
+                                        <p><a href="#" onclick="$(this).closest('.content').hide().closest('.villageBlogPost').find('.description').show();return false;">{{currentLocale == 'en' ? 'Hide full text...' : 'Свернуть весь текст...'}}</a></p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if (items | length > 0) and (currentUser) %}
+                            <p><a class="btn btn-default" href="/myblogs.html?blogtype={{template == 'mir_taxonomy_viewvillage' ? 'village' :'house'}}&blog={{id}}#addPostAnchor">{% if currentLocale == 'en' %}Add post{% else %}Добавить пост{% endif %}</a></p>
+                        {% endif %}
+                    </div>

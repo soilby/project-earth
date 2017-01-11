@@ -1,0 +1,14 @@
+<p><a href="?" class="btn btn-default">Назад</a><a href="?file={{file.id}}" class="btn btn-default">Редактировать</a></p>
+{% if diffContent %}
+    <p class="pull-right checkbox"><label><input type="checkbox" onclick="$('.projectfiles-html-content').toggle();" />Сравнить с предыдущей версией</label></p>
+{% endif %}
+<h1>{{currentLocale == 'en' ? file.title : file.titleRu}}</h1>
+
+<div class="projectfiles-html-content">
+    {{content | raw}}
+</div>
+{% if diffContent %}
+<div class="projectfiles-html-content" style="display:none">
+    {{diffContent | raw}}
+</div>
+{% endif %}

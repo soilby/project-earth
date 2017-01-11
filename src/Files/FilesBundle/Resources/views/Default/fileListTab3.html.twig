@@ -1,0 +1,32 @@
+        {% if (app.user.checkAccess('file_editpage') == 1) %}<a class="button" href="#" id="unblockedPage2">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('file_editpage') == 1) %}<a class="button" href="#" id="blockedPage2">Выключить</a>{% endif %}
+        {% if (app.user.checkAccess('file_editpage') == 1) %}<a class="button" href="#" id="deletePage2">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('file_editpage') == 1) %}<a href="{{path('files_files_editpage_create')}}" class="button">Создать новую страницу редактирования файлов</a>{% endif %}
+        <table class="tableContent" id="pageList2">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                        Название
+                </th>
+                <th>
+                        Включено
+                </th>
+                <th>
+                        URL страницы
+                </th>
+            </tr>
+            {% for editpage in editpages2 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{editpage.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('files_files_editpage_edit')}}?id={{editpage.id}}">{{editpage.title}}</a>{% if (errors2[editpage.id] is defined) %}<p class="error">{{errors2[editpage.id]}}</p>{% endif %}</td>
+                <td>{{editpage.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{editpage.url}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#blockedPage2').click(function () {ajaxAction('{{path('files_files_file_ajax')}}?tab=2', 'blockedpage', '#pageList2 input.check', '#con_tab3');return false;});
+            $('#unblockedPage2').click(function () {ajaxAction('{{path('files_files_file_ajax')}}?tab=2', 'unblockedpage', '#pageList2 input.check', '#con_tab3');return false;});
+            $('#deletePage2').click(function () {ajaxActionConfirm('{{path('files_files_file_ajax')}}?tab=2', 'deletepage', '#pageList2 input.check', '#con_tab3','Удалить выбранные страницы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

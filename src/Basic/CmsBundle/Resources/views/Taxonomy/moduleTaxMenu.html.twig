@@ -1,0 +1,47 @@
+<table class="cfgTable">
+    <tr>
+        <td colspan="2"><label><input type="checkbox" name="parameters[showself]" value="1" {% if (parameters['showself'] != 0) %}checked="checked"{% endif %} />Включать в вывод начальную категорию</label><span class="helpContainerButton" data-id="showself">?</span></td>
+        <td class="cfgError">{{parameterserror['showself']}}</td>
+    </tr>
+    <tr>
+        <td colspan="2"><label><input type="checkbox" name="parameters[getidformseo]" value="1" {% if (parameters['getidformseo'] != 0) %}checked="checked"{% endif %} />Брать начальную категорию из текущей страницы</label><span class="helpContainerButton" data-id="getidfromseo">?</span></td>
+        <td class="cfgError">{{parameterserror['getidformseo']}}</td>
+    </tr>
+    <tr>
+        <td colspan="2"><label><input type="checkbox" name="parameters[getExtCatInfo]" value="1" {% if (parameters['getExtCatInfo'] != 0) %}checked="checked"{% endif %} />Дополнить информацию о категориях</label><span class="helpContainerButton" data-id="getextcatinfo">?</span></td>
+        <td class="cfgError">{{parameterserror['getExtCatInfo']}}</td>
+    </tr>
+</table>
+<p>Выберите начальную категорию:<span class="helpContainerButton" data-id="categoryid">?</span></p>
+<p class="globalError">{{parameterserror['categoryid']}}</p>
+<div class="categoryTree">
+    <ul>
+        {% if (taxonomylist|length) > 0 %}
+            {% for i in 0..(taxonomylist|length - 1) %}
+                <li><label><input type="radio" name="parameters[categoryid]" value="{{taxonomylist[i]['id']}}" {% if (taxonomylist[i]['id'] == parameters['categoryid']) %}checked="checked"{% endif %} />
+                    <span {% if (taxonomylist[i]['enabled'] == 0) %}class="disabled"{% endif %}>{{taxonomylist[i]['title']}}</span></label>
+                {%if ((i < taxonomylist|length-1) and (taxonomylist[i+1]['nesting'] > taxonomylist[i]['nesting']))%}
+                <ul>
+                {%else%}
+                </li>
+                {%endif%}
+                {%if ((i < taxonomylist|length-1) and (taxonomylist[i+1]['nesting'] < taxonomylist[i]['nesting']))%}
+                    {% for j in 0..(taxonomylist[i]['nesting'] - taxonomylist[i+1]['nesting'] - 1) %}
+                    </ul></li>
+                    {% endfor %}
+                {%endif%}
+            {% endfor %}
+            {%if (taxonomylist[taxonomylist|length-1]['nesting'] > 0)%}
+                {% for j in 0..(taxonomylist[taxonomylist|length-1]['nesting'] - 1) %}
+                </ul></li>
+                {% endfor %}
+            {%endif%}
+        {% endif %}
+    </ul>
+</div>
+<div class="helpContainerAdd">
+    <div id="helpContainer-showself">При включении данной опции корневым элементом меню будет начальная категория. При выключении данной опции корневыми элементами меню будут вложенные категории.</div>
+    <div id="helpContainer-getidfromseo">При включении данной опции начальная категория будет браться из просматриваемой пользователем страницы.</div>
+    <div id="helpContainer-getextcatinfo">Позволяет вывести дополнительную информацию о категориях.</div>
+    <div id="helpContainer-categoryid">Задаёт начальную категорию, от которой будет сформировано меню категорий.</div>
+</div>

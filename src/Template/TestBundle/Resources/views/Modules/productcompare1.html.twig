@@ -1,0 +1,11 @@
+<div>
+<p><a href="{{url}}">{{name}}</a></p>
+<small>Выбрано товаров: {{itemCount}} <a href="?actionobject=product&action=compareclear">очистить</a></small>
+{% for item in items %}
+<div>
+    {% for fieldname, field in item %}
+        <p>{{fieldname}}: {{field.timestamp is defined ? field | date('d.m.Y') : field}}</p>
+    {% endfor %}
+</div>
+{% endfor %}
+</div>

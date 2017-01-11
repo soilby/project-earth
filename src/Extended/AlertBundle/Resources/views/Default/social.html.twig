@@ -1,0 +1,172 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Социальные сети{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Социальные сети</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Интеграция с соц.сетями</a>
+</div>
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+                <table class="cfgTable">
+                    <tr>
+                        <td>Сообщение перед ссылкой</td>
+                        <td>
+                            <textarea name="message" id="facebook_message">{{message}}</textarea>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Заголовок сайта для соц.сетей</td>
+                        <td>
+                            <textarea name="title" id="facebook_title">{{title}}</textarea>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Описание сайта для соц.сетей</td>
+                        <td>
+                            <textarea name="description" id="facebook_description">{{description}}</textarea>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Модуль главного меню</td>
+                        <td>
+                            <select name="module" id="facebook_module">
+                                {% for item in modules %}
+                                <option value="{{item['id']}}">{{item['name']}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><button class="button" id="facebook_submitimage">Обновить изображение</button><button class="button" id="facebook_submit">Отправить на соц.сети</button></td>
+                    </tr>
+                </table>
+                <div> 
+                    <p><a href="#" onclick="$(this).closest('div').find('table').toggle();return false;">Редактировать данные для доступа к Facebook</a></p>
+                    <form action="{{path('extended_alert_social')}}" method="post">
+                        <table class="cfgTable" style="display:none;">
+                            <tr>
+                                <td>App ID</td>
+                                <td>
+                                    <input type="text" name="facebook[appid]" value="{{facebook['appid'] | default('')}}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Secret key</td>
+                                <td>
+                                    <input type="text" name="facebook[secret]" value="{{facebook['secret'] | default('')}}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Access token</td>
+                                <td>
+                                    <input type="text" name="facebook[token]" value="{{facebook['token'] | default('')}}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Group ID</td>
+                                <td>
+                                    <input type="text" name="facebook[group]" value="{{facebook['group'] | default('')}}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <button class="button" type="submit">Сохранить</button>
+                                    <a class="button" href="{{path('extended_alert_social_facebookgettoken')}}">Получить новый Access token</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>            
+                <div> 
+                    <p><a href="#" onclick="$(this).closest('div').find('table').toggle();return false;">Редактировать данные для доступа к ВКонтакте</a></p>
+                    <form action="{{path('extended_alert_social')}}" method="post">
+                        <table class="cfgTable" style="display:none;">
+                            <tr>
+                                <td>App ID</td>
+                                <td>
+                                    <input type="text" name="vkontakte[appid]" value="{{vkontakte['appid'] | default('')}}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Secret key</td>
+                                <td>
+                                    <input type="text" name="vkontakte[secret]" value="{{vkontakte['secret'] | default('')}}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Access token</td>
+                                <td>
+                                    <input type="text" name="vkontakte[token]" value="{{vkontakte['token'] | default('')}}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Group ID</td>
+                                <td>
+                                    <input type="text" name="vkontakte[group]" value="{{vkontakte['group'] | default('')}}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <button class="button" type="submit">Сохранить</button>
+                                    <a class="button" href="{{path('extended_alert_social_vkontaktegettoken')}}" target="_blank">Получить новый Access token</a>
+                                    <p>Для получения access token нажмите на кнопку, согласитесь с разрешением прав, скопируйте access token из адресной строки браузера в соответствующее поле настроек (в адресной строке параметр access token находится между текстом <i>access_token=</i> и символом <i>&</i> следующего параметра или конца строки)</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>            
+                            
+                            
+                <script>
+                    $('#facebook_submit').click(function () {
+                        var module = $('#facebook_module').val();
+                        var description = $('#facebook_description').val();
+                        var title = $('#facebook_title').val();
+                        var message = $('#facebook_message').val();
+                        $.ajax({
+                            type: "POST",
+                            url: "{{path('extended_alert_social_facebookupdate')}}",
+                            data: {module:module, description:description, title:title, message:message},
+                            error: function(){
+                                alert('Ошибка обращения к серверу');
+                            },
+                            success: function(data){
+                                var answer = $.parseJSON(data);
+                                if (answer['result'] != 'OK') alert(answer['message']); else alert('Обновление успешно произведено');
+                            }
+                        });
+                        return false;
+                    });
+                    $('#facebook_submitimage').click(function () {
+                        var module = $('#facebook_module').val();
+                        var description = $('#facebook_description').val();
+                        var title = $('#facebook_title').val();
+                        var message = $('#facebook_message').val();
+                        $.ajax({
+                            type: "POST",
+                            url: "{{path('extended_alert_social_facebookupdateimage')}}",
+                            data: {module:module, description:description, title:title, message:message},
+                            error: function(){
+                                alert('Ошибка обращения к серверу');
+                            },
+                            success: function(data){
+                                var answer = $.parseJSON(data);
+                                if (answer['result'] != 'OK') alert(answer['message']); else alert('Обновление успешно произведено');
+                            }
+                        });
+                        return false;
+                    });
+                </script>
+        </div>
+</div>​
+{% endblock %}       
+
+
+

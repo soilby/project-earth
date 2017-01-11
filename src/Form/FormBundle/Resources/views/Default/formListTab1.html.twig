@@ -1,0 +1,100 @@
+        {% if (app.user.checkAccess('form_letterviewall') == 1) %}<a class="button" href="#" id="viewedLetters0">Пометить как прочитанные</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="hidden" name="tab" value="0" />
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="letterList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Название формы &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Название формы &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Название формы</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Дата создания &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Дата создания &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Дата создания</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?tab=0&sort0=5">Просмотрено &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?tab=0&sort0=4">Просмотрено &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=4">Просмотрено</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Просмотрел &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Просмотрел &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Просмотрел</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for letter in letters0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{letter.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('form_form_viewletter')}}?id={{letter.id}}">{{letter.title}}</a>{% if (errors0[letter.id] is defined) %}<p class="error">{{errors0[letter.id]}}</p>{% endif %}</td>
+                <td>{{letter.createDate | date('d.m.Y G:i')}}</td>
+                <td>{{letter.viewed != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{letter.fullName}}{% if (letter.viewed != 0) %} ({{letter.viewDate | date('d.m.Y G:i')}}){% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#viewedLetters0').click(function () {ajaxAction('{{path('form_form_ajax')}}?tab=0', 'viewed', '#letterList0 input.check', '#con_tab1');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

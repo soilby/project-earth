@@ -1,0 +1,11 @@
+<div>
+<h1>Пользователи онлайн</h1>
+    <p>
+    {% for user in users %}
+        {% if loop.index0 != 0 %} | {% endif %}
+        {{user.login}}
+    {% endfor %}
+    </p>
+</div>
+
+

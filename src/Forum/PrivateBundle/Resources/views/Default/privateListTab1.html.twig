@@ -1,0 +1,112 @@
+        {% if (app.user.checkAccess('forum_private') == 1) %}<a class="button" href="#" id="deletePrivate0">Удалить выбранные</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="hidden" name="tab" value="0" />
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="privateList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Заголовок &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Заголовок &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Заголовок</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Создано (изменено) &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Создано (изменено) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Создано (изменено)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 8) %}
+                        <a href="?tab=0&sort0=9">Адресат &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 9) %}
+                        <a href="?tab=0&sort0=8">Адресат &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=8">Адресат</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 10) %}
+                        <a href="?tab=0&sort0=11">Просмотрено &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 11) %}
+                        <a href="?tab=0&sort0=10">Просмотрено &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=10">Просмотрено</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for private in privates0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{private.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('forum_private_private_view')}}?id={{private.id}}">{{private.title}}</a>{% if (errors0[private.id] is defined) %}<p class="error">{{errors0[private.id]}}</p>{% endif %}</td>
+                <td>{{private.createDate | date('d.m.Y G:i')}}{% if (private.modifyDate != private.createDate) %} ({{private.modifyDate | date('d.m.Y G:i')}}){% endif %}</td>
+                <td>{{private.createrName}}</td>
+                <td>{{private.targetName}}</td>
+                <td>{{private.viewed != 0 ? 'Да' : 'Нет'}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#deletePrivate0').click(function () {ajaxActionConfirm('{{path('forum_private_private_ajax')}}?tab=0', 'deleteprivate', '#privateList0 input.check', '#con_tab1','Удалить выбранные сообщения?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

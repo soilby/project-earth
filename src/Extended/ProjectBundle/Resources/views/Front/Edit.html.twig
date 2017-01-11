@@ -1,0 +1,150 @@
+<p><a href="?" class="btn btn-default">Назад</a></p>
+<style>
+    .projectfiles-edit-form p {
+        margin-bottom: 15px;
+    }
+</style>
+<h3>Основные данные</h3>
+{% if result %}<h4 class="alert alert-success">Данные сохранены</h4>{% endif %}
+<style>
+    .projectfiles-edit-form label {
+        text-align: left;
+    }
+</style>
+<form method="POST" class="projectfiles-edit-form form-horizontal">
+    <div class="form-group">
+        <label class="col-sm-4 control-label">Заголовок (английский)</label>
+        <div class="col-sm-8">
+            <input type="text" name="title" value="{{file.title}}" class="form-control" />
+            {% if errors['title'] is defined %}<p class="form-error">{{errors['title']}}</p>{% endif %}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 control-label">Заголовок (русский)</label>
+        <div class="col-sm-8">
+            <input type="text" name="titleRu" value="{{file.titleRu}}" class="form-control" />
+            {% if errors['titleRu'] is defined %}<p class="form-error">{{errors['titleRu']}}</p>{% endif %}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-4 control-label">Папка</label>
+        <div class="col-sm-8">
+            <select name="parentId" class="form-control">
+            <option value="" {% if file.parentId == null %}selected="selected"{% endif %}>[корневая]</option>
+        {% for folder in folders %}
+            <option value="{{folder['id']}}" {% if file.parentId == folder['id'] %}selected="selected"{% endif %}>{% if folder['nesting'] > 0 %}{% for i in 0..folder['nesting'] %} - {% endfor %}{% endif %}{{folder['title']}}</option>
+        {% endfor %}
+        </select>
+            {% if errors['parentId'] is defined %}<p class="form-error">{{errors['parentId']}}</p>{% endif %}
+        </div>
+    </div>
+    {% if file.mimeType == 'text/html' %}
+        <div class="form-group">
+                            <label class="col-sm-12 control-label">Содержание (английский)</label>
+                            <div class="col-sm-12">
+                                <textarea class="documentTextArea form-control" name="contentEn">{{htmlContentEn}}</textarea>
+                            </div>
+                        </div>
+        <div class="form-group">
+                            <label class="col-sm-12 control-label">Содержание (русский)</label>
+                            <div class="col-sm-12">
+                                <textarea class="documentTextArea form-control" name="contentRu">{{htmlContentRu}}</textarea>
+                            </div>
+                        </div>
+            <script>
+            tinymce.init({
+                selector: "textarea.documentTextArea",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                content_css: "/css/tinymce.css",
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages | sxmfilemgr"
+            });
+            </script>
+    {% endif %}
+    <p><button class="btn btn-primary" type="submit">Сохранить</button></p>
+</form>
+{% if file.isCollection == 0 %}
+    <h3>Версии</h3>
+    {% for locale in findLocales %}
+        <p>{% if locale == 'en' %}Английские версии:{% elseif locale == 'ru' %}Русские версии:{% endif %}</p>
+        {% for version in versions %}
+            {% if version['locale'] == locale %}
+                <p>Версия от {{version['createDate'] | date('d.m.Y H:i')}}, пользователь {{version['createrFullName']}}</p>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    {% if file.mimeType in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text'] %}
+    <h3>Редактирование</h3>
+    <p>
+        <a href="ms-word:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в Word</a>
+        <a href="ms-word:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в Word</a>
+    </p>
+    {% elseif file.mimeType in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
+    <h3>Редактирование</h3>
+    <p>
+        <a href="ms-excel:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в Excel</a>
+        <a href="ms-excel:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в Excel</a>
+    </p>
+    {% elseif file.mimeType in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow'] %}
+    <h3>Редактирование</h3>
+    <p>
+        <a href="ms-powerpoint:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в PowerPoint</a>
+        <a href="ms-powerpoint:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в PowerPoint</a>
+    </p>
+    {% elseif file.mimeType != 'text/html' %}
+    <h3>Редактирование</h3>
+    <p><a href="#" id="projectfiles-upload-ru" class="button">Закачать новую русскую версию</a> <a href="#" id="projectfiles-upload-en" class="button">Закачать новую английскую версию</a></p>
+    <p>Ссылка для открытия файла в программах русской версии: <a href="{{urlRu}}">{{urlRu}}</a></p>
+    <p>Ссылка для открытия файла в программах английской версии: <a href="{{urlEn}}">{{urlEn}}</a></p>
+    {% endif %}    
+    
+
+
+<script type="text/javascript" src="/js/ajaxupload.partial.js"></script>    
+<script>
+    $(function () {
+        var alaxuploaderru =  new AjaxUploadPartial('#projectfiles-upload-ru', {
+            url: '{{path('extended_project_front_upload')}}?file={{file.id}}&locale=ru',
+            progressElement: "#progress",
+            onSubmit: function(file, extension)
+            {
+                //$('#preloader').show();
+            },
+            onComplete: function(file, response)
+            {
+                var answer = $.parseJSON(response);
+                if (answer.result != "OK") alert(answer.message);
+                $('#progress').html('');
+                location.reload();
+            }
+        });        
+        var alaxuploaderen =  new AjaxUploadPartial('#projectfiles-upload-en', {
+            url: '{{path('extended_project_front_upload')}}?file={{file.id}}&locale=en',
+            progressElement: "#progress",
+            onSubmit: function(file, extension)
+            {
+                //$('#preloader').show();
+            },
+            onComplete: function(file, response)
+            {
+                var answer = $.parseJSON(response);
+                if (answer.result != "OK") alert(answer.message);
+                $('#progress').html('');
+                location.reload();
+            }
+        });        
+        
+    });
+        
+</script>
+
+{% endif %}

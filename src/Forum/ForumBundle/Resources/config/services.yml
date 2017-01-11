@@ -1,0 +1,4 @@
+services:
+    object.forum:
+        class: Forum\ForumBundle\ForumManager
+        arguments: ['@service_container']

@@ -1,0 +1,173 @@
+                <form id="import3ConfigForm">
+                {% for tablerownum, tablerowtmp in tablerowcfg %}
+                <input type="hidden" name="tablerowcfg[{{tablerownum}}]" value="{{tablerowtmp}}" />
+                {% endfor %}
+                <br />
+                <p><strong>Основная информация:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    <tr>
+                        <td>Количество продуктов</td>
+                        <td>{{productcount}}</td>
+                    </tr>
+                </table>
+                <br />
+                <p><strong>Соответствие статусов наличия:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    {% for key,stat in findstatuses %}
+                    <tr>
+                        <td>Статус "{{stat}}"</td>
+                        <td>
+                            <select name="statuses[{{key}}]">
+                                <option value="1">Есть в наличии</option>
+                                <option value="0">Нет в наличии</option>
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br />
+                <p><strong>Соответствие категорий:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    {% for key,cat in findcategories %}
+                    <tr>
+                        <td>Категория {{cat['name']}} ({{cat['count']}} товаров)</td>
+                        <td>
+                            <select name="categories[{{key}}]">
+                                <option value="">Не импортировать</option>
+                                {% for ourcat in ourcategories %}
+                                <option value="{{ourcat['id']}}">{% if (ourcat['nesting'] > 0) %}{% for i in 0..(ourcat['nesting']-1) %}- {% endfor %}{% endif %}{{ourcat['title']}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br />
+                <p><strong>Выбор валюты:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    <tr>
+                        <td>Выберите валюту в файле</td>
+                        <td>
+                            <select name="currency">
+                                {% for currency in currencies %}
+                                <option value="{{currency['id']}}" {% if (currency['id'] == curcfg) %}selected="selected"{% endif %}>{{currency['name']}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <p><strong>Параметры страницы:</strong></p>
+                <br />
+                <table class="cfgTable">
+                <tr>
+                    <td>Основной шаблон</td>
+                    <td>
+                        <select name="layout">
+                            <option value="" {% if (layoutcfg == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (layoutcfg == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента</td>
+                    <td>
+                        <select name="template">
+                            <option value="" {% if (templatecfg == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (templatecfg == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули</td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="modules[]" value="{{module['id']}}" {% if (module['id'] in modulecfg) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                </tr>
+                {% endif %}
+                </table>
+                </form>
+                <br />
+                <p><strong>Импорт:</strong></p>
+                <br />
+                <div id="progress3Wrap">
+                    <button id="import3StartImport" onclick="return false;">Начать импорт</button>
+                </div>
+<script type="text/javascript">
+    window.lastproduct3 = 0;
+
+    function import3ProcessBlock()
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('extended_shop_import_three_process')}}',
+            data: "start="+window.lastproduct3+'&'+$('#import3ConfigForm').serialize(),
+            global: false,
+            error: function(){
+                import3ProcessBlock();
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                if (answer['result'] != 'OK') import3ProcessBlock(); else
+                {
+                    if (answer['status'] == 'OK')
+                    {
+                        $('#progress3Wrap').html('<div class="progressBar"><p style="width:'+parseInt(answer['percent'])+'%"></p></div>');
+                        window.lastproduct3 = parseInt(answer['start']);
+                    }
+                    if (answer['status'] == 'Fine')
+                    {
+                        $('#progress3Wrap').html('<p>Импорт завершен.</p>');
+                    } else import3ProcessBlock();
+                }
+            }
+        });	      
+    }
+    
+    $('#import3StartImport').click(function () 
+    {
+        $('#import3ConfigForm').hide();
+        $('#progress3Wrap').html('<div class="progressBar"><p style="width:0%"></p></div>');
+        import3ProcessBlock();
+        return false;
+    });
+    
+    $('#import3ImportData input, #import3ImportData button, #import3ImportData a.button, #import3ImportData select, #import3ImportData textarea').not('.uniformOff').uniform();
+    
+</script>
+                
+              
+
+{#
+<script type="text/javascript">
+    $('#import3NexStep2').click(function () 
+    {
+        $.ajax({
+            type: "POST",
+            url: {{path('extended_shop_import_three_loadtablecfg')}},
+            data: $('#tableRowCfgForm').serialize(),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                $('#import3ImportData').html(data);    
+            }
+        });	      
+        
+        return false;
+    });
+    $('#import3ImportData input, #import3ImportData button, #import3ImportData a.button, #import3ImportData select, #import3ImportData textarea').not('.uniformOff').uniform();
+</script>
+                
+#}

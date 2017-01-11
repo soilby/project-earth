@@ -1,0 +1,8 @@
+<h4>Language/язык</h4>
+<ul class="nav nav-stacked earth-nav-language">
+    {% for locale in (locales | reverse) %}
+        <li><a href="/{{currentSeoPage.url}}?actionobject=module&action=changelocale&actionlocale={{locale['shortName']}}" {% if locale['active'] != 0 %}onclick="return false;"{% endif %}><img src="{{asset('assets/img/locale/'~locale['shortName']~'.png')}}" />{{locale['fullName']}}</a></li>
+    {% endfor %}
+</ul>
+
+

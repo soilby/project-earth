@@ -1,0 +1,107 @@
+<div id="attachmentCfgTable" class="noselect">
+    {% for item in attachments %}
+        <div class="attachmentItem">
+            <p>{{item['filename']}}</p>
+            <div class="attachmentWrap"><img src="/adminimg/fileava.jpg" /></div>
+            <label><input type="checkbox" name="temp" class="attachmentEnabled" onclick="updateAttachmentIerarhy();" autocomplate="off" {% if (item['enabled'] != 0) %}checked="checked"{% endif %}>Опубликован</label>
+            <button onclick="deleteAttachment(this);return false;">Удалить</button>
+            <input type="hidden" name="temp" class="attachmentId" value="{{item['fileid']}}" />
+        </div>
+    {% endfor %}
+</div>
+<div id="attachmentFromWrap">
+</div>
+<button id="attachmentAdd">Добавить вложение</button>
+<script>
+    window.moveelement = null;
+    function updateAttachmentIerarhy()
+    {
+        var index = 0;
+        $('#attachmentFromWrap').html('');
+        $('#attachmentCfgTable').children('div.attachmentItem').each(function (i, element)
+        {
+            var enabled = ($(element).find('input.attachmentEnabled').is(':checked') == false ? 0 : 1);
+            var filename = $(element).find('p').html();
+            var fileid = $(element).find('input.attachmentId').val();
+            $('#attachmentFromWrap').append('<input type="hidden" name="attachments['+index+'][fileid]" value="'+fileid+'" /><input type="hidden" name="attachments['+index+'][enabled]" value="'+enabled+'" /><input type="hidden" name="attachments['+index+'][filename]" value="'+filename+'" />');
+            index++;
+        });
+        $('#attachmentCfgTable div.attachmentWrap').unbind('mousedown').unbind('mouseenter');
+        $('#attachmentCfgTable div.attachmentWrap').mousedown(function()
+        {
+            window.moveelement = $(this).closest('div.attachmentItem');
+            $(window.moveelement).parent().find('div.attachmentWrap').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().find('div.attachmentItem');
+                    var indexnew = elements.index($(this).closest('div.attachmentItem'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+            return false;
+        });
+    }
+    updateAttachmentIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateAttachmentIerarhy();});
+    
+    $(function () 
+    {
+        new AjaxUpload('#attachmentAdd', 
+        {
+            action: '{{path('shop_attachment_ajaxadd')}}',
+            name: 'attachment',
+            onSubmit: function(file, extension)
+            {
+                $('#preloader').show();
+            },
+            onComplete: function(file, response)
+            {
+                $('#preloader').hide();
+                if (!response) response = "{fileid:'', filename:'', error:'Ошибка загрузки файла'}";
+                var answer = $.parseJSON(response);
+                if(answer.fileid)
+                {
+                        $('#attachmentCfgTable').append(
+                            '        <div class="attachmentItem">'+
+                            '            <p>'+answer.filename+'</p>'+
+                            '            <div class="attachmentWrap"><img src="/adminimg/fileava.jpg" /></div>'+
+                            '            <label><input type="checkbox" name="temp" class="attachmentEnabled" onclick="updateAttachmentIerarhy();" checked="checked">Опубликован</label>'+
+                            '            <button onclick="deleteAttachment(this);return false;">Удалить</button>'+
+                            '            <input type="hidden" name="temp" class="attachmentId" value="'+answer.fileid+'" />'+
+                            '        </div>');
+                        $('#attachmentCfgTable input, #attachmentCfgTable button').not('.uniformOff').uniform();
+                        updateAttachmentIerarhy();
+                } else
+                {
+                        alert(answer.error);
+                }
+            }
+        });
+    });
+    
+    function deleteAttachment(that)
+    {
+        var fileid = $(that).closest('div.attachmentItem').find('input.attachmentId').val();
+        $(that).closest('div.attachmentItem').remove();
+        $.ajax({
+            type: "POST",
+            url: '{{path('shop_attachment_ajaxremove')}}',
+            data: "id="+fileid,
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+            }
+        });	      
+        updateAttachmentIerarhy();
+        return false;
+    }
+    
+</script>

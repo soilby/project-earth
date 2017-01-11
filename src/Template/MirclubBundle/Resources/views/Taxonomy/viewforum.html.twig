@@ -1,0 +1,87 @@
+			<h1>{{title}}</h1>
+                        {% if (categories | length > 0) %}
+                        <form class="searchForm" method="get" action="/forumsearch.html">
+				<input type="text" name="search" value="" />
+				<button type="submit">Поиск</button>
+			</form>
+			<p class="tableTitle">Разделы</p>
+			<table class="forumCatTable">
+                            {% for category in categories  %}
+                                {% if category['nesting'] == 0 %}
+				<tr>
+					<td class="forumColNewFlag">
+						<span class="{% if ((category['forumNewFlag'] | default(0)) == 0) %}forumNewFlagOff{% else %}forumNewFlagOn{% endif %}"></span>
+					</td>
+					<td class="forumColTitle">
+						<p class="forumTitle"><a href="{{category['url'] | default('')}}">{{category['title'] | default('')}}</a><p>
+                                                <p class="forumDescription">{{category['description'] | default('') | striptags}}</p>
+					</td>
+					<td class="forumColLastMsg">
+                                                <span class="mirclubTransliteration">{{category['forumModifyCreaterFullName'] | default('')}}</span><br />
+						<a href="{{category['forumModifyUrl'] | default('')}}">{% if (category['forumMofidyDate'] is defined) and ((category['forumCount'] | default(0)) > 0) %}{{category['forumMofidyDate'] | date('d.m.Y H:i')}}{% endif %}</a>
+					</td>
+					<td class="forumColInfo">
+                                                <span>{{category['forumCount'] | default('0')}}</span> тем
+					</td>
+				</tr>
+                                {% endif %}
+                            {% endfor %}
+			</table>
+			{% endif %}
+			<p class="tableTitle">Темы{% if (enableAdd != 0) and (currentUser != null) %}<a href="/forumcreate.html?categoryid={{id}}" class="flr mt5 button">Создать новую тему</a>{% endif %}</p>
+                        {% if (items | length > 0) %}
+			<table class="forumCatTable">
+                            {% for item in items %}
+				<tr>
+					<td class="forumColNewFlag">
+						<span class="{% if ((item['newFlag'] | default(0)) == 0) %}forumNewFlagOff{% else %}forumNewFlagOn{% endif %}"></span>
+					</td>
+					<td class="forumColTitle">
+						<p class="forumTitle"><a href="{{item['url'] | default('')}}" {% if (item['isImportant'] | default(0)) != 0 %}class="important"{% endif %}>{% if (item['isClosed'] | default(0)) != 0 %}[Закрыта]{% endif %}{{item['title'] | default('')}}</a><p>
+                                                <p class="forumDescription">{{(item['description'] | default('')) | striptags}}</p>
+					</td>
+					<td class="forumColLastMsg">
+						<span class="mirclubTransliteration">{% if (item['messageCount'] | default(0)) == 0 %}{{item['createrFullName'] | default('')}}{% else %}{{item['lastMessageCreaterFullName'] | default('')}}{% endif %}</span><br />
+						<a href="{{item['url'] | default('')}}">{% if item['lastMessageDate'] is defined %}{{item['lastMessageDate'] | date('d.m.Y H:i')}}{% endif %}</a>
+					</td>
+					<td class="forumColInfo">
+                                                <span>{{(item['messageCount'] | default(0)) + 1}}</span> сообщений
+					</td>
+				</tr>
+                            {% endfor %}
+			</table>
+                        {% else %}
+                        <p class="tac m15">В разделе нет тем</p>
+                        {% endif %}
+                        <div class="paginatorWrap">
+                        {% if (pageCount > 1) %}
+                            {% set to = page + 1 %}
+                            {% set from = page - 1 %}
+                            {% if (to >= pageCount) %}
+                                {% set to = pageCount - 1 %}
+                            {% endif %}
+                            {% if (from < 0) %}
+                                {% set from = 0 %}
+                            {% endif %}
+                            {% if (from > 0) %}
+                                <a href="?page=0">1</a>
+                            {% endif %}
+                            {% if (from > 1) %}
+                                ...
+                            {% endif %}
+                            {% for i in from..to %}
+                                {% if i == page %}
+                                <a href="#" class="active">{{i+1}}</a>
+                                {% else %}
+                                <a href="?page={{i}}">{{i+1}}</a>
+                                {% endif %}
+                            {% endfor %}
+                            {% if (to < (pageCount - 2)) %}
+                            ...
+                            {% endif %}
+                            {% if (to < (pageCount - 1)) %}
+                                <a href="?page={{pageCount - 1}}">{{pageCount}}</a>
+                            {% endif %}
+                        {% endif %}
+                        </div>
+                        

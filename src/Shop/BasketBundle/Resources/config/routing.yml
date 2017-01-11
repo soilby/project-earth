@@ -1,0 +1,59 @@
+shop_basket_orderlist:
+    path:  /admin/products/basket/orders/
+    defaults: { _controller: ShopBasketBundle:Default:orderList }
+
+shop_basket_orderajaxstatus:
+    path:  /admin/products/basket/orders/ajaxstatus
+    defaults: { _controller: ShopBasketBundle:Default:orderAjaxStatus }
+
+shop_basket_orderview:
+    path:  /admin/products/basket/orders/view
+    defaults: { _controller: ShopBasketBundle:Default:orderView }
+
+shop_basket_orderajax:
+    path:  /admin/products/basket/orders/ajax
+    defaults: { _controller: ShopBasketBundle:Default:orderAjax }
+
+shop_basket_list:
+    path:  /admin/products/basket/
+    defaults: { _controller: ShopBasketBundle:Default:basketList }
+
+shop_basket_fieldcreate:
+    path:  /admin/products/basket/fieldcreate
+    defaults: { _controller: ShopBasketBundle:Default:fieldCreate }
+
+shop_basket_fieldedit:
+    path:  /admin/products/basket/fieldedit
+    defaults: { _controller: ShopBasketBundle:Default:fieldEdit }
+
+shop_basket_fieldajax:
+    path:  /admin/products/basket/fieldajax
+    defaults: { _controller: ShopBasketBundle:Default:fieldAjax }
+
+shop_basket_shipmentedit:
+    path:  /admin/products/basket/shipmentedit
+    defaults: { _controller: ShopBasketBundle:Default:shipmentEdit }
+
+shop_basket_shipmentajax:
+    path:  /admin/products/basket/shipmentajax
+    defaults: { _controller: ShopBasketBundle:Default:shipmentAjax }
+
+shop_basket_paymentedit:
+    path:  /admin/products/basket/paymentedit
+    defaults: { _controller: ShopBasketBundle:Default:paymentEdit }
+
+shop_basket_paymentajax:
+    path:  /admin/products/basket/paymentajax
+    defaults: { _controller: ShopBasketBundle:Default:paymentAjax }
+
+shop_basket_create:
+    path:  /admin/products/basket/create
+    defaults: { _controller: ShopBasketBundle:Default:basketCreate }
+
+shop_basket_edit:
+    path:  /admin/products/basket/edit
+    defaults: { _controller: ShopBasketBundle:Default:basketEdit }
+
+shop_basket_ajax:
+    path:  /admin/products/basket/ajax
+    defaults: { _controller: ShopBasketBundle:Default:basketAjax }

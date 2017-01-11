@@ -1,0 +1,11 @@
+<div>
+<h1>{{title}}</h1>
+<small>Создано {{createDate | date('d.m.Y')}} пользователем {{createrFullName}}</small>
+<p>Описание: {{description | raw}}</p>
+<p>Скидка: {{discount | number_format(0,',',' ')}}%</p>
+<p>Цена: {% for pr in formatPrice %}{% if (loop.index0 > 0) %} / {% endif %}{{pr}}{% endfor %}</p>
+<p>Цена со скидкой: {% for pr in formatPriceWithDiscount %}{% if (loop.index0 > 0) %} / {% endif %}{{pr}}{% endfor %}</p>
+<p>На складе: {% if (onStock != 0) %}есть{% else %}нет{% endif %}</p>
+<p>Добавить к сравнению: <a href="?actionobject=product&action=compareadd&actionid={{id}}">+</a> </p>
+<p>Добавить в корзину: <a href="?actionobject=product&action=basketadd&actionid={{id}}">+</a> </p>
+</div>

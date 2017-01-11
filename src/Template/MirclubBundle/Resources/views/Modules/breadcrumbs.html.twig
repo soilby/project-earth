@@ -1,0 +1,11 @@
+<ol class="breadcrumb earth-breadcrumbs">
+    <li><a href="/">Главная</a></li>
+        {% for item in breadcrumbs %}
+            {% if (item['active'] == 0) %}
+            <li><a href="{{item['url']}}">{{item['title']}}</a></li>
+            {% else %}
+            <li class="active">{{item['title']}}</li>
+            {% endif %}
+        {% endfor %}
+</ol>
+

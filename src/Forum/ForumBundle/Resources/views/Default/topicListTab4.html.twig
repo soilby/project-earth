@@ -1,0 +1,127 @@
+        {% if (app.user.checkAccess('forum_commentsedit') == 1) %}<a class="button" href="#" id="unblockedComment3">Опубликовать</a>{% endif %}
+        {% if (app.user.checkAccess('forum_commentsedit') == 1) %}<a class="button" href="#" id="blockedComment3">Скрыть</a>{% endif %}
+        {% if (app.user.checkAccess('forum_commentsedit') == 1) %}<a class="button" href="#" id="deleteComment3">Удалить выбранные</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm3">
+            <input type="text" name="search3" value="{{search3}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="commentList3">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort3 == 0) %}
+                        <a href="?tab=3&sort3=1">Создано (изменено) &#9650;</a>
+                    {% else %}
+                    {% if (sort3 == 1) %}
+                        <a href="?tab=3&sort3=0">Создано (изменено) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=3&sort3=0">Создано (изменено)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort3 == 2) %}
+                        <a href="?tab=3&sort3=3">Опубликовано &#9650;</a>
+                    {% else %}
+                    {% if (sort3 == 3) %}
+                        <a href="?tab=3&sort3=2">Опубликовано &#9660;</a>
+                    {% else %}
+                        <a href="?tab=3&sort3=2">Опубликовано</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort3 == 4) %}
+                        <a href="?tab=3&sort3=5">Текст сообщения &#9650;</a>
+                    {% else %}
+                    {% if (sort3 == 5) %}
+                        <a href="?tab=3&sort3=4">Текст сообщения &#9660;</a>
+                    {% else %}
+                        <a href="?tab=3&sort3=4">Текст сообщения</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort3 == 6) %}
+                        <a href="?tab=3&sort3=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort3 == 7) %}
+                        <a href="?tab=3&sort3=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=3&sort3=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort3 == 8) %}
+                        <a href="?tab=3&sort3=9">Модератор &#9650;</a>
+                    {% else %}
+                    {% if (sort3 == 9) %}
+                        <a href="?tab=3&sort3=8">Модератор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=3&sort3=8">Модератор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort3 == 10) %}
+                        <a href="?tab=3&sort3=11">Страница &#9650;</a>
+                    {% else %}
+                    {% if (sort3 == 11) %}
+                        <a href="?tab=3&sort3=10">Страница &#9660;</a>
+                    {% else %}
+                        <a href="?tab=3&sort3=10">Страница</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for comment in comments3 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{comment.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('forum_forum_comments_edit')}}?id={{comment.id}}">{{comment.createDate | date('d.m.Y G:i')}}{% if (comment.modifyDate != comment.createDate) %} ({{comment.modifyDate | date('d.m.Y G:i')}}){% endif %}</a>{% if (errors3[comment.id] is defined) %}<p class="error">{{errors3[comment.id]}}</p>{% endif %}</td>
+                <td>{{comment.isVisible != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{comment.content | textlimit}}</td>
+                <td>{{comment.fullName}}</td>
+                <td>{{comment.moderatorFullName}}</td>
+                <td>{{comment.description}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount3 > 1) %}
+            {% set to = page3 + 1 %}
+            {% set from = page3 - 1 %}
+            {% if (to >= pagecount3) %}
+                {% set to = pagecount3 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=3&page3=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page3 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=3&page3={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount3 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount3 - 1)) %}
+                <a class="button" href="?tab=3&page3={{pagecount3 - 1}}">{{pagecount3}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#blockedComment3').click(function () {ajaxAction('{{path('forum_forum_topic_ajax')}}?tab=3', 'blockedcomment', '#commentList3 input.check', '#con_tab4');return false;});
+            $('#unblockedComment3').click(function () {ajaxAction('{{path('forum_forum_topic_ajax')}}?tab=3', 'unblockedcomment', '#commentList3 input.check', '#con_tab4');return false;});
+            $('#deleteComment3').click(function () {ajaxActionConfirm('{{path('forum_forum_topic_ajax')}}?tab=3', 'deletecomment', '#commentList3 input.check', '#con_tab4','Удалить выбранные сообщения?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

@@ -1,0 +1,310 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование изображения{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('gallery_gallery_images_list')}}">Галерея</a>
+    <span>Редактирование изображения &laquo;{{image['title']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+    {% if (locales|length > 0) %}
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Локализация</a>
+    {% endif %}
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+4}}" {% if (activetab == loop.index0+4) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="{{path('gallery_gallery_images_edit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('image_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('image_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('image_list') == 1) %}<a class="button" href="{{path('gallery_gallery_images_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="image[enabled]" value="1" {% if (image['enabled'] != 0) %}checked="checked"{% endif %} />Опубликовано</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{imageerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Заголовок<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="image[title]" value="{{image['title']}}" /></td>
+                    <td class="cfgError">{{imageerror['title']}}</td>
+                </tr>
+                <tr>
+                    <td>Тип изображения<span class="helpContainerButton" data-id="isVideo">?</span></td>
+                    <td>
+                        <select name="image[isVideo]" onchange="if ($(this).val() == 0) {$('#fotoTypeWrap').show();$('#videoTypeWrap').hide();} else {$('#fotoTypeWrap').hide();$('#videoTypeWrap').show();}">
+                            <option value="0" {% if image['isVideo'] == 0 %}selected="selected"{% endif %}>Фото</option>
+                            <option value="1" {% if image['isVideo'] != 0 %}selected="selected"{% endif %}>Видео</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{imageerror['isVideo']}}</td>
+                </tr>
+                <tr id="fotoTypeWrap" {% if image['isVideo'] != 0 %}style="display:none;"{% endif %}>
+                    <td>Фотография<span class="helpContainerButton" data-id="contentFoto">?</span></td>
+                    <td class="tac">
+                        <input type="hidden" id="fotoInput" name="image[contentFoto]" value="{{image['contentFoto']}}" />
+                        <span id="fotoWrap">
+                            {% if (image['contentFoto'] == '') %}
+                            <img src="/adminimg/noava.jpg" style="max-width:100px;max-height:100px;" />
+                            {% else %}
+                            <a href="{{image['contentFoto']}}" rel="lightbox"><img src="{{image['contentFoto']}}" style="max-width:100px;max-height:100px;" /></a>
+                            {% endif %}
+                        </span>
+                        <br />
+                        <a class="button" id="fotoLoad" onclick="return false;" href="#">Изменить</a>
+                        <a class="button" onclick="fotoClear();return false;" href="#">Сброс</a>
+                    </td>
+                    <td class="cfgError" id="fotoError">{{imageerror['contentFoto']}}</td>
+                </tr>
+                <tr id="videoTypeWrap" {% if image['isVideo'] == 0 %}style="display:none;"{% endif %}>
+                    <td>Видео-ссылка<span class="helpContainerButton" data-id="contentVideo">?</span></td>
+                    <td><input type="text" name="image[contentVideo]" value="{{image['contentVideo']}}" /></td>
+                    <td class="cfgError">{{imageerror['contentVideo']}}</td>
+                </tr>
+                <tr>
+                    <td>META ключи<span class="helpContainerButton" data-id="metaKeywords">?</span></td>
+                    <td><textarea name="image[metakey]" class="metaTextArea">{{image['metakey']}}</textarea></td>
+                    <td class="cfgError">{{imageerror['metakey']}}</td>
+                </tr>
+                <tr>
+                    <td>META описание<span class="helpContainerButton" data-id="metaDescription">?</span></td>
+                    <td><textarea name="image[metadescr]" class="metaTextArea">{{image['metadescr']}}</textarea></td>
+                    <td class="cfgError">{{imageerror['metadescr']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Описание изображения:<span class="helpContainerButton" data-id="description">?</span></p>
+            <p class="globalError">{{imageerror['description']}}</p>
+            <br />
+            <textarea name="image[description]" id="imageDescription">{{image['description']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#imageDescription",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('image_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('image_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('image_list') == 1) %}<a class="button" href="{{path('gallery_gallery_images_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="page[enable]" value="1" {% if (page['enable'] != 0) %}checked="checked"{% endif %} />Включить страницу просмотра</label><span class="helpContainerButton" data-id="seopageEnabled">?</span></td>
+                    <td class="cfgError">{{pageerror['enable']}}</td>
+                </tr>
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('image_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('image_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('image_list') == 1) %}<a class="button" href="{{path('gallery_gallery_images_list')}}">Отмена</a>{% endif %}
+            </div>
+            {% for locale in locales %}    
+            <table class="cfgTable">
+                <tr>
+                    <td>Заголовок ({{locale['fullName']}})</td>
+                    <td><input type="text" name="imageloc[{{locale['shortName']}}][title]" value="{{imageloc[locale['shortName']]['title']}}" /></td>
+                    <td class="cfgError">{{imagelocerror[locale['shortName']]['title']}}</td>
+                </tr>
+                <tr>
+                    <td>META ключи ({{locale['fullName']}})</td>
+                    <td><textarea name="imageloc[{{locale['shortName']}}][metakey]" class="metaTextArea">{{imageloc[locale['shortName']]['metakey']}}</textarea></td>
+                    <td class="cfgError">{{imagelocerror[locale['shortName']]['metakey']}}</td>
+                </tr>
+                <tr>
+                    <td>META описание ({{locale['fullName']}})</td>
+                    <td><textarea name="imageloc[{{locale['shortName']}}][metadescr]" class="metaTextArea">{{imageloc[locale['shortName']]['metadescr']}}</textarea></td>
+                    <td class="cfgError">{{imagelocerror[locale['shortName']]['metadescr']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Описание изображения ({{locale['fullName']}}):</p>
+            <p class="globalError">{{imagelocerror[locale['shortName']]['description']}}</p>
+            <br />
+            <textarea name="imageloc[{{locale['shortName']}}][description]" id="imageLocDescription{{locale['shortName']}}">{{imageloc[locale['shortName']]['description']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#imageLocDescription{{locale['shortName']}}",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            {% endfor %}    
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+4}}" {% if (activetab == loop.index0+4) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('image_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('image_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('image_list') == 1) %}<a class="button" href="{{path('gallery_gallery_images_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+</div>​
+</form>
+<script>
+function fotoClear()
+{
+    $('#fotoWrap').html('<img src="/adminimg/noava.jpg" style="max-width:100px;max-height:100px;" />');
+    $('#fotoInput').val('');
+    $('#fotoError').html('');
+}
+$(function () 
+{
+    new AjaxUpload('#fotoLoad', 
+    {
+        action: '{{path('gallery_gallery_images_ajaximage')}}',
+        name: 'foto',
+        inputFilter: 'image/jpeg,image/png,image/gif',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "{file:'', error:'Ошибка загрузки файла'}";
+            var answer = $.parseJSON(response);
+            if(answer.file)
+            {
+                    $('#fotoWrap').html('<a href="'+answer.file+'" rel="lightbox"><img src="'+answer.file+'" style="max-height:100px;max-width:100px;" /></a>');
+                    $('#fotoInput').val(answer.file);
+                    $('#fotoError').html('');
+            } else
+            {
+                    $('#fotoError').html(answer.error);
+            }
+        }
+    });
+});
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить изображение.</div>
+    <div id="helpContainer-title">Задаёт название изображения.</div>
+    <div id="helpContainer-isVideo">Задаёт тип изображения: фото или видео.</div>
+    <div id="helpContainer-contentFoto">Фотография позволяет загрузить фото-изображение.</div>
+    <div id="helpContainer-contentVideo">Видео-ссылка задаёт ссылку на видео-изображение. Поддерживаются сервисы YouTube, Vimeo, RuTube.</div>
+    <div id="helpContainer-metaKeywords">МЕТА ключи позволяют задать ключевые слова для данной страницы сайта. Данная информация участвует в оптимизации сайта для поисковых систем (SEO).</div>
+    <div id="helpContainer-metaDescription">МЕТА описание позволяет задать краткое описание для данной страницы сайта. Данная информация участвует в оптимизации сайта для поисковых систем (SEO).</div>
+    <div id="helpContainer-description">Задаёт описание изображения галереи.</div>
+    <div id="helpContainer-seopageEnabled">При включении создаёт отдельную страницу сайта для данного объекта.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+</div>
+{% endblock %}       
+
+
+

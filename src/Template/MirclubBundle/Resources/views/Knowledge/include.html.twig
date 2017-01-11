@@ -1,0 +1,187 @@
+<style>
+    
+    
+    
+</style>
+
+<div class="modal fade" id="popup-knowledge-edit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var mirKnowledgeManager = {
+        
+        locale: '{{currentLocale}}',
+        
+        isAjaxMode: false,
+        formId: null,
+        locales: null,
+        types: null,
+        objectTitle: null,
+        objectDefaultTitle: null,
+        objectTypes: null,
+        
+        objectType: null,
+        objectId: null,
+        objectTextId: null,
+        
+        updateForm: function () {
+            var html = (this.locale != 'en' ? '<h4>Информация реестра объектов</h4>' : '<h4>Object registry information</h4>');
+            html += (this.locale != 'en' ? '<p>Название</p>' : '<p>Title</p>');
+            html += '<p><input type="text" id="popup-knowledge-title-default" class="popup-knowledge-form form-control" name="actionfields[knowledgetitle][default]" /></p>'
+            for (var i in this.locales) {
+                html += (this.locale != 'en' ? '<p>Название ('+this.locales[i]+')</p>' : '<p>Title ('+this.locales[i]+')</p>');
+                html += '<p><input type="text" name="actionfields[knowledgetitle]['+i+']" class="popup-knowledge-form form-control" id="popup-knowledge-title-'+i+'" /></p>'
+            }
+            for (var i in this.types) {
+                var checked = false;
+                for (var j in this.objectTypes) {
+                    if (this.types[i]['id'] == this.objectTypes[j]) {
+                        checked = true;
+                        break;
+                    }
+                }
+                html += '<p class="checkbox" style="padding-left:'+(parseInt(this.types[i]['nesting']) * 15 + 20)+'px"><label><input class="popup-knowledge-form" type="checkbox" name="actionfields[knowledgetypes][]" value="'+this.types[i]['id']+'" '+(checked ? 'checked="checked"' : '')+' />'+this.types[i]['name']+'</label></p>';
+            }
+            html += '<p class="text-right"> <button class="btn btn-primary" onclick="mirKnowledgeManager.submitForm();return false;">'+(this.locale != 'en' ? 'Сохранить' : 'Save')+'</button> <button class="btn btn-default" data-dismiss="modal">'+(this.locale != 'en' ? 'Отмена' : 'Cancel')+'</button></p>'
+            $('#popup-knowledge-edit .modal-body').html(html);
+            $('#popup-knowledge-title-default').val((this.objectTitle['default'] != undefined ? this.objectTitle['default'] : this.objectDefaultTitle['default']));
+            for (var i in this.locales) {
+                $('#popup-knowledge-title-'+i).val((this.objectTitle[i] != undefined ? this.objectTitle[i] : (this.objectDefaultTitle[i] != undefined ? this.objectDefaultTitle[i] : '')));
+            }
+        },
+        
+        submitForm: function () {
+            if (this.isAjaxMode == false) {
+                var data = $('.popup-knowledge-form').serializeArray();
+                $('#popup-knowledge-edit .modal-body').html('');
+                for (var i in data) {
+                    var $input = $('<input type="hidden" />').attr('name', data[i]['name']).attr('value', data[i]['value']);
+                    $(this.formId).append($input);
+                }
+                $(this.formId).submit();
+            } else {
+                var data = $('.popup-knowledge-form').serialize();
+                if ((this.objectType !== null) && (this.objectType !== undefined)) {
+                    data += '&type='+this.objectType;
+                }
+                if ((this.objectId !== null) && (this.objectId !== undefined)) {
+                    data += '&id='+this.objectId;
+                }
+                if ((this.objectTextId !== null) && (this.objectTextId !== undefined)) {
+                    data += '&textid='+this.objectTextId;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: '/system/knowledge/addinfo',
+                    data: data,
+                    error: function(){
+                        alert('Ошибка обращения к серверу');
+                    },
+                    success: function(data) {
+                        if (data.result != 'OK') {
+                            var html = (this.locale != 'en' ? '<h4>Информация реестра объектов</h4>' : '<h4>Object registry information</h4>');
+                            html += (this.locale != 'en' ? '<p>Ошибка добавления записи</p>' : '<p>Record add error</p>');
+                            html += '<p class="text-right"><button class="btn btn-default" data-dismiss="modal">'+(this.locale != 'en' ? 'OK' : 'OK')+'</button></p>'
+                            $('#popup-knowledge-edit .modal-body').html(html);
+                            $('#popup-knowledge-edit').modal('show');
+                        } else {
+                            location.reload();
+                        }
+                    }
+                });	      
+            }
+            $('#popup-knowledge-edit').modal('hide');
+        },
+
+        submitFormWithoutData: function () {
+            if (this.isAjaxMode == false) {
+                $(this.formId).submit();
+            }
+            $('#popup-knowledge-edit').modal('hide');
+        },
+
+        closeForm: function () {
+            $('#popup-knowledge-edit').modal('hide');
+        },
+            
+        getObjectInfo: function () {
+            var requestData = {locale: this.locale};
+            if ((this.objectType !== null) && (this.objectType !== undefined)) {
+                requestData.type = this.objectType;
+            }
+            if ((this.objectId !== null) && (this.objectId !== undefined)) {
+                requestData.id = this.objectId;
+            }
+            if ((this.objectTextId !== null) && (this.objectTextId !== undefined)) {
+                requestData.textid = this.objectTextId;
+            }
+            $.ajax({
+                type: "POST",
+                url: '/system/knowledge/loadinfo',
+                data: requestData,
+                error: function(){
+                    alert('Ошибка обращения к серверу');
+                },
+                success: function(data) {
+                    /*if ((mirKnowledgeManager.objectType !== null) && (mirKnowledgeManager.objectType !== undefined) && (data['registred'] == 0)) {
+                        mirKnowledgeManager.submitFormWithoutData();
+                        return false;
+                    }*/
+                    mirKnowledgeManager.locales = data['locales'];
+                    mirKnowledgeManager.types = data['types'];
+                    mirKnowledgeManager.objectTitle = data['objectTitle'];
+                    mirKnowledgeManager.objectTypes = data['objectTypes'];
+                    mirKnowledgeManager.updateForm();
+                }
+            });	      
+        },
+        
+        showForm: function () {
+            $('#popup-knowledge-edit .modal-body').html('<p>Загрузка...</p>');
+            $('#popup-knowledge-edit').modal('show');
+            this.getObjectInfo();
+        },
+        
+        formMode: function (formId, defaultTitle, objectType, objectId, objectTextId) {
+            this.isAjaxMode = false;
+            this.formId = formId;
+            if (typeof defaultTitle == 'string') {
+                this.objectDefaultTitle = {
+                    default: defaultTitle
+                }
+            } else {
+                this.objectDefaultTitle = defaultTitle;
+            }
+            this.objectType = objectType;
+            this.objectId = objectId;
+            this.objectTextId = objectTextId;
+            this.showForm();
+            return false;
+        },
+        
+        ajaxMode: function (defaultTitle, objectType, objectId, objectTextId) {
+            this.isAjaxMode = true;
+            this.formId = null;
+            if (typeof defaultTitle == 'string') {
+                this.objectDefaultTitle = {
+                    default: defaultTitle
+                }
+            } else {
+                this.objectDefaultTitle = defaultTitle;
+            }
+            this.objectType = objectType;
+            this.objectId = objectId;
+            this.objectTextId = objectTextId;
+            this.showForm();
+            return false;
+        },
+        
+    };
+</script>

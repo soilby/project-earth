@@ -1,0 +1,22 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Список мастерских{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Мастерские</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Мастерские</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "ExtendedProjectBundle:Default:projectListTab1.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

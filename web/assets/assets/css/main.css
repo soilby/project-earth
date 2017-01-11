@@ -1,0 +1,408 @@
+header {
+    background: #185359 url("../img/headerbk.png") repeat-x scroll left top;
+    min-height: 300px;
+    z-index: 2;
+    position: relative;
+}
+
+header h4 {
+    font-size: 18px;
+    color: #fff;
+    text-decoration: underline;
+}
+
+.earth-logo {
+    color: #fff;
+    display: inline-block;
+    font-size: 18px;
+    padding: 15px 15px 0;
+    text-align: center;
+    text-shadow: 0 0 5px #000;    
+}
+
+.earth-nav-language>li>a {
+    padding: 4px 8px;
+    color: #fff;
+    display: inline-block;
+}
+
+.earth-nav-language>li>a:hover {
+    text-decoration: underline;
+    background: transparent;
+}
+
+.earth-nav-menu>li>a {
+    padding: 4px 8px;
+    color: #000;
+}
+
+.earth-nav-menu>li>a:hover {
+    text-decoration: underline;
+    background: transparent;
+}
+
+.earth-nav-menu>li.active>a {
+    font-weight: bold;
+}
+
+.earth-left-item {
+    margin: 20px 0;
+}
+
+.earth-left-item h4 {
+    font-size: 18px;
+    color: #185356;
+    text-decoration: underline;
+}
+
+footer {
+    border-top: 1px solid #ccc;
+    margin-top: 10px;
+    padding-top: 10px;
+    font-size: 12px;
+    font-style: italic;
+    color: #777;    
+}
+
+.earth-breadcrumbs {
+    background: transparent none repeat scroll 0 0;
+    font-size: 12px;
+    padding: 20px 0 0;    
+}
+
+@media (max-width: 991px) {
+    header {
+        min-height: auto;
+    }
+    .earth-logo img {
+        display: inline-block;
+        height: 50px;
+        padding-right: 15px;
+    }
+    .earth-logo {
+        padding: 5px;
+    }
+    .earth-logo p {
+        display: inline-block;
+    }
+    #earth-menu {
+        background: #fafafa none repeat scroll 0 0;
+        bottom: 0;
+        box-shadow: 0 0 5px #000;
+        display: none;
+        overflow-y: scroll;
+        position: fixed;
+        right: 0;
+        top: 60px;
+        z-index: 99;
+    }
+}
+
+#earth-menu-wrap {
+    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.earth-btn-menu {
+    background: transparent none repeat scroll 0 0;
+    color: #ccc;
+    display: inline-block;
+    font-size: 30px;
+    line-height: 50px;
+    padding: 5px;
+    text-align: center;
+    width: 60px;
+}
+
+#earth-preloader {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.4);
+	z-index: 100;
+}
+
+#earth-preloader img{
+	top: 50%;
+	left: 50%;
+	width: 128px;
+	height: 128px;
+	margin-left: -64px;
+	margin-top: -64px;
+	display: block;
+	position: relative;
+}
+
+
+.earth-main-slider {
+    position: relative;
+}
+
+.earth-main-slider_wrap {
+        border: 1px solid #ccc;
+        margin: 0 30px;
+	overflow:hidden;
+}
+
+.earth-main-slider_wrap ul {
+	list-style: none;
+}
+
+.earth-main-slider_wrap li {
+    padding: 0 15px;
+}
+
+.earth-main-slider_left {
+        display: block;
+	width: 30px;
+	height: 30px;
+        top: 50%;
+        margin-top: -15px;
+        left: 0;
+        position: absolute;
+}
+
+.earth-main-slider_right {
+        display: block;
+	width: 30px;
+	height: 30px;
+        top: 50%;
+        margin-top: -15px;
+        right: 0;
+        position: absolute;
+}
+
+.earth-main-slider_pager {
+	text-align:center;
+	height: 20px;
+}
+
+.earth-main-slider_pager a{
+	display:inline-block;
+	height: 10px;
+	width: 10px;
+        text-decoration: none;
+        border-radius: 5px;
+        border: solid 1px #ccc;
+        margin-top: 5px;
+}
+
+.earth-main-slider_pager a.active{
+        background: #185359;
+        border: solid 1px #185359;
+}
+
+.earth-main-slider_pager a:hover{
+        border: solid 1px #185359;
+}
+
+.earth-main-slider_left a, .earth-main-slider_right a{
+	display:inline-block;
+	height: 30px;
+	width: 30px;
+        text-align: center;
+        line-height: 30px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #ccc;
+        text-decoration: none;
+}
+
+.earth-main-slider_left a:hover, .earth-main-slider_right a:hover{
+    color: #185359;
+}
+
+.earth-main-slider li .title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.earth-main-slider li .title a{
+    color: #185359;
+}
+
+.earth-main-slider li .datetime {
+    color: #ccc;
+    font-size: 11px;
+    font-style: italic;
+}
+
+.earth-main-slider li .description {
+    color: #000;
+    padding-bottom: 10px;
+}
+
+.earth-messages-table_info img {
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 0 10px;
+}
+
+.form-error {
+    color: #f00;
+}
+
+.earth-messages-table_info {
+    width: 250px;
+}
+
+.earth-village-item, .earth-knowledge-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.earth-village-item p, .earth-knowledge-item p{
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.earth-village-item img, .earth-knowledge-item img {
+    max-width: 100%;
+}
+
+.earth-comments {
+    border: 1px solid #aaa;
+    padding: 15px;
+}
+
+.earth-files-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.earth-projectlist-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    color: #185359;
+    margin-bottom: 15px;
+}
+
+.earth-projectlist-item .title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.earth-projectlist-item.hover {
+    background: #eee;
+}
+
+body h1 {
+    color: #185359;
+    border-bottom: 1px solid #ccc;
+}
+
+.documentListForProject .noteLink {
+    color: #777;
+    font-size: 11px;
+    font-style: italic;
+    text-decoration: none;
+}
+
+.documentListForProject .noteLink:hover {
+    color: #000;
+}
+
+.afterButtonNote {
+    color: #777;
+    display: inline-block;
+    font-size: 11px;
+    font-style: italic;
+    padding-right: 30px;
+    vertical-align: top;
+    width: 320px;
+}
+
+.documentListForProject {
+    border-bottom: 1px solid rgba(170, 170, 68, 0.7);
+    display: inline-block;
+    list-style: outside none none;
+    margin-bottom: 10px;
+    overflow: hidden;
+    padding-left: 0;
+}
+
+.documentListForProject li {
+    background: rgba(255, 255, 204, 0.4) none repeat scroll 0 0;
+    border-left: 1px solid rgba(170, 170, 68, 0.7);
+    border-right: 1px solid rgba(170, 170, 68, 0.7);
+    list-style: inside;
+    padding: 3px 10px;   
+}
+
+.documentListForProject li:first-child {
+    background: rgba(255, 255, 204, 0.4) none repeat scroll 0 0;
+    border: 1px solid rgba(170, 170, 68, 0.7);
+    border-radius: 2px 20px 0 0;
+    margin-left: 10px;
+    margin-right: 20px;
+    list-style: none;
+}
+
+.documentListForProject li a{
+    /*color: #000;*/
+    text-decoration: none;
+}
+
+.documentListForProject li a:hover{
+    text-decoration: underline;
+}
+
+.tinymceContent p{
+        min-height: 1em;
+}
+
+.tinymceContent p, .tinymceContent h1, .tinymceContent h2, .tinymceContent h3, .tinymceContent h4, .tinymceContent h5, .tinymceContent h6 {
+    margin: 12px 0;
+    /*background: #fff;*/
+}
+
+.tinymceContent ul {
+    margin: 12px 0;
+    list-style: circle outside;
+    padding-left: 40px;
+}
+
+.tinymceContent ol {
+    margin: 12px 0;
+    list-style: decimal outside;
+    padding-left: 40px;
+}
+
+.earth-menu-lang-mobile {
+    font-size: 0;
+}
+
+.earth-menu-lang-mobile li {
+    display: inline-block;
+    list-style: none;
+    font-size: 10px;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+
+.earth-menu-lang-mobile img {
+    display: block;
+    width: 18px;
+    margin: 5px auto;
+}   
+.earth-menu-lang-mobile a {
+    color: #fff;
+}
+    

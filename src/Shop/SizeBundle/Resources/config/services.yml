@@ -1,0 +1,4 @@
+services:
+    addone.product.size:
+        class: Shop\SizeBundle\SizeManager
+        arguments: ['@service_container']

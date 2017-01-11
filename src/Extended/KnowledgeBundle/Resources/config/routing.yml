@@ -1,0 +1,61 @@
+extended_knowledge_list:
+    path:  /admin/knowledge/
+    defaults: { _controller: ExtendedKnowledgeBundle:Default:list }
+
+extended_knowledge_listtable:
+    path:  /admin/knowledge/table
+    defaults: { _controller: ExtendedKnowledgeBundle:Default:listTable }
+
+extended_knowledge_loadobjects:
+    path:  /admin/knowledge/loadobjects
+    defaults: { _controller: ExtendedKnowledgeBundle:Default:loadObjects }
+
+extended_knowledge_addobject:
+    path:  /admin/knowledge/addobject
+    defaults: { _controller: ExtendedKnowledgeBundle:Default:addObject }
+
+extended_knowledge_getobject:
+    path:  /admin/knowledge/getobject
+    defaults: { _controller: ExtendedKnowledgeBundle:Default:getObject }
+
+extended_knowledge_editobject:
+    path:  /admin/knowledge/editobject
+    defaults: { _controller: ExtendedKnowledgeBundle:Default:editObject }
+
+extended_knowledge_removeobject:
+    path:  /admin/knowledge/removeobject
+    defaults: { _controller: ExtendedKnowledgeBundle:Default:removeObject }
+
+
+extended_knowledge_typelist:
+    path:  /admin/knowledge/types
+    defaults: { _controller: ExtendedKnowledgeBundle:Types:list }
+
+extended_knowledge_typelist_ajaxsave:
+    path:  /admin/knowledge/types/ajaxsave
+    defaults: { _controller: ExtendedKnowledgeBundle:Types:ajaxSave }
+
+extended_knowledge_typelist_ajaxdelete:
+    path:  /admin/knowledge/types/ajaxdelete
+    defaults: { _controller: ExtendedKnowledgeBundle:Types:ajaxDelete }
+
+extended_knowledge_typelist_ajaxadd:
+    path:  /admin/knowledge/types/ajaxadd
+    defaults: { _controller: ExtendedKnowledgeBundle:Types:ajaxAdd }
+
+extended_knowledge_typelist_edit:
+    path:  /admin/knowledge/types/edit
+    defaults: { _controller: ExtendedKnowledgeBundle:Types:edit }
+
+extended_knowledge_typelist_editavatar:
+    path:  /admin/knowledge/types/editajaxavatar
+    defaults: { _controller: ExtendedKnowledgeBundle:Types:editAjaxAvatar }
+
+
+extended_knowledge_front_loadinfo:
+    path:  /system/knowledge/loadinfo
+    defaults: { _controller: ExtendedKnowledgeBundle:Front:loadInfo }
+
+extended_knowledge_front_addinfo:
+    path:  /system/knowledge/addinfo
+    defaults: { _controller: ExtendedKnowledgeBundle:Front:addInfo }

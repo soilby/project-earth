@@ -1,0 +1,4 @@
+services:
+    addone.user.profile:
+        class: Addone\ProfileBundle\UserProfileManager
+        arguments: ['@service_container']

@@ -1,0 +1,85 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание новой валюты{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('shop_product_currency_list')}}">Настройки валюты</a>
+    <span>Создание новой валюты</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Основные данные</a>
+</div>
+<form action="{{path('shop_product_currency_create')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('product_currencyedit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('product_currencylist') == 1) %}<a class="button" href="{{path('shop_product_currency_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="cur[enabled]" value="1" {% if (cur['enabled'] != 0) %}checked="checked"{% endif %} />Включено</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{curerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Название валюты<span class="helpContainerButton" data-id="name">?</span></td>
+                    <td><input type="text" name="cur[name]" value="{{cur['name']}}" /></td>
+                    <td class="cfgError">{{curerror['name']}}</td>
+                </tr>
+                <tr>
+                    <td>Курс валюты к основной валюте<span class="helpContainerButton" data-id="exchangeIndex">?</span></td>
+                    <td><input type="text" name="cur[exchangeIndex]" value="{{cur['exchangeIndex']}}" /></td>
+                    <td class="cfgError">{{curerror['exchangeIndex']}}</td>
+                </tr>
+                <tr>
+                    <td>Префикс<span class="helpContainerButton" data-id="prefix">?</span></td>
+                    <td><input type="text" name="cur[prefix]" value="{{cur['prefix']}}" /></td>
+                    <td class="cfgError">{{curerror['prefix']}}</td>
+                </tr>
+                <tr>
+                    <td>Постфикс<span class="helpContainerButton" data-id="postfix">?</span></td>
+                    <td><input type="text" name="cur[postfix]" value="{{cur['postfix']}}" /></td>
+                    <td class="cfgError">{{curerror['postfix']}}</td>
+                </tr>
+                <tr>
+                    <td>Количество знаков дробной части<span class="helpContainerButton" data-id="decimalSigns">?</span></td>
+                    <td><input type="text" name="cur[decimalSigns]" value="{{cur['decimalSigns']}}" /></td>
+                    <td class="cfgError">{{curerror['decimalSigns']}}</td>
+                </tr>
+                <tr>
+                    <td>Разделитель дробной части<span class="helpContainerButton" data-id="decimalSep">?</span></td>
+                    <td><input type="text" name="cur[decimalSep]" value="{{cur['decimalSep']}}" /></td>
+                    <td class="cfgError">{{curerror['decimalSep']}}</td>
+                </tr>
+                <tr>
+                    <td>Разделитель тысячных групп<span class="helpContainerButton" data-id="thousandSep">?</span></td>
+                    <td><input type="text" name="cur[thousandSep]" value="{{cur['thousandSep']}}" /></td>
+                    <td class="cfgError">{{curerror['thousandSep']}}</td>
+                </tr>
+                <tr>
+                    <td>Минимальная банкнота<span class="helpContainerButton" data-id="minNote">?</span></td>
+                    <td><input type="text" name="cur[minNote]" value="{{cur['minNote']}}" /></td>
+                    <td class="cfgError">{{curerror['minNote']}}</td>
+                </tr>
+            </table>
+        </div>
+</div>​
+</form>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить отображение валюты.</div>
+    <div id="helpContainer-name">Задаёт название валюты.</div>
+    <div id="helpContainer-exchangeIndex">Задаёт обменный курс к основной валюте, т.е. количество единиц данной валюты, равное единице основной валюты.</div>
+    <div id="helpContainer-prefix">Задаёт префикс, т.е. текст, который будет отображаться перед ценой в данной валюте.</div>
+    <div id="helpContainer-postfix">Задаёт постфикс, т.е. текст, который будет отображаться после цены в данной валюте</div>
+    <div id="helpContainer-decimalSigns">Задаёт количество знаков дробной части, необходимое для отображения.</div>
+    <div id="helpContainer-decimalSep">Задаёт разделитель целой и дробной части для данной валюты.</div>
+    <div id="helpContainer-thousandSep">Задаёт разделитель тысячных групп для данной валюты.</div>
+    <div id="helpContainer-minNote">Задаёт минимальную банкноту для данной валюты. Все цены будут округлены до этого числа.</div>
+</div>
+{% endblock %}       
+
+
+

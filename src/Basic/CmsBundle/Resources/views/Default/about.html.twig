@@ -1,0 +1,181 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}О программе{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>О программе</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">О программе</a>
+    <a href="#" onclick="return false;" id="tab2">Лицензионное соглашение</a>
+    <a href="#" onclick="return false;" id="tab3">Установленные расширения</a>
+    <a href="#" onclick="return false;" id="tab4">Список изменений</a>
+</div>
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="aboutInfo">
+                <img src="/adminimg/biglogo.gif" />
+                <h1>EMBEDDED.CMS</h1>
+                <p>Версия 1.0</p>
+                <br />
+                <p>Сделано в 2013 &mdash; 2014 году</p>
+                <p>&copy; SergSXM</p>
+                <br />
+                <br />
+                <p>Сайт <a href="http://embedded.by/">http://embedded.by/</a></p>
+                <p>E-mail <a href="mailto:sergsxm@embedded.by">sergsxm@embedded.by</a></p>
+                <br />
+                <br />
+                <p>Использование и распространение данного программного обеспечения разрешено только с согласия автора.</p>
+                <p>Свободное использование и распространение данного программного продукта запрещено.</p>
+            </div>
+        </div>
+        <div id="con_tab2">
+            <div class="aboutLicense">
+                <p>Использование EMBEDDED.CMS подразумевает, что Вы принимаете условия настоящего лицензионного соглашения.</p>
+                <p>EMBEDDED.CMS распространяется <strong>бесплатно</strong>, c разрешения Автора. 
+                   Вы <strong>не можете</strong> использовать, видоизменять, сдавать в аренду, продавать и модифицировать данное програмное обеспечение без разрешения Автора. 
+                   Любое подобное неавторизованное использование програмного обеспечения является нарушением данного соглашения 
+                   и может стать предметом преследования согласно законодательству.</p>
+                <p>Это программное обеспечение и сопутствующие файлы предоставляются такими <strong>«как они есть»</strong>, и без гарантий по эксплуатации или иных гарантий, 
+                   выраженных или подразумеваемых. Гарантия товарной ценности или пригодности для определенной цели <strong>не предоставляется</strong>. 
+                   Пользователь принимает на себя целиком риск, связанный с использованием программы. 
+                   Автор не несет ответственности за любые какие бы то ни было последствия, прямой и косвенный, а также специальный и иной ущерб, 
+                   вызванный этим программным обеспечением, включая, без ограничений, убытки от утраты прибыли от бизнеса, прерывание бизнеса, 
+                   потерю деловой информации или иной финансовый урон.</p>
+                <p>Все авторские права на EMBEDDED.CMS принадлежат исключительно Автору.</p>
+                <br />
+                <p>В EMBEDDED.CMS использовано следующее стороннее программное обеспечение:<p>
+                    <p> - Symfony 2 (<a href="http://www.symfony-project.org/">http://www.symfony-project.org/</a>)</p>
+                    <p> - jQuery (<a href="http://jquery.com/">http://jquery.com/</a>)</p>
+                    <p> - Uniform (<a href="http://uniformjs.com/">http://uniformjs.com/</a>)</p>
+                    <p> - AjaxUpload (<a href="http://valums.com/ajax-upload/">http://valums.com/ajax-upload/</a>)</p>
+                    <p> - TinyMCE (<a href="http://www.tinymce.com/">http://www.tinymce.com/</a>)</p>
+            </div>
+        </div>
+        <div id="con_tab3">
+        <table class="tableContent">
+            <tr>
+                <th>
+                    Техническое имя расширения
+                </th>
+                <th>
+                    Описание
+                </th>
+            </tr>
+                {% for item in modules %}
+                <tr>
+                    <td {% if (item.type == 'object') %}style="font-weight:bold"{% endif %}>
+                        {{item.name}}
+                        {% if (item.type == 'object') %}(объект){% endif %}
+                        {% if (item.type == 'addone') %}(дополнение){% endif %}
+                        {% if (item.type == 'template') %}(шаблон){% endif %}
+                    </td>
+                    <td>{{item.description}}</td>
+                </tr>
+                {% endfor %}
+        </table>
+        </div>
+        <div id="con_tab4">
+        <table class="tableContent">
+            <tr>
+                <th>
+                    Дата изменения
+                </th>
+                <th>
+                    Версия
+                </th>
+                <th>
+                    Изменение
+                </th>
+            </tr>
+                <tr>
+                    <td>10.11.2014</td>
+                    <td>1.0 rev 132</td>
+                    <td>Добавлена статистика по уникальным пользователям</td>
+                </tr>
+                <tr>
+                    <td>29.10.2014</td>
+                    <td>1.0 rev 131</td>
+                    <td>Изменена система URL адресации</td>
+                </tr>
+                <tr>
+                    <td>11.07.2014</td>
+                    <td>1.0 rev 125</td>
+                    <td>Добавлен журнал событий фронт-части сайта</td>
+                </tr>
+                <tr>
+                    <td>05.05.2014</td>
+                    <td>1.0 rev 119</td>
+                    <td>Добавлены комментарии к страницам сайта</td>
+                </tr>
+                <tr>
+                    <td>23.04.2014</td>
+                    <td>1.0 rev 116</td>
+                    <td>Добавлена система справки</td>
+                </tr>
+                <tr>
+                    <td>09.04.2014</td>
+                    <td>1.0 rev 111</td>
+                    <td>Добавлен механизм удаления старых файлов</td>
+                </tr>
+                <tr>
+                    <td>02.04.2014</td>
+                    <td>1.0 rev 106</td>
+                    <td>Добавлен поиск по сайту</td>
+                </tr>
+                <tr>
+                    <td>20.03.2014</td>
+                    <td>1.0 rev 102</td>
+                    <td>Добавлен форум</td>
+                </tr>
+                <tr>
+                    <td>10.03.2014</td>
+                    <td>1.0 rev 96</td>
+                    <td>Добавлена расширенная статистика</td>
+                </tr>
+                <tr>
+                    <td>06.03.2014</td>
+                    <td>1.0 rev 92</td>
+                    <td>Добавлен менеджер файлов</td>
+                </tr>
+                <tr>
+                    <td>05.03.2014</td>
+                    <td>1.0 rev 91</td>
+                    <td>Добавлен менеджер изображений</td>
+                </tr>
+                <tr>
+                    <td>27.02.2014</td>
+                    <td>1.0 rev 90</td>
+                    <td>Добавлена возможность регистрации пользователей</td>
+                </tr>
+                <tr>
+                    <td>08.10.2013</td>
+                    <td>1.0 rev 58</td>
+                    <td>Добавлен функционал корзины</td>
+                </tr>
+                <tr>
+                    <td>19.09.2013</td>
+                    <td>1.0 rev 44</td>
+                    <td>Добавлен менеджер форм</td>
+                </tr>
+                <tr>
+                    <td>17.09.2013</td>
+                    <td>1.0 rev 40</td>
+                    <td>Добавлен менеджер продукции</td>
+                </tr>
+                <tr>
+                    <td>05.09.2013</td>
+                    <td>1.0 rev 30</td>
+                    <td>Базовый выпуск CMS</td>
+                </tr>
+        </table>
+        </div>
+</div>​
+{% endblock %}       
+
+
+

@@ -1,0 +1,38 @@
+<div class="earth-left-item">
+    <h4>{% if currentLocale == 'en' %}Autorization{% else %}Авторизация{% endif %}</h4>
+    {% if (autorized == 0) %}
+        <form action="?actionobject=user&action=login" method="POST" name="auth">
+            <input type="hidden" name="actionrememberme" value="1" />
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                    <input type="text" class="form-control" placeholder="{% if currentLocale == 'en' %}Login{% else %}Логин{% endif %}" name="actionlogin" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                    <input type="password" class="form-control" placeholder="{% if currentLocale == 'en' %}Pasword{% else %}Пароль{% endif %}" name="actionpassword" value="">
+                </div>
+            </div>
+            {% if (status != 'OK') %}
+                <p style="color:#f00">{% if currentLocale == 'en' %}Login or password do not match{% else %}Логин или пароль не совпадают{% endif %}</p>
+                <a class="btn btn-default btn-block" href="/recovery.html">{% if currentLocale == 'en' %}Forgot your password?{% else %}Забыли пароль?{% endif %}</a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary btn-block">{% if currentLocale == 'en' %}Login{% else %}Вход{% endif %}</button>
+            <a href="/registration.html" class="btn btn-default btn-block">{% if currentLocale == 'en' %}Registration{% else %}Регистрация{% endif %}</a>
+        </form>
+    {% else %}
+        <p>{% if currentLocale == 'en' %}You are logged in as{% else %}Вы вошли как{% endif %} <strong>{{user.fullName}}</strong>.</p>
+        {% if (blocked != 0) %}<p class="text-center" style="color:#f00;">{% if currentLocale == 'en' %}Account is blocked!{% else %}Аккаунт заблокирован!{% endif %}</p>{% endif %}
+        <a class="btn btn-default btn-block" href="/mysettlements.html">{% if currentLocale == 'en' %}My settlements{% else %}Мои поселения{% endif %}</a>
+        <a class="btn btn-default btn-block" href="/myblogs.html">{% if currentLocale == 'en' %}My blogs{% else %}Мои блоги{% endif %}</a>
+        <a class="btn btn-default btn-block" href="/myfiles.html?userid={{user.id}}">{% if currentLocale == 'en' %}My files{% else %}Мои файлы{% endif %}</a>
+        <a class="btn btn-default btn-block" href="/profile.html">{% if currentLocale == 'en' %}My profile{% else %}Мой профиль{% endif %}</a>
+        <a class="btn btn-default btn-block" href="?actionobject=user&action=logout">{% if currentLocale == 'en' %}Logout{% else %}Выйти{% endif %}</a>
+    {% endif %}
+</div>
+
+
+
+

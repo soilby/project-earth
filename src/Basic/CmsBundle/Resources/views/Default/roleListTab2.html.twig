@@ -1,0 +1,36 @@
+{% if (app.user.checkAccess('user_editall') == 1) %}        
+        <div class="saveButtons">
+            <a class="button" href="#" id="changeRole">Переназначить роль</a>
+        </div>
+        <table class="cfgTable">
+            {% if (errors['success'] is defined) %}<tr><td>{{errors['success']}}</td><td></td><td></td></tr>{% endif %}
+            <tr>
+                <td>Старая роль</td>
+                <td>
+                    <select name="change[from]" class="changeRoleParam">
+                    {% for role in changeroles %}
+                        {% if (role.usercount > 0) %}
+                            <option value="{{role.id}}">{{role.name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </td>
+                <td class="cfgError">{% if (errors['from'] is defined) %}{{errors['from']}}{% endif %}</td>
+            </tr>
+            <tr>
+                <td>Новая роль</td>
+                <td>
+                    <select name="change[to]" class="changeRoleParam">
+                    {% for role in changeroles %}
+                         <option value="{{role.id}}">{{role.name}}</option>
+                    {% endfor %}
+                    </select>
+                </td>
+                <td class="cfgError">{% if (errors['to'] is defined) %}{{errors['to']}}{% endif %}</td>
+            </tr>
+        </table>
+        <script type="text/javascript">
+            $('#changeRole').click(function () {ajaxAction('{{path('basic_cms_role_ajax_change')}}', 'change', 'select.changeRoleParam', '#con_tab2');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>
+{% endif %}        

@@ -1,0 +1,155 @@
+        <label><input type="checkbox" {% if randomSetting0 %}checked="checked"{% endif %} onclick="changeRandomSetting(this);"/>Включить случайное изображение для страниц</label>
+        <div id="bannerCfgTable" class="noselect">
+            {% for item in images0 %}
+                <div class="bannerItem">
+                    <p><a href="{{path('template_mirclub_image_edit')}}?id={{item['id']}}">{{item['title']}}</a></p>
+                    <div class="bannerWrap"><img src="{{item['image']}}" /></div>
+                    <a onclick="deleteImage({{item['id']}}, this);return false;">Удалить</a>
+                </div>
+            {% endfor %}
+        </div>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <p class="mt20">Добавление изображений</p>
+        <p><a class="button" href="#" onclick="$('#imageListWrap').slideDown(200);return false;">Добавить по ссылкам</a><button id="imageAdd">Добавить из файлов</button></p>
+        <div style="display:none" id="imageListWrap">
+            <p><textarea id="imageList" name="image"></textarea></p>
+            <p><button id="imageListSubmit">Добавить</button></p>
+        </div>
+        <script type="text/javascript">
+            function changeRandomSetting(that)
+            {
+                $.ajax({
+                    type: "POST",
+                    url: '{{path('template_mirclub_changerandomajax')}}',
+                    data: 'state='+($(that).is(':checked') ? 'true' : 'false'),
+                    error: function(){
+                        alert('Ошибка обращения к серверу');
+                    },
+                    success: function(data){
+                        if ((data != 'true') && (data != 'false')) alert(data); else {
+                            if (data == 'true') $(that).attr('checked', 'checked'); else $(that).removeAttr('checked');
+                            $.uniform.update(that);
+                        }
+                    },
+                });
+            }
+            
+            function deleteImage(id, that) 
+            {
+                $.ajax({
+                    type: "POST",
+                    url: '{{path('template_mirclub_deleteajax')}}',
+                    data: 'id='+id,
+                    error: function(){
+                        alert('Ошибка обращения к серверу');
+                    },
+                    success: function(data){
+                        if (data != 'OK') alert(data); else {
+                            $(that).closest('.bannerItem').remove();
+                        }
+                    },
+                });
+            }
+            
+            $(function () 
+            {
+                new AjaxUpload('#imageAdd', 
+                {
+                    action: '{{path('template_mirclub_uploadajax')}}',
+                    name: 'image',
+                    multiply: true,
+                    inputFilter: 'image/jpeg,image/png,image/gif',
+                    onSubmit: function(file, extension)
+                    {
+                        $('#preloader').show();
+                    },
+                    onComplete: function(file, response)
+                    {
+                        $('#preloader').hide();
+                        if (!response) response = "[{file:'', error:'Ошибка загрузки файла'}]";
+                        var answers = $.parseJSON(response);
+                        var key;
+                        for (key in answers)
+                        {
+                            var answer = answers[key];
+                            if(answer.file)
+                            {
+                                    $('#bannerCfgTable').append(
+                                        '        <div class="bannerItem">'+
+                                        '            <p><a href="{{path('template_mirclub_image_edit')}}?id='+answer.id+'">'+answer.title+'</a></p>'+
+                                        '            <div class="bannerWrap"><img src="'+answer.file+'" /></div>'+
+                                        '            <a onclick="deleteImage('+answer.id+',this);return false;">Удалить</a>'+
+                                        '        </div>');
+                            } else
+                            {
+                                    alert(answer.error);
+                            }
+                        }
+                        $('#bannerCfgTable input, #bannerCfgTable button').not('.uniformOff').uniform();
+                    }
+                });
+                $('#imageListSubmit').click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: '{{path('template_mirclub_uploadurl')}}',
+                        data: $('#imageList').serialize(),
+                        error: function(){
+                            alert('Ошибка обращения к серверу');
+                        },
+                        success: function(data){
+                            if (!data) data = "[{file:'', error:'Ошибка загрузки файла'}]";
+                            var answers = $.parseJSON(data);
+                            var key;
+                            for (key in answers)
+                            {
+                                var answer = answers[key];
+                                if(answer.file)
+                                {
+                                        $('#bannerCfgTable').append(
+                                            '        <div class="bannerItem">'+
+                                            '            <p><a href="{{path('template_mirclub_image_edit')}}?id='+answer.id+'">'+answer.title+'</a></p>'+
+                                            '            <div class="bannerWrap"><img src="'+answer.file+'" /></div>'+
+                                            '            <a onclick="deleteImage('+answer.id+', this);return false;">Удалить</a>'+
+                                            '        </div>');
+                                } else
+                                {
+                                        alert(answer.error);
+                                }
+                            }
+                            $('#bannerCfgTable input, #bannerCfgTable button').not('.uniformOff').uniform();
+                        },
+                    });
+                    return false;
+                });
+            });
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

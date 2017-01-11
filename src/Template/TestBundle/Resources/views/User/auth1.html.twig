@@ -1,0 +1,25 @@
+<h1>{{title}}</h1>
+{% if (autorized == 0) %}
+<div>
+    <p>Форма авторизации</p>
+    <form action="" method="POST">
+        <input type="hidden" name="actionobject" value="user" />
+        <input type="hidden" name="action" value="login" />
+        <p>Логин <input type="text" name="actionlogin" value="" /></p>
+        <p>Пароль <input type="password" name="actionpassword" value="" /></p>
+        <p><label><input type="checkbox" name="actionrememberme" value="1" checked="checked" />Запомнить меня</label></p>
+        <p><input type="submit" value="Ok" /></p>
+        {% if (status != 'OK') %}
+            <p style="color:#f00">Логин или пароль не совпадают</p>
+        {% endif %}
+    </form>
+</div>
+{% else %}
+<div>
+<p>Вы вошли как <strong>{{user.fullName}}</strong>
+{% if (blocked != 0) %}(заблокирован){% endif %}</p>
+<p><a href="?actionobject=user&action=logout">Выйти</a></p>
+</div>
+{% endif %}
+
+

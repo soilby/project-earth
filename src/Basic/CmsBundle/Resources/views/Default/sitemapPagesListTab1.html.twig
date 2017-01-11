@@ -1,0 +1,32 @@
+        {% if (app.user.checkAccess('site_searchpageedit') == 1) %}<a class="button" href="#" id="unblockedSearchPages0">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('site_searchpageedit') == 1) %}<a class="button" href="#" id="blockedSearchPages0">Выключить</a>{% endif %}
+        {% if (app.user.checkAccess('site_searchpageedit') == 1) %}<a class="button" href="#" id="deleteSearchPages0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('site_searchpagenew') == 1) %}<a href="{{path('basic_cms_sitemap_searchpage_create')}}" class="button">Создать новую страницу поиска</a>{% endif %}
+        <table class="tableContent" id="searchList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Включено
+                </th>
+                <th>
+                    URL страницы
+                </th>
+            </tr>
+            {% for searchpage in searchpages0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{searchpage.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_sitemap_searchpage_edit')}}?id={{searchpage.id}}">{{searchpage.title}}</a>{% if (errors0[searchpage.id] is defined) %}<p class="error">{{errors0[searchpage.id]}}</p>{% endif %}</td>
+                <td>{{(searchpage.enabled != 0 ? 'Да' : 'Нет')}}</td>
+                <td>{{searchpage.url}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#blockedSearchPages0').click(function () {ajaxAction('{{path('basic_cms_sitemap_pageslist_ajax')}}?tab=0', 'blocked', '#searchList0 input.check', '#con_tab1');return false;});
+            $('#unblockedSearchPages0').click(function () {ajaxAction('{{path('basic_cms_sitemap_pageslist_ajax')}}?tab=0', 'unblocked', '#searchList0 input.check', '#con_tab1');return false;});
+            $('#deleteSearchPages0').click(function () {ajaxActionConfirm('{{path('basic_cms_sitemap_pageslist_ajax')}}?tab=0', 'delete', '#searchList0 input.check', '#con_tab1','Удалить выбранные страницы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

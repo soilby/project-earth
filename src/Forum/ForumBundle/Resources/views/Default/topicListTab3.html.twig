@@ -1,0 +1,85 @@
+        <table class="tableContent" id="moderList2">
+            <tr>
+                <th style="width:20%">
+                        Категория
+                </th>
+                <th style="width:80%">
+                        Модераторы
+                </th>
+            </tr>
+            {% for category in categories2 %}
+            <tr>
+                <td class="tal">{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658; {% endfor %}{% endif %}{{category['title']}}{% if (errors2[category.id] is defined) %}<p class="error">{{errors2[category.id]}}</p>{% endif %}</td>
+                <td class="tal">
+                    {% for moderator in category['moderators'] %}
+                    <div class="moderatorWrapInTable">{{moderator['login']}} / {{moderator['fullName']}} 
+                        {% if (app.user.checkAccess('forum_edit') == 1) %}
+                            <a href="#" class="deleleModerator" onclick="ajaxActionData('{{path('forum_forum_topic_ajax')}}?tab=2', 'delmoderator', 'userid={{moderator['id']}}&categoryid={{category['id']}}', '#con_tab3');return false;"> </a>
+                        {% else %}
+                            <span class="deleleModerator unactive"> </span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% if (app.user.checkAccess('forum_edit') == 1) %}
+                    <button onclick="loadUsersToPopup(0, {{category['id']}});$('#popupCfgWindow').show();return false;">Добавить</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="popupCfgWindow" id="popupCfgWindow">
+            <div id="usersItemPopup">
+            </div>
+        </div>
+        <script type="text/javascript">
+
+    function loadUsersToPopupAddModerator(login, fullName, id, catid)
+    {
+        ajaxActionData('{{path('forum_forum_topic_ajax')}}?tab=2', 'addmoderator', 'userid='+id+'&categoryid='+catid, '#con_tab3');
+    }
+
+    function loadUsersToPopup(page, catid)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('forum_forum_topic_ajaxloadusers')}}',
+            data: "page="+page+"&search="+($('#searchFromUsers').length > 0 ? $('#searchFromUsers').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['users'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'loadUsersToPopupAddModerator(\''+addslashes(answer['users'][key]['login'])+'\',\''+addslashes(answer['users'][key]['fullName'])+'\',\''+addslashes(answer['users'][key]['id'])+'\','+catid+');'+
+'$(\'#popupCfgWindow\').hide();return false;'+
+'" href="#">'+answer['users'][key]['login']+' / '+answer['users'][key]['fullName']+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#usersItemPopup').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromUsers" id="searchFromUsers" value="'+($('#searchFromUsers').length > 0 ? htmlentities($('#searchFromUsers').val()) : '')+'"/><button onclick="loadUsersToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#usersItemPopup input, #usersItemPopup button, #usersItemPopup a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

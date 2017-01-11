@@ -1,0 +1,458 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование мастерской{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('extended_project_list')}}">Мастерские</a>
+    <span>Редактирование мастерской &laquo;{{project['title']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Локализация</a>
+    <a href="#" onclick="return false;" id="tab4" {% if (activetab == 4) %}class="active"{% endif %}>Доступ к мастерской</a>
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+5}}" {% if (activetab == loop.index0+5) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="{{path('extended_project_edit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('project_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('project_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('project_list') == 1) %}<a class="button" href="{{path('extended_project_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="project[enabled]" value="1" {% if (project['enabled'] != 0) %}checked="checked"{% endif %} />Опубликован</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{projecterror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Заголовок<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="project[title]" value="{{project['title']}}" /></td>
+                    <td class="cfgError">{{projecterror['title']}}</td>
+                </tr>
+                <tr>
+                    <td>Количество просмотров</td>
+                    <td><input type="text" name="project[viewCount]" value="{{project['viewCount']}}" /></td>
+                    <td class="cfgError">{{projecterror['viewCount']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="project[isLocked]" value="1" {% if (project['isLocked'] != 0) %}checked="checked"{% endif %} />Временно заблокирован для изменения всем, кроме мастеров</label></td>
+                    <td class="cfgError">{{projecterror['isLocked']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Краткое описание мастерской:<span class="helpContainerButton" data-id="description">?</span></p>
+            <p class="globalError">{{projecterror['description']}}</p>
+            <br />
+            <textarea name="project[description]" id="projectDescription">{{project['description']}}</textarea>
+            </div>
+            <div class="mb20">
+            <p>Полное описание мастерской:<span class="helpContainerButton" data-id="content">?</span></p>
+            <p class="globalError">{{projecterror['content']}}</p>
+            <br />
+            <textarea name="project[content]" id="projectContent">{{project['content']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#projectDescription, textarea#projectContent",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('project_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('project_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('project_list') == 1) %}<a class="button" href="{{path('extended_project_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="page[enable]" value="1" {% if (page['enable'] != 0) %}checked="checked"{% endif %} />Включить страницу просмотра</label><span class="helpContainerButton" data-id="seopageEnabled">?</span></td>
+                    <td class="cfgError">{{pageerror['enable']}}</td>
+                </tr>
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('project_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('project_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('project_list') == 1) %}<a class="button" href="{{path('extended_project_list')}}">Отмена</a>{% endif %}
+            </div>
+            {% for locale in locales %}    
+            <table class="cfgTable">
+                <tr>
+                    <td>Заголовок ({{locale['fullName']}})</td>
+                    <td><input type="text" name="projloc[{{locale['shortName']}}][title]" value="{{projloc[locale['shortName']]['title']}}" /></td>
+                    <td class="cfgError">{{projlocerror[locale['shortName']]['title']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Описание мастерской ({{locale['fullName']}}):</p>
+            <p class="globalError">{{projlocerror[locale['shortName']]['description']}}</p>
+            <br />
+            <textarea name="projloc[{{locale['shortName']}}][description]" id="projLocDescription{{locale['shortName']}}">{{projloc[locale['shortName']]['description']}}</textarea>
+            </div>
+            <div class="mb20">
+            <p>Содержание мастерской ({{locale['fullName']}}):</p>
+            <p class="globalError">{{projlocerror[locale['shortName']]['content']}}</p>
+            <br />
+            <textarea name="projloc[{{locale['shortName']}}][content]" id="projLocContent{{locale['shortName']}}">{{projloc[locale['shortName']]['content']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#projLocDescription{{locale['shortName']}}, textarea#projLocContent{{locale['shortName']}}",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            {% endfor %}    
+        </div>
+        <div id="con_tab4" {% if (activetab == 4) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('project_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('project_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('project_list') == 1) %}<a class="button" href="{{path('extended_project_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input id="projectUsersIsUnvisibleInput" type="checkbox" name="project[isUnvisible]" value="1" {% if (project['isUnvisible'] != 0) %}checked="checked"{% endif %} />Закрытая мастерская для всех, кроме указанных пользователей</label></td>
+                    <td class="cfgError">{{projecterror['isUnvisible']}}</td>
+                </tr>
+                {#<tr>
+                    <td>Доступ к документам всем авторизованным пользователям</td>
+                    <td>
+                        <select name="project[isPublic]" id="projectUsersIsPublicInput">
+                            <option value="0" {% if (project['isPublic'] == 0) %}selected="selected"{% endif %}>Запрещен</option>
+                            <option value="1" {% if (project['isPublic'] == 1) %}selected="selected"{% endif %}>Только чтение</option>
+                            <option value="2" {% if (project['isPublic'] == 2) %}selected="selected"{% endif %}>Полный доступ</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{projecterror['isPublic']}}</td>
+                </tr>#}
+            </table>
+            <div class="mb20">
+                <p>Пользователи, имеющие доступ к документам мастерской:<span class="helpContainerButton" data-id="users">?</span></p>
+                <ul class="cfgSimpleList" id="projectUsers">
+                    {% for useritem in users %}
+                        <li>{{useritem.login}} / <span class="projectUsersFullname">{{useritem.fullName}}</span> 
+                            ({% if (useritem.readOnly == 0) %}<a href="#" onclick="usersChangeReadOnly(this,{{useritem.id}});return false;">полный доступ</a>{% else %}<a href="#" onclick="usersChangeReadOnly(this,{{useritem.id}});return false;">только чтение</a>{% endif %}, 
+                            <a href="#" onclick="usersChangeProjectRole(this,{{useritem.id}});return false;">{% if useritem.projectRole == 3 %}мастер{% elseif useritem.projectRole == 2 %}подмастерья{% elseif useritem.projectRole == 1 %}ученик{% else %}наблюдатель{% endif %}</a>,
+                            <a href="#" onclick="$(this).parent('li').remove();return false;">удалить</a>)
+                            <input type="hidden" class="projectUsersInput" id="usersInput{{useritem.id}}" name="users[{{useritem.id}}]" value="{{useritem.readOnly}}" />
+                            <input type="hidden" id="usersRoleInput{{useritem.id}}" name="usersrole[{{useritem.id}}]" value="{{useritem.projectRole}}" />
+                            {% if useritem.error != '' %}<p class="globalError">{{useritem.error}}</p>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+                <button onclick="loadUsersToPopup(0);$('#popupCfgWindow').show();return false;">Добавить пользователя</button>
+            </div>
+            <div class="mb20">
+                <p>Наглядное представление доступа к мастерской (<a href="#" onclick="projectUsersPermissionsTableRefresh();return false;">обновить</a>):</p>
+                <style>
+                    #projectUsersPermissionsTable {
+                        width: auto;
+                    }
+                    #projectUsersPermissionsTable th, #projectUsersPermissionsTable td {
+                        border: 1px solid #000;
+                        padding: 5px;
+                        text-align: left;
+                    }
+                    
+                </style>
+                <table id="projectUsersPermissionsTable">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+5}}" {% if (activetab == loop.index0+5) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('project_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('project_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('project_list') == 1) %}<a class="button" href="{{path('extended_project_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+</div>​
+</form>
+<div class="popupCfgWindow" id="popupCfgWindow">
+    <div id="usersItemPopup">
+    </div>
+</div>
+<script>
+    function projectUsersPermissionsTableRefresh()
+    {
+        $('#projectUsersPermissionsTable thead').html('');
+        $('#projectUsersPermissionsTable tbody').html('');
+        var permissionListRW = '<br />{{createrEnt.fullName}}';
+        var permissionListRO = '';
+        var isUnvisible = $('#projectUsersIsUnvisibleInput').is(':checked');
+        //var isPublic = $('#projectUsersIsPublicInput').val();
+        $('#projectUsers li').each(function () {
+            var name = $(this).find('.projectUsersFullname').html();
+            var roFlag = $(this).find('.projectUsersInput').val();
+            if (roFlag != 0) permissionListRO += '<br />'+name; else permissionListRW += '<br />'+name;
+        });
+        $('#projectUsersPermissionsTable thead').html('<tr>'+
+                                                        '<th></th>'+
+                                                        '<th>Незарегистрированные пользователи</th>'+
+                                                        '<th>Авторизованные пользователи</th>'+
+                                                        '<th>Список полного доступа:'+permissionListRW+'</th>'+
+                                                        (permissionListRO != '' ? '<th>Список только на чтение:'+permissionListRO+'</th>' : '')+
+                                                      '</tr>');
+        $('#projectUsersPermissionsTable tbody').append('<tr>'+
+                                                          '<td>Описание мастерской</td>'+
+                                                          '<td>'+(isUnvisible ? '' : 'Чтение')+'</td>'+
+                                                          '<td>'+(isUnvisible ? '' : 'Чтение')+'</td>'+
+                                                          '<td>Чтение</td>'+
+                                                          (permissionListRO != '' ? '<td>Чтение</td>' : '')+
+                                                        '</tr>');
+        var list1, list2, list3, list4;
+    {% for doc in documentList %}
+        list1 = 0;
+        list2 = 0;
+        list3 = 2;
+        list4 = 1;
+        {% if doc.isPublic != 0 %}
+            if (list1 < 1) list1 = 1;
+            if (list2 < 1) list2 = 1;
+            if (list3 < 2) list3 = 2;
+            if (list4 < 1) list4 = 1;
+        {% endif %}
+        /*if (isPublic != 0) {
+            if (list2 < 1) list2 = 1;
+            if (list3 < 1) list3 = 1;
+            if (list4 < 1) list4 = 1;
+            if (isPublic == 2) {
+                if (list2 < 2) list2 = 2;
+                if (list3 < 2) list3 = 2;
+                if (list4 < 2) list4 = 2;
+            }
+        }*/
+        {% if doc.readOnly != 0 %}
+            if (list1 > 1) list1 = 1;
+            if (list2 > 1) list2 = 1;
+            if (list3 > 1) list3 = 1;
+            if (list4 > 1) list4 = 1;
+        {% endif %}
+        if (isUnvisible) {
+            list1 = 0;
+            list2 = 0;
+        }
+        $('#projectUsersPermissionsTable tbody').append('<tr>'+
+                                                          '<td>Документ &laquo;{{doc.title}}&raquo;</td>'+
+                                                          '<td>'+(list1 == 2 ? 'Запись' : (list1 == 1 ? 'Чтение' : ''))+'</td>'+
+                                                          '<td>'+(list2 == 2 ? 'Запись' : (list2 == 1 ? 'Чтение' : ''))+'</td>'+
+                                                          '<td>'+(list3 == 2 ? 'Запись' : (list3 == 1 ? 'Чтение' : ''))+'</td>'+
+                                                          (permissionListRO != '' ? (list4 == 2 ? '<td>Запись</td>' : (list4 == 1 ? '<td>Чтение</td>' : '<td></td>')) : '')+
+                                                        '</tr>');
+    {% endfor %}
+    }
+    projectUsersPermissionsTableRefresh();
+    
+    function usersChangeProjectRole(that, userid)
+    {
+        if ($('#usersRoleInput'+userid).val() == 3)
+        {
+            $('#usersRoleInput'+userid).val(0);
+            $(that).text('наблюдатель');
+        } else if ($('#usersRoleInput'+userid).val() == 2)
+        {
+            $('#usersRoleInput'+userid).val(3);
+            $(that).text('мастер');
+        } else if ($('#usersRoleInput'+userid).val() == 1)
+        {
+            $('#usersRoleInput'+userid).val(2);
+            $(that).text('подмастерья');
+        } else
+        {
+            $('#usersRoleInput'+userid).val(1);
+            $(that).text('ученик');
+        }
+    }
+    function usersChangeReadOnly(that, userid)
+    {
+        if ($('#usersInput'+userid).val() == 0)
+        {
+            $('#usersInput'+userid).val(1);
+            $(that).text('только чтение');
+        } else
+        {
+            $('#usersInput'+userid).val(0);
+            $(that).text('полный доступ');
+        }
+    }
+    
+    function loadUsersToPopupAddUser(login, fullName, id)
+    {
+        $('#projectUsers').append('<li>'+login+' / <span class="projectUsersFullname">'+fullName+'</span> (<a href="#" onclick="usersChangeReadOnly(this,'+id+');return false;">полный доступ</a>, <a href="#" onclick="usersChangeProjectRole(this,'+id+');return false;">наблюдатель</a>, <a href="#" onclick="$(this).parent(\'li\').remove();return false;">удалить</a>)<input type="hidden" id="usersInput'+id+'" name="users['+id+']" value="0" /><input type="hidden" id="usersRoleInput'+id+'" name="usersrole['+id+']" value="0" /></li>');
+    }
+
+    function loadUsersToPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('extended_project_ajaxusers')}}',
+            data: "page="+page+"&search="+($('#searchFromUsers').length > 0 ? $('#searchFromUsers').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['users'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'loadUsersToPopupAddUser(\''+addslashes(answer['users'][key]['login'])+'\',\''+addslashes(answer['users'][key]['fullName'])+'\',\''+addslashes(answer['users'][key]['id'])+'\');'+
+'$(\'#popupCfgWindow\').hide();return false;'+
+'" href="#">'+answer['users'][key]['login']+' / '+answer['users'][key]['fullName']+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#usersItemPopup').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromUsers" id="searchFromUsers" value="'+($('#searchFromUsers').length > 0 ? htmlentities($('#searchFromUsers').val()) : '')+'"/><button onclick="loadUsersToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#usersItemPopup input, #usersItemPopup button, #usersItemPopup a.button').uniform();
+            }
+        });	      
+    }
+    
+    
+    
+    
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить мастерскую для отображения.</div>
+    <div id="helpContainer-title">Задаёт название мастерской.</div>
+    <div id="helpContainer-description">Задаёт краткое описание мастерской.</div>
+    <div id="helpContainer-content">Задаёт полное описание мастерской.</div>
+    <div id="helpContainer-seopageEnabled">При включении создаёт отдельную страницу сайта для данного объекта.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+    <div id="helpContainer-users">Список пользователей, которые имеют доступ к документам мастерской.</div>
+</div>
+{% endblock %}       
+
+
+

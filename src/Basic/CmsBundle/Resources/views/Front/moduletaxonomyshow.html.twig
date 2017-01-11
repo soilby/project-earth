@@ -1,0 +1,13 @@
+<div>
+<h6>{{title}}</h6>
+<small>Создано {{createDate | date('d.m.Y')}} пользователем {{createrFullName}}</small>
+{% for item in items %}
+<div>
+    {% for fieldname, field in item %}
+        <p>{{fieldname}}: {{field.timestamp is defined ? field | date('d.m.Y') : field}}</p>
+    {% endfor %}
+</div>
+{% endfor %}
+<div>
+</div>
+</div>

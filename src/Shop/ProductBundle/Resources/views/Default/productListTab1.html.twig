@@ -1,0 +1,164 @@
+        {% if (app.user.checkAccess('product_editall') == 1) %}<a class="button" href="#" id="saveOrdering0">Сохранить порядок</a>{% endif %}
+        {% if (app.user.checkAccess('product_editall') == 1) %}<a class="button" href="#" id="unblockedProduct0">Опубликовать</a>{% endif %}
+        {% if (app.user.checkAccess('product_editall') == 1) %}<a class="button" href="#" id="blockedProduct0">Скрыть</a>{% endif %}
+        {% if (app.user.checkAccess('product_editall') == 1) %}<a class="button" href="#" id="deleteProduct0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('product_new') == 1) %}<a href="{{path('shop_product_create')}}" class="button">Создать продукт</a>{% endif %}
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="hidden" name="tab" value="0" />
+            {% if (taxonomyenabled != 0) %}
+            <select name="taxonomy0" class="quickSearch uniformOff">
+                <option value="0" {% if taxonomy0 == 0 %}selected="selected"{% endif %}>Все категории</option>
+                {% for category in taxonomyinfo0['categories'] %}
+                    <option value="{{category['id']}}" {% if taxonomy0 == category['id'] %}selected="selected"{% endif %}>{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658; {% endfor %}{% endif %}{{category['title']}}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="productList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Заголовок (артикул) &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Заголовок (артикул) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Заголовок (артикул)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Опубликован &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Опубликован &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Опубликован</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?tab=0&sort0=5">Создан (изменен) &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?tab=0&sort0=4">Создан (изменен) &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=4">Создан (изменен)</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Автор &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Автор &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Автор</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 10) %}
+                        <a href="?tab=0&sort0=11">Цена &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 11) %}
+                        <a href="?tab=0&sort0=10">Цена &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=10">Цена</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                {% if taxonomyenabled != 0 %}
+                <th>
+                    Категории
+                </th>
+                {% endif %}
+                <th>
+                    {% if (sort0 == 8) %}
+                        <a href="?tab=0&sort0=9">Порядок &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 9) %}
+                        <a href="?tab=0&sort0=8">Порядок &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=8">Порядок</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for product in products0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{product.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('shop_product_edit')}}?id={{product.id}}">{{product.title}}{% if (product.article != '') %} ({{product.article}}){% endif %}</a>{% if (errors0[product.id] is defined) %}<p class="error">{{errors0[product.id]}}</p>{% endif %}</td>
+                <td>{{product.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{product.createDate | date('d.m.Y G:i')}}{% if (product.modifyDate != product.createDate) %} ({{product.modifyDate | date('d.m.Y G:i')}}){% endif %}</td>
+                <td>{{product.fullName}}</td>
+                <td>{{product.price}} {{product.onStock != 0 ? '(на складе)' : '(нет на складе)'}}</td>
+                {% if taxonomyenabled != 0 %}
+                <td>
+                    {% if (taxonomyinfo0['links'][product.id] | length) == 1 %}
+                        {% for taxid, taxtitle in taxonomyinfo0['links'][product.id] %}
+                        <a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a>
+                        {% endfor %}
+                    {% endif %}
+                    {% if (taxonomyinfo0['links'][product.id] | length) > 1 %}
+                        {% for taxid, taxtitle in taxonomyinfo0['links'][product.id] %}
+                            {% if loop.index0 == 0 %}
+                            <a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a><p class="hintLabel"><span class="miniNote">и еще {{(taxonomyinfo0['links'][product.id] | length) - 1}} категорий</span><span class="hintWrap">
+                            {% else %}
+                            {% if loop.index0 != 1 %}, {% endif %}<a href="{{path('basic_cms_taxonomy_catedit')}}?id={{taxid}}">{{taxtitle}}</a>
+                            {% endif %}
+                        {% endfor %}
+                        </span></p>
+                    {% endif %}
+                </td>
+                {% endif %}
+                <td><input type="text" class="ordering" name="ordering[{{product.id}}]" value="{{product.ordering}}" />{% if (errorsorder0[product.id] is defined) %}<p class="error">{{errorsorder0[product.id]}}</p>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#saveOrdering0').click(function () {ajaxAction('{{path('shop_product_ajax')}}?tab=0', 'ordering', '#productList0 input.ordering', '#con_tab1');return false;});
+            $('#blockedProduct0').click(function () {ajaxAction('{{path('shop_product_ajax')}}?tab=0', 'blocked', '#productList0 input.check', '#con_tab1');return false;});
+            $('#unblockedProduct0').click(function () {ajaxAction('{{path('shop_product_ajax')}}?tab=0', 'unblocked', '#productList0 input.check', '#con_tab1');return false;});
+            $('#deleteProduct0').click(function () {ajaxActionConfirm('{{path('shop_product_ajax')}}?tab=0', 'delete', '#productList0 input.check', '#con_tab1','Удалить выбранные продукты?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+            $('select.quickSearch').chosen({no_results_text: 'Нет результатов для ', width: '300px'});
+        </script>

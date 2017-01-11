@@ -1,0 +1,4 @@
+services:
+    object.form:
+        class: Form\FormBundle\FormManager
+        arguments: ['@service_container']

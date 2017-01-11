@@ -1,0 +1,45 @@
+<h1>{{title}}</h1>
+{% if saveStatus == 'OK' %}
+<p> Форум успешно создан <a href="{{createdUrl}}">{{createdUrl}}</a></p>
+{% else %}
+<form action="" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="actionobject" value="forum" />
+    <input type="hidden" name="action" value="create" />
+    <input type="hidden" name="actionid" value="{{id}}" />
+    
+    <p>Заголовок <input type="text" name="actionfields[title]" value="{{forumTitle}}" /></p>
+    <small>{{forumTitleError}}</small>
+    <p>Описание <input type="text" name="actionfields[description]" value="{{forumDescription}}" /></p>
+    <small>{{forumDescriptionError}}</small>
+    <p>Аватар <img src="{{forumAvatar}}" /><input type="hidden" name="actionfields[avatar]" value="{{forumAvatar}}" /> <input type="file" name="actionfiles[avatar]" /></p>
+    <small>{{forumAvatarError}}</small>
+    <p>Текст сообщения <textarea name="actionfields[content]">{{forumContent}}</textarea></p>
+    <small>{{forumContentError}}</small>
+    {% if forumCategoryMode == 1 %}
+    <p>Категория форума 
+        <select name="actionfields[categoryId]">
+            {% for category in categories %}
+            <option value="{{category['id']}}" {% if forumCategoryId == category['id'] %}selected="selected"{% endif %} {% if (category['enabled'] == 0) or (category['enableAdd'] == 0) %}disabled="disabled"{% endif %} >{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658; {% endfor %}{% endif %}{{category['title']}}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <small>{{forumCategoryIdError}}</small>
+    {% endif %}
+    <p>Прикрепленные файлы</p>
+    {% for attach in forumAttachments %}
+    <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+    {{attach['fileName']}} ({{attach['fileSize']}} байт)<br/>
+    {% endfor %}
+    <input type="file" name="actionfiles[attachments][]" />
+    <small>{{forumAttachmentsError}}</small>
+    {% if captchaEnabled != 0 %}
+    <p>
+    Введите строку с картинки
+    <img src="{{captchaPath}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));"/>
+    <input type="text" name="actionfields[captcha]" value="" />
+    <small>{{captchaError}}</small>
+    </p>
+    {% endif %}
+    <p><input type="submit" value="Ok" /></p>
+</form>
+{% endif %}

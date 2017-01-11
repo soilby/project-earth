@@ -1,0 +1,181 @@
+body, html {
+    font-family: arial;
+    font-size: 15px;    
+}
+
+.fileList {
+    border: 1px solid #ccc;
+    height: 320px;
+    margin: 3px;
+    overflow-y: scroll;
+}
+
+.fileItem {
+    line-height: 30px;
+    padding: 0 5px;    
+}
+
+.fileItem>.miniButton {
+    display: none;
+}
+
+.fileItem:hover {
+    background: #eee;
+}
+
+.fileItem a.file {
+    color: #000;
+    text-decoration: none;
+    display: inline-block;
+    height: 30px;
+    padding-left: 30px;
+    width: 360px;    
+    background: url(../img/unknown.png) no-repeat 3px 3px;
+}
+
+.fileItem:hover>.miniButton {
+    display: inline-block;
+    float: right;
+    width: 30px;
+    height: 30px;
+    text-decoration: none;
+    background: url(../img/fileicons.png?update=1) 0px 0px no-repeat;
+    overflow: hidden;
+}
+
+.fileItem:hover>.miniButton:hover {
+    background: url(../img/fileicons.png?update=1) -30px 0px no-repeat;
+}
+
+.fileItem:hover>.miniButton.download {
+    background: url(../img/fileicons.png?update=1) 0px -30px no-repeat;
+}
+
+.fileItem:hover>.miniButton.download:hover {
+    background: url(../img/fileicons.png?update=1) -30px -30px no-repeat;
+}
+
+.fileItem:hover>.miniButton.unlink {
+    background: url(../img/fileicons.png?update=1) 0px -60px no-repeat;
+}
+
+.fileItem:hover>.miniButton.unlink:hover {
+    background: url(../img/fileicons.png) -30px -60px no-repeat;
+}
+
+.fileItem:hover>.miniButton.rename {
+    background: url(../img/fileicons.png?update=1) 0px -90px no-repeat;
+}
+
+.fileItem:hover>.miniButton.rename:hover {
+    background: url(../img/fileicons.png?update=1) -30px -90px no-repeat;
+}
+
+.fileItem:hover>.miniButton.move {
+    background: url(../img/fileicons.png?update=1) 0px -120px no-repeat;
+}
+
+.fileItem:hover>.miniButton.move:hover {
+    background: url(../img/fileicons.png?update=1) -30px -120px no-repeat;
+}
+
+#preloader {
+    display: none;
+    background: url(../img/popupbk.png) repeat;
+    background: url(../img/ajaxloader.gif) center center no-repeat, url(../img/popupbk.png) repeat;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+#progress {
+    color: #000;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
+    margin-top: -10px;
+    position: absolute;
+    text-align: center;
+    top: 50%;    
+    left:0;
+    right:0;
+}
+
+.button {
+    background: #eee;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    color: #333;
+    display: inline-block;
+    margin: 3px;
+    text-decoration: none;
+    text-align: center;
+    padding: 5px 15px;
+}
+
+.fileItem a.file.folder {
+    background: url(../img/folder.png) no-repeat 3px 3px;
+}
+
+.fileItem a.file.extentionavi {
+    background: url(../img/avi.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionmpg {
+    background: url(../img/avi.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionmpeg {
+    background: url(../img/avi.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionwmv {
+    background: url(../img/avi.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionbmp {
+    background: url(../img/bmp.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentiondoc {
+    background: url(../img/doc.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentiondocx {
+    background: url(../img/doc.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionjpg {
+    background: url(../img/jpg.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionjpeg {
+    background: url(../img/jpg.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionpng {
+    background: url(../img/jpg.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentiongif {
+    background: url(../img/jpg.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionmp3 {
+    background: url(../img/mp3.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionwma {
+    background: url(../img/mp3.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionwav {
+    background: url(../img/mp3.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionpdf {
+    background: url(../img/pdf.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentiontxt {
+    background: url(../img/txt.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionxls {
+    background: url(../img/xls.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionxlsx {
+    background: url(../img/xls.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionrar {
+    background: url(../img/zip.png) no-repeat 3px 3px;
+}
+.fileItem a.file.extentionzip {
+    background: url(../img/zip.png) no-repeat 3px 3px;
+}

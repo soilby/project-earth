@@ -1,0 +1,62 @@
+<table class="cfgTable">
+    {% for item in parameters %}
+        {% if (item['type'] == 'text') %}
+        <tr>
+            <td>{{item.description}}</td>
+            <td><input type="text" name="parameters[{{item.name}}]" value="{{item.value}}" /></td>
+            <td class="cfgError">{{item.error}}</td>
+        </tr>
+        {% endif %}
+        {% if (item['type'] == 'textarea') %}
+        <tr>
+            <td>{{item.description}}</td>
+            <td><textarea name="parameters[{{item.name}}]">{{item.value}}</textarea></td>
+            <td class="cfgError">{{item.error}}</td>
+        </tr>
+        {% endif %}
+        {% if (item['type'] == 'html') %}
+        <tr>
+            <td colspan="3">
+            {{item.description}}<br/>
+            <textarea name="parameters[{{item.name}}]" id="parametersHtml{{item.name}}">{{item.value}}</textarea>
+            <script>
+            tinymce.init({
+                selector: "textarea#parametersHtml{{item.name}}",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            <p class="globalError">{{item.error}}</p>
+            </td>
+        </tr>
+        {% endif %}
+        {% if (item['type'] == 'select') %}
+        <tr>
+            <td>{{item.description}}</td>
+            <td>
+                <select name="parameters[{{item.name}}]">
+                    {% for line in item['items'] %}
+                        <option value="{{line}}" {% if (line==item.value) %}selected="selected"{% endif %}>{{line}}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td class="cfgError">{{item.error}}</td>
+        </tr>
+        {% endif %}
+        {% if (item['type'] == 'checkbox') %}
+        <tr>
+            <td colspan="2"><label><input type="checkbox" name="parameters[{{item.name}}]" value="1" {% if (item.value != 0) %}checked="checked"{% endif %} />{{item.description}}</label></td>
+            <td class="cfgError">{{item.error}}</td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+</table>

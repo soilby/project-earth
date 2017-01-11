@@ -1,0 +1,438 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание нового форума{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('forum_forum_topic_list')}}">Форум</a>
+    <span>Создание нового форума</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Сообщение</a>
+    <a href="#" onclick="return false;" id="tab4" {% if (activetab == 4) %}class="active"{% endif %}>Модераторы</a>
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+5}}" {% if (activetab == loop.index0+5) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="{{path('forum_forum_topic_create')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_list') == 1) %}<a class="button" href="{{path('forum_forum_topic_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[enabled]" value="1" {% if (forum['enabled'] != 0) %}checked="checked"{% endif %} />Опубликовано</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{forumerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Заголовок<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="forum[title]" value="{{forum['title']}}" /></td>
+                    <td class="cfgError">{{forumerror['title']}}</td>
+                </tr>
+                <tr>
+                    <td>Аватар<span class="helpContainerButton" data-id="avatar">?</span></td>
+                    <td class="tac">
+                        <input type="hidden" id="avatarInput" name="forum[avatar]" value="{{forum['avatar']}}" />
+                        <span id="avatarWrap">
+                            {% if (forum['avatar'] == '') %}
+                            <img src="/adminimg/noava.jpg" style="max-width:100px;max-height:100px;" />
+                            {% else %}
+                            <a href="{{forum['avatar']}}" rel="lightbox"><img src="{{forum['avatar']}}" style="max-width:100px;max-height:100px;" /></a>
+                            {% endif %}
+                        </span>
+                        <br />
+                        <a class="button" id="avatarLoad" onclick="return false;" href="#">Изменить</a>
+                        <a class="button" onclick="avatarClear();return false;" href="#">Сброс</a>
+                    </td>
+                    <td class="cfgError" id="avatarError">{{forumerror['avatar']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[isImportant]" value="1" {% if (forum['isImportant'] != 0) %}checked="checked"{% endif %} />Пометить тему как важную</label><span class="helpContainerButton" data-id="isImportant">?</span></td>
+                    <td class="cfgError">{{forumerror['isImportant']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[isClosed]" value="1" {% if (forum['isClosed'] != 0) %}checked="checked"{% endif %} />Тема закрыта</label><span class="helpContainerButton" data-id="isClosed">?</span></td>
+                    <td class="cfgError">{{forumerror['isClosed']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[onlyAutorizedView]" value="1" {% if (forum['onlyAutorizedView'] != 0) %}checked="checked"{% endif %} />Для просмотра требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedView">?</span></td>
+                    <td class="cfgError">{{forumerror['onlyAutorizedView']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[onlyAutorizedImage]" value="1" {% if (forum['onlyAutorizedImage'] != 0) %}checked="checked"{% endif %} />Для просмотра изображений требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedImage">?</span></td>
+                    <td class="cfgError">{{forumerror['onlyAutorizedImage']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[onlyAutorizedDownload]" value="1" {% if (forum['onlyAutorizedDownload'] != 0) %}checked="checked"{% endif %} />Для просмотра вложений требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedDownload">?</span></td>
+                    <td class="cfgError">{{forumerror['onlyAutorizedDownload']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[onlyAutorizedPost]" value="1" {% if (forum['onlyAutorizedPost'] != 0) %}checked="checked"{% endif %} />Для публикации сообщения требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedPost">?</span></td>
+                    <td class="cfgError">{{forumerror['onlyAutorizedPost']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[captchaEnabled]" value="1" {% if (forum['captchaEnabled'] != 0) %}checked="checked"{% endif %} />Включить капчу для публикации сообщения</label><span class="helpContainerButton" data-id="captchaEnabled">?</span></td>
+                    <td class="cfgError">{{forumerror['captchaEnabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Разрешенные теги<span class="helpContainerButton" data-id="allowTags">?</span></td>
+                    <td><textarea name="forum[allowTags]" class="metaTextArea">{{forum['allowTags']}}</textarea></td>
+                    <td class="cfgError">{{forumerror['allowTags']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[allowStyleProp]" value="1" {% if (forum['allowStyleProp'] != 0) %}checked="checked"{% endif %} />Разрешить стилизацию тегов с помощью свойства style</label><span class="helpContainerButton" data-id="allowStyleProp">?</span></td>
+                    <td class="cfgError">{{forumerror['allowStyleProp']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[replaceUrls]" value="1" {% if (forum['replaceUrls'] != 0) %}checked="checked"{% endif %} />Заменять пути URL на перенаправления</label><span class="helpContainerButton" data-id="replaceUrls">?</span></td>
+                    <td class="cfgError">{{forumerror['replaceUrls']}}</td>
+                </tr>
+                <tr>
+                    <td>Кол-во сообщений на странице<span class="helpContainerButton" data-id="messageInPage">?</span></td>
+                    <td><input type="text" name="forum[messageInPage]" value="{{forum['messageInPage']}}" /></td>
+                    <td class="cfgError">{{forumerror['messageInPage']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Описание форума:<span class="helpContainerButton" data-id="description">?</span></p>
+            <p class="globalError">{{forumerror['description']}}</p>
+            <br />
+            <textarea name="forum[description]" id="forumDescription">{{forum['description']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#forumDescription",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_list') == 1) %}<a class="button" href="{{path('forum_forum_topic_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="page[enable]" value="1" {% if (page['enable'] != 0) %}checked="checked"{% endif %} />Включить страницу просмотра</label><span class="helpContainerButton" data-id="seopageEnabled">?</span></td>
+                    <td class="cfgError">{{pageerror['enable']}}</td>
+                </tr>
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_list') == 1) %}<a class="button" href="{{path('forum_forum_topic_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="forum[isVisible]" value="1" {% if (forum['isVisible'] != 0) %}checked="checked"{% endif %} />Отображать сообщение</label><span class="helpContainerButton" data-id="isVisible">?</span></td>
+                    <td class="cfgError">{{forumerror['isVisible']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Текст сообщения:<span class="helpContainerButton" data-id="content">?</span></p>
+            <p class="globalError">{{forumerror['content']}}</p>
+            <br />
+            <textarea name="forum[content]" id="forumContent">{{forum['content']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#forumContent",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            <div class="mb20">
+                <p>Вложения:<span class="helpContainerButton" data-id="attachments">?</span></p>
+                <ul class="cfgSimpleList" id="forumMessageAttachments">
+                    {% for attach in forum['attachments'] %}
+                    <li>{{attach.filename}} ({{(attach.filesize / 1024) | number_format(0,',',' ')}} Кб, <a href="#" onclick="$(this).parent('li').remove();return false;">удалить</a>)<input type="hidden" name="attachments[]" value="{{attach.id}}" />{% if attach.error != '' %}<p class="globalError">{{attach.error}}</p>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+                <button id="forumMessageAddFile">Добавить файлы</button>
+            </div>
+        </div>
+        <div id="con_tab4" {% if (activetab == 4) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_list') == 1) %}<a class="button" href="{{path('forum_forum_topic_list')}}">Отмена</a>{% endif %}
+            </div>
+            <div class="mb20">
+                <p>Модераторы форума (кроме унаследованных от категорий):<span class="helpContainerButton" data-id="moderators">?</span></p>
+                <ul class="cfgSimpleList" id="forumModerators">
+                    {% for moder in forum['moderators'] %}
+                    <li>{{moder.login}} / {{moder.fullName}} (<a href="#" onclick="$(this).parent('li').remove();return false;">удалить</a>)<input type="hidden" name="moderators[]" value="{{moder.id}}" />{% if moder.error != '' %}<p class="globalError">{{moder.error}}</p>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+                <button onclick="loadUsersToPopup(0);$('#popupCfgWindow').show();return false;">Добавить модератора</button>
+            </div>
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+5}}" {% if (activetab == loop.index0+5) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_list') == 1) %}<a class="button" href="{{path('forum_forum_topic_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+</div>​
+</form>
+<div class="popupCfgWindow" id="popupCfgWindow">
+    <div id="usersItemPopup">
+    </div>
+</div>
+<script>
+function avatarClear()
+{
+    $('#avatarWrap').html('<img src="/adminimg/noava.jpg" style="max-width:100px;max-height:100px;" />');
+    $('#avatarInput').val('');
+    $('#avatarError').html('');
+}
+$(function () 
+{
+    new AjaxUpload('#avatarLoad', 
+    {
+        action: '{{path('forum_forum_topic_ajaxavatar')}}',
+        name: 'avatar',
+        inputFilter: 'image/jpeg,image/png,image/gif',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "{file:'', error:'Ошибка загрузки файла'}";
+            var answer = $.parseJSON(response);
+            if(answer.file)
+            {
+                    $('#avatarWrap').html('<a href="'+answer.file+'" rel="lightbox"><img src="'+answer.file+'" style="max-height:100px;max-width:100px;" /></a>');
+                    $('#avatarInput').val(answer.file);
+                    $('#avatarError').html('');
+            } else
+            {
+                    $('#avatarError').html(answer.error);
+            }
+        }
+    });
+});
+
+
+$(function () 
+{
+    new AjaxUpload('#forumMessageAddFile', 
+    {
+        action: '{{path('forum_forum_topic_ajaxattachment')}}',
+        name: 'files',
+        multiply: true,
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "[{id:'', filename:'', filesize:'', error:'Ошибка загрузки файла'}]";
+            var answers = $.parseJSON(response);
+            var key;
+            for (key in answers)
+            {
+                var answer = answers[key];
+                if(answer.id)
+                {
+                        $('#forumMessageAttachments').append('<li>'+answer.filename+' ('+answer.filesize+' Кб, <a href="#" onclick="$(this).parent(\'li\').remove();return false;">удалить</a>)<input type="hidden" name="attachments[]" value="'+answer.id+'" /></li>');
+                } else
+                {
+                        $('#forumMessageAttachments').append('<li>'+answer.filename+'<p class="globalError">'+answer.error+'</p></li>');
+                }
+            }
+        }
+    });
+});
+
+    function loadUsersToPopupAddModerator(login, fullName, id)
+    {
+        $('#forumModerators').append('<li>'+login+' / '+fullName+' (<a href="#" onclick="$(this).parent(\'li\').remove();return false;">удалить</a>)<input type="hidden" name="moderators[]" value="'+id+'" /></li>');
+    }
+
+
+
+    function loadUsersToPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('forum_forum_topic_ajaxloadusers')}}',
+            data: "page="+page+"&search="+($('#searchFromUsers').length > 0 ? $('#searchFromUsers').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['users'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'loadUsersToPopupAddModerator(\''+addslashes(answer['users'][key]['login'])+'\',\''+addslashes(answer['users'][key]['fullName'])+'\',\''+addslashes(answer['users'][key]['id'])+'\');'+
+'$(\'#popupCfgWindow\').hide();return false;'+
+'" href="#">'+answer['users'][key]['login']+' / '+answer['users'][key]['fullName']+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#usersItemPopup').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromUsers" id="searchFromUsers" value="'+($('#searchFromUsers').length > 0 ? htmlentities($('#searchFromUsers').val()) : '')+'"/><button onclick="loadUsersToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#usersItemPopup input, #usersItemPopup button, #usersItemPopup a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+
+
+
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить форум.</div>
+    <div id="helpContainer-title">Задаёт название форума.</div>
+    <div id="helpContainer-avatar">Аватар задаёт изображение форума на сайте.</div>
+    <div id="helpContainer-isImportant">Позволяет пометить тему как важную. При сортировке по умолчанию важные темы находятся в начале списка.</div>
+    <div id="helpContainer-isClosed">Позволяет закрыть тему. Публикация сообщений в закрытую тему невозможна.</div>
+    <div id="helpContainer-onlyAutorizedView">При включенном значении только авторизованные пользователи смогут просматривать форум.</div>
+    <div id="helpContainer-onlyAutorizedImage">При включенном значении только авторизованные пользователи смогут просматривать вложения к сообщениям, являющиеся изображениями.</div>
+    <div id="helpContainer-onlyAutorizedDownload">При включенном значении только авторизованные пользователи смогут скачивать вложения к сообщениям, не являющиеся изображениями.</div>
+    <div id="helpContainer-onlyAutorizedPost">При включенном значении только авторизованные пользователи смогут публиковать сообщения в форум.</div>
+    <div id="helpContainer-captchaEnabled">Включает защиту капчей, что позволяет обезопасить сайт от роботов (спам-роботов или роботов для перебора паролей).</div>
+    <div id="helpContainer-allowTags">Поле позволяет задать HTML-теги, разрешенные для использования в форуме. Теги перечисляются через запятую.</div>
+    <div id="helpContainer-allowStyleProp">Позволяет включить дополнительную стилизацию HTML-тегов с помощью свойства style.</div>
+    <div id="helpContainer-replaceUrls">При включенном значении все ссылки в сообщении будут заменяться на JavaScript. Это позволяет исключить индексацию данных ссылок поисковыми машинами. Рекомендуется включать данную опцию.</div>
+    <div id="helpContainer-messageInPage">Задаёт количество сообщений на одной странице форума.</div>
+    <div id="helpContainer-description">Задаёт краткое описание форума.</div>
+    <div id="helpContainer-isVisible">Позволяет разрешить или запретить отображение первого сообщения. Если отображение сообщения запрещено, то оно будет видимо только модераторам данного форума.</div>
+    <div id="helpContainer-content">Задаёт текст первого сообщения.</div>
+    <div id="helpContainer-attachments">Задаёт вложения к первому сообщению.</div>
+    <div id="helpContainer-moderators">Задаёт модераторов данного форума. При этом итоговый перечень модераторов будет содержать супер-администраторов сайта, модератов, назначенных для категории, в которую входит данный форум, и модераторов из этого списка.</div>
+    <div id="helpContainer-seopageEnabled">При включении создаёт отдельную страницу сайта для данного объекта.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+</div>
+{% endblock %}       
+
+
+

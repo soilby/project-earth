@@ -1,0 +1,78 @@
+        <h1 id="projectTitle">{{title}}</h1>
+        <p>
+            <a href="/{{url}}" class="btn btn-default">Back to the workshop</a>
+        </p>
+        {% if editStatus == 'OK' %}
+            <p class="alert alert-success">Workshop data is saved</p>
+        {% endif %}
+        <div class="documentEditContent">
+            <form action="?id={{id}}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                <input type="hidden" name="actionobject" value="project" />
+                <input type="hidden" name="action" value="editproject" />
+                <input type="hidden" name="actionid" value="{{id}}" />
+                
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">Title (Russian)</label>
+                    <div class="col-sm-8">
+                        <input class="form-control" type="text" name="actionfields[title][default]" value="{{editTitle['default']}}" />
+                        {% if editTitleError['default'] != '' %}<p class="form-error">Field is not valid</p>{% endif %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Short description (Russian)</label>
+                    <div class="col-sm-12">
+                        <textarea class="documentTextArea form-control" name="actionfields[description][default]">{{editDescription['default']}}</textarea>
+                        {% if editDescriptionError['default'] != '' %}<p class="form-error">Field is not valid</p>{% endif %}
+                    </div>
+                </div>    
+                <div class="form-group">
+                    <label class="col-sm-12 control-label">Full description (Russian)</label>
+                    <div class="col-sm-12">
+                        <textarea class="documentTextArea form-control" name="actionfields[content][default]">{{editContent['default']}}</textarea>
+                        {% if editContentError['default'] != '' %}<p class="form-error">Field is not valid</p>{% endif %}
+                    </div>
+                </div>    
+                {% for loc in locales %}
+                    
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Title ({{loc['fullName']}})</label>
+                        <div class="col-sm-8">
+                            <input class="form-control" type="text" name="actionfields[title][{{loc['shortName']}}]" value="{{editTitle[loc['shortName']]}}" />
+                            {% if editTitleError[loc['shortName']] != '' %}<p class="form-error">Field is not valid</p>{% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-12 control-label">Short description ({{loc['fullName']}})</label>
+                        <div class="col-sm-12">
+                            <textarea class="documentTextArea form-control" name="actionfields[description][{{loc['shortName']}}]">{{editDescription[loc['shortName']]}}</textarea>
+                            {% if editDescriptionError[loc['shortName']] != '' %}<p class="form-error">Field is not valid</p>{% endif %}
+                        </div>
+                    </div>    
+                    <div class="form-group">
+                        <label class="col-sm-12 control-label">Full description ({{loc['fullName']}})</label>
+                        <div class="col-sm-12">
+                            <textarea class="documentTextArea form-control" name="actionfields[content][{{loc['shortName']}}]">{{editContent[loc['shortName']]}}</textarea>
+                            {% if editContentError[loc['shortName']] != '' %}<p class="form-error">Field is not valid</p>{% endif %}
+                        </div>
+                    </div>    
+                {% endfor %}
+                <p><button type="submit" class="btn btn-primary">Save</button></p>
+            </form>
+            <script>
+            tinymce.init({
+                selector: "textarea.documentTextArea",
+                language : 'en',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                content_css: "/css/tinymce.css",
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages | sxmfilemgr"
+            });
+            </script>
+        </div>

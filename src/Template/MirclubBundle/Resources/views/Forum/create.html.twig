@@ -1,0 +1,88 @@
+			<h1>{{title}}</h1>
+                    {% if saveStatus == 'OK' %}
+                        <p class="tac"> Форум успешно создан. Перейти на него можно по <a href="{{createdUrl}}">ссылке</a>.</p>
+                    {% else %}
+			<div class="messageAdd">
+                        <form action="?" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="actionobject" value="forum" />
+                            <input type="hidden" name="action" value="create" />
+                            <input type="hidden" name="actionid" value="{{id}}" />
+				<p><span>Тема форума</span><input type="text" name="actionfields[title]" value="{{forumTitle}}" />{% if forumTitleError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+				<p>Описание темы форума</p>
+				<p><textarea autocomplete="off"  name="actionfields[description]">{{forumDescription}}</textarea>{% if forumDescriptionError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+                                {% if forumCategoryMode == 1 %}
+				<p><span>Категория</span><select name="actionfields[categoryId]">
+                                    {% for category in categories %}
+                                    <option value="{{category['id']}}" {% if forumCategoryId == category['id'] %}selected="selected"{% endif %} {% if (category['enabled'] == 0) or (category['enableAdd'] == 0) %}disabled="disabled"{% endif %} >{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658;{% endfor %}{% endif %}{{category['title']}}</option>
+                                    {% endfor %}
+                                    </select>{% if forumCategoryIdError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+                                {% endif %}
+				<p>Текст сообщения</p>
+				<p><textarea class="addTinyMce" autocomplete="off" name="actionfields[content]">{{forumContent}}</textarea>{% if forumContentError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+				<p>Прикреплённые файлы:</p>
+				<div id="fileAttachmentsNew">
+                                    {% for attach in forumAttachments %}
+                                        <p>
+                                            <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                                            {{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб, <a href="#" onclick="$(this).parent('p').remove();return false;">удалить</a>)
+                                        </p>
+                                    {% endfor %}
+				</div>
+                                {% if forumAttachmentsError != '' %}<span class="error">Ошибка загрузки файлов</span>{% endif %}
+				<p><button class="button" id="fileAttachmentsAddNew">Добавить файлы</button></p>
+                                <script>
+                                    $(function () 
+                                    {
+                                        new AjaxUpload('#fileAttachmentsAddNew', 
+                                        {
+                                            action: '{{path('forum_forum_front_attachmentsupload')}}',
+                                            name: 'files',
+                                            multiply: true,
+                                            onSubmit: function(file, extension)
+                                            {
+                                                $('#preloader').show();
+                                            },
+                                            onComplete: function(file, response)
+                                            {
+                                                $('#preloader').hide();
+                                                if (!response) response = "[{id:'', error:'Ошибка загрузки файла'}]";
+                                                var answers = $.parseJSON(response);
+                                                var key;
+                                                for (key in answers)
+                                                {
+                                                    var answer = answers[key];
+                                                    if(answer.id)
+                                                    {
+                                                            $('#fileAttachmentsNew').append(
+                                                                '<p>'+
+                                                                '    <input type="hidden" name="actionfields[attachments][]" value="'+answer.id+'" />'+
+                                                                '    '+answer.filename+' ('+answer.filesizeformat+' кб, <a href="#" onclick="$(this).parent(\'p\').remove();return false;">удалить</a>)'+
+                                                                '</p>');
+                                                    } else
+                                                    {
+                                                            alert(answer.error);
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    });
+                                </script>
+                                {% if captchaEnabled != 0 %}
+                                <p><span>Введите строку с картинки</span><input type="text" name="actionfields[captcha]" value="" />{% if captchaError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+                                <p><img src="{{captchaPath}}&rand={{random()}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));"/></p>
+                                {% endif %}
+				<p class="tac"><button class="button" type="submit">Создать тему</button></p>
+				<script>
+					tinymce.init({
+						selector: "textarea.addTinyMce",
+						language : 'ru',
+						height: 100,
+						menubar: false,
+						convert_urls: false,
+						verify_html : true,
+						plugins: ["link"],
+						toolbar: "undo redo | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link"
+					});
+				</script>
+			</div>
+                     {% endif %}

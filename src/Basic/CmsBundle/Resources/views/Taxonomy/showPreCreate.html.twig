@@ -1,0 +1,34 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание нового представления{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_taxonomy_list')}}">Категории</a>
+    <span>Создание нового представления</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Выбор объекта классификации</a>
+</div>
+<form action="{{path('basic_cms_taxonomyshow_create')}}" method="get">
+    <div id="tabsContent">
+        <div id="con_tab1" class="active">
+        <p>Выберите объект классификации для представления:<span class="helpContainerButton" data-id="object">?</span></p><br />
+            <input type="hidden" name="object" id="objectVal" value="" />
+                {% for objectkey,objectname in taxonomyobjects %}
+                    <p><label><input autocomplete="off" type="radio" name="object" value="{{objectkey}}" />{{objectname}}</label></p>
+                {% endfor %}
+            <br />
+            <button type="submit">Далее</button>
+        </div>
+    </div>​
+</form>
+<div id="helpContainer">
+    <div id="helpContainer-object">Объект, с которым будет оперировать представление.</div>
+</div>
+{% endblock %}       
+
+
+

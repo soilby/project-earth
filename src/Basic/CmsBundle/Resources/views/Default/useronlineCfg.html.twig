@@ -1,0 +1,28 @@
+<table class="cfgTable">
+    <tr>
+        <td>Выводить пользователей, которые были на сайте в пределах</td>
+        <td>
+            <select name="parameters[timeOnline]">
+                 <option value="1" {% if (parameters['timeOnline'] == 1) %}selected="selected"{% endif %}>1 минуты</option>
+                 <option value="2" {% if (parameters['timeOnline'] == 2) %}selected="selected"{% endif %}>2 минут</option>
+                 <option value="3" {% if (parameters['timeOnline'] == 3) %}selected="selected"{% endif %}>3 минут</option>
+                 <option value="4" {% if (parameters['timeOnline'] == 4) %}selected="selected"{% endif %}>4 минут</option>
+                 <option value="5" {% if (parameters['timeOnline'] == 5) %}selected="selected"{% endif %}>5 минут</option>
+                 <option value="7" {% if (parameters['timeOnline'] == 7) %}selected="selected"{% endif %}>7 минут</option>
+                 <option value="10" {% if (parameters['timeOnline'] == 10) %}selected="selected"{% endif %}>10 минут</option>
+                 <option value="15" {% if (parameters['timeOnline'] == 15) %}selected="selected"{% endif %}>15 минут</option>
+                 <option value="20" {% if (parameters['timeOnline'] == 20) %}selected="selected"{% endif %}>20 минут</option>
+                 <option value="25" {% if (parameters['timeOnline'] == 25) %}selected="selected"{% endif %}>25 минут</option>
+                 <option value="30" {% if (parameters['timeOnline'] == 30) %}selected="selected"{% endif %}>30 минут</option>
+                 <option value="35" {% if (parameters['timeOnline'] == 35) %}selected="selected"{% endif %}>35 минут</option>
+                 <option value="40" {% if (parameters['timeOnline'] == 40) %}selected="selected"{% endif %}>40 минут</option>
+                 <option value="45" {% if (parameters['timeOnline'] == 45) %}selected="selected"{% endif %}>45 минут</option>
+                 <option value="50" {% if (parameters['timeOnline'] == 50) %}selected="selected"{% endif %}>50 минут</option>
+                 <option value="55" {% if (parameters['timeOnline'] == 55) %}selected="selected"{% endif %}>55 минут</option>
+                 <option value="60" {% if (parameters['timeOnline'] == 60) %}selected="selected"{% endif %}>60 минут</option>
+            </select>
+        </td>
+        <td class="cfgError">{{parameterserror['timeOnline']}}</td>
+    </tr>
+</table>
+

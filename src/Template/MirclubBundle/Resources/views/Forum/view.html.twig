@@ -1,0 +1,475 @@
+			<h1>{{title}}</h1>
+			<p class="tableTitle tar">
+                            {% if permissions['moderator'] != 0 %}
+                                {% if isImportant != 0 %}
+                                <a href="?actionobject=forum&action=importanttopic&actionid={{id}}&actionvalue=0" class="button">Снять важность темы</a> 
+                                {% else %}
+                                <a href="?actionobject=forum&action=importanttopic&actionid={{id}}&actionvalue=1" class="button">Пометить как важную</a> 
+                                {% endif %}
+                                {% if isClosed != 0 %}
+                                <a href="?actionobject=forum&action=closetopic&actionid={{id}}&actionvalue=0" class="button">Открыть тему</a> 
+                                {% else %}
+                                <a href="?actionobject=forum&action=closetopic&actionid={{id}}&actionvalue=1" class="button">Закрыть тему</a> 
+                                {% endif %}
+                            {% endif %}
+                        </p>
+			<table class="forumMsgTable">
+                            {% if page == 0 %}
+				<tr id="message0">
+					<td class="forumColAuthor">
+						<strong>{{(createrId != null ? '<span class="mirclubTransliteration">'~createrFullName~'</span>' : 'Гость') | raw}}</strong>
+						<em>Автор темы</em>
+						<img src="{{(createrAvatar != '' ? '/helper/imageresize.php?width=100&height=100&scale=f&url='~createrAvatar : '/img/noava.png')}}" />
+                                            {% if permissions['moderator'] != 0 %}   
+						<a class="button" onclick="$('#popupModeration0').show();return false;">Модерация</a>
+							<div class="popupContainer" id="popupModeration0" {% if (moderateStatus != '') and (moderateStatus != 'OK') %}style="display:block"{% endif %}>
+								<div class="popupWindowModeration">
+                                                                <form action="?" method="post" enctype="multipart/form-data">
+                                                                    <input type="hidden" name="actionobject" value="forum" />
+                                                                    <input type="hidden" name="action" value="moderate" />
+                                                                    <input type="hidden" name="actionid" value="{{id}}" />
+                                                                    <input type="hidden" name="actionmessageid" value="0" />
+									<h4>Модерация сообщения</h4>
+									<p>Причина модерации</p>
+									<p><textarea name="actionfields[text]">{{moderateTextValue}}</textarea>{% if moderateTextError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+									<p><label><input type="checkbox" name="actionfields[hide]" value="1" {% if moderateHideValue != 0 %}checked="checked"{% endif %} />Скрыть сообщение</label></p>
+									<p><label><input type="checkbox" name="actionfields[ban]" value="1" {% if moderateBanValue != 0 %}checked="checked"{% endif %} />Заблокировать автора</label></p>
+									<p class="tac"><button class="button" type="submit">Отправить</button><button class="button" onclick="$('#popupModeration0').hide();return false;">Отмена</button></p>
+                                                                </form>
+								</div>
+							</div>
+                                                        {% if moderateStatus == 'OK' %}
+							<div class="popupContainer" style="display:block">
+								<div class="popupWindowModeration">
+									<h4>Модерация сообщения</h4>
+                                                                        <p class="tac">Сообщение отправлено</p>
+									<p class="tac"><a class="button" href="#" onclick="$(this).closest('.popupContainer').remove();return false;">OK</a></p>
+								</div>
+							</div>
+                                                        {% endif %}
+                                            {% endif %}    
+                                            {% if permissions['edit'] != 0 %}
+						<a class="button" onclick="$('#popupEdit0').show();return false;">Редактировать</a>
+							<div class="popupContainer" id="popupEdit0" {% if (editStatus != '') and (editStatus != 'OK') %}style="display:block"{% endif %}>
+								<div class="popupWindowModeration">
+                                                                <form action="?" method="post" enctype="multipart/form-data">
+                                                                    <input type="hidden" name="actionobject" value="forum" />
+                                                                    <input type="hidden" name="action" value="edit" />
+                                                                    <input type="hidden" name="actionid" value="{{id}}" />
+                                                                    <input type="hidden" name="actionmessageid" value="0" />
+									<h4>Редактирование сообщения</h4>
+									<p>Текст сообщения</p>
+									<p><textarea class="addTinyMce" name="actionfields[text]">{{editMessageValue}}</textarea>{% if editMessageError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+									<p>Прикреплённые файлы:</p>
+                                                                        <div id="fileAttachments0">
+                                                                            {% for attach in editAttachments %}
+                                                                            <p>
+                                                                                <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                                                                                {{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб, <a href="#" onclick="$(this).parent('p').remove();return false;">удалить</a>)
+                                                                            </p>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                        {% if editAttachmentsError != '' %}<span class="error">Ошибка загрузки файлов</span>{% endif %}
+									<p><button class="button" id="fileAttachmentsAdd0" onclick="return false;">Добавить файлы</button></p>
+									<p class="tac"><button class="button" type="submit">Отправить</button><button class="button" onclick="$('#popupEdit0').hide();return false;">Отмена</button></p>
+                                                                </form>
+								</div>
+							</div>
+                                                        <script>
+                                                            $(function () 
+                                                            {
+                                                                new AjaxUpload('#fileAttachmentsAdd0', 
+                                                                {
+                                                                    action: '{{path('forum_forum_front_attachmentsupload')}}',
+                                                                    name: 'files',
+                                                                    multiply: true,
+                                                                    onSubmit: function(file, extension)
+                                                                    {
+                                                                        $('#preloader').show();
+                                                                    },
+                                                                    onComplete: function(file, response)
+                                                                    {
+                                                                        $('#preloader').hide();
+                                                                        if (!response) response = "[{id:'', error:'Ошибка загрузки файла'}]";
+                                                                        var answers = $.parseJSON(response);
+                                                                        var key;
+                                                                        for (key in answers)
+                                                                        {
+                                                                            var answer = answers[key];
+                                                                            if(answer.id)
+                                                                            {
+                                                                                    $('#fileAttachments0').append(
+                                                                                        '<p>'+
+                                                                                        '    <input type="hidden" name="actionfields[attachments][]" value="'+answer.id+'" />'+
+                                                                                        '    '+answer.filename+' ('+answer.filesizeformat+' кб, <a href="#" onclick="$(this).parent(\'p\').remove();return false;">удалить</a>)'+
+                                                                                        '</p>');
+                                                                            } else
+                                                                            {
+                                                                                    alert(answer.error);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                });
+                                                            });
+                                                        </script>
+                                                        {% if editStatus == 'OK' %}
+							<div class="popupContainer" style="display:block">
+								<div class="popupWindowModeration">
+									<h4>Редактирование сообщения</h4>
+                                                                        <p class="tac">Сообщение изменено</p>
+									<p class="tac"><a class="button" href="#" onclick="$(this).closest('.popupContainer').remove();return false;">OK</a></p>
+								</div>
+							</div>
+                                                        {% endif %}
+                                            {% endif %}
+					</td>
+					<td class="forumColMessage">
+						<div class="messageInfo">{{createDate | date('d.m.Y H:i')}}{% if modifyDate != createDate %}, изменено {{modifyDate | date('d.m.Y H:i')}} {% endif %} <a href="?page={{page}}#message0">#0</a> <a href="#" onclick="citeMessageToEditor('Сообщение {{(createrId != null ? createrFullName : 'Гость')}} от {{createDate | date('d.m.Y H:i')}}:',this);return false;">Цитировать</a></div>
+                                                {% if isVisible == 0 %}[сообщение скрыто]<br />{% endif %}
+                                                {{content | raw}}
+                                                {#
+                                                {% if attachments|length > 0 %}
+						<div class="messageAttachments">
+                                                    {% for attach in attachments %}
+                                                    {% if attach['permissions']['download'] != 0 %}
+                                                    <a href="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}">{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб)</a><br/>
+                                                    {% else %}
+                                                    <span>{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб) [это вложение вам запрещено скачивать]</span>
+                                                    {% endif %}
+                                                    {% endfor %}
+						</div>
+                                                {% endif %}#}
+                                                {% if attachments|length > 0 %}
+						<div class="messageAttachments">
+                                                    <div class="messageAttachmentsMultimedia">
+                                                    {% for attach in attachments %}
+                                                    {% if attach['permissions']['download'] != 0 %}
+                                                        {% if attach['isImage'] != 0 %}
+                                                        <a href="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}" rel="lightbox[photo]"><img src="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}" title="{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб)" /></a>
+                                                        {% elseif ('.flv' in attach['fileName']) or ('.mp4' in attach['fileName']) or ('.webm' in attach['fileName']) or ('.ogv' in attach['fileName']) or ('.ts' in attach['fileName']) or ('.m3u8' in attach['fileName'])%}
+                                                            {% set videotype = '' %}
+                                                            {% if '.flv' in attach['fileName'] %}{% set videotype = 'video/flash' %}{% endif %}
+                                                            {% if '.mp4' in attach['fileName'] %}{% set videotype = 'video/mp4' %}{% endif %}
+                                                            {% if '.ogv' in attach['fileName'] %}{% set videotype = 'video/ogg' %}{% endif %}
+                                                            {% if '.ts' in attach['fileName'] %}{% set videotype = 'video/mp2t' %}{% endif %}
+                                                            {% if '.m3u8' in attach['fileName'] %}{% set videotype = 'application/x-mpegurl' %}{% endif %}
+                                                            {% if '.webm' in attach['fileName'] %}{% set videotype = 'video/webm' %}{% endif %}
+                                                        <div class="forumViedoFlowplayer">
+                                                            <video controls="controls" width="300" height="250">
+                                                                <source type="{{videotype}}" src="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}">
+                                                            </video>
+                                                        </div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                    </div>
+                                                    {% for attach in attachments %}
+                                                    {% if attach['permissions']['download'] != 0 %}
+                                                        {% if attach['isImage'] != 0 %}
+                                                        {% elseif ('.flv' in attach['fileName']) or ('.mp4' in attach['fileName']) or ('.webm' in attach['fileName']) or ('.ogv' in attach['fileName']) or ('.ts' in attach['fileName']) or ('.m3u8' in attach['fileName'])%}
+                                                        {% else %}
+                                                        <a href="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}">{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб)</a><br/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                    <span>{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб) [это вложение вам запрещено скачивать]</span>
+                                                    {% endif %}
+                                                    {% endfor %}
+						</div>
+                                                {% endif %}
+                                                {% if moderatorId != null %}
+                                                    <div class="messageModeration">{{moderatorMessage}}<br />Модератор: <span class="mirclubTransliteration">{{moderatorFullName}}</span></div>
+                                                {% endif %}
+					</td>
+				</tr>
+                            {% endif %}
+                            {% for message in messages %}    
+				<tr id="message{{message['id']}}">
+					<td class="forumColAuthor">
+						<strong class="mirclubTransliteration">{{(message['createrId'] != null ? '<span class="mirclubTransliteration">'~message['createrFullName']~'</span>' : 'Гость') | raw}}</strong>
+						{% if message['createrId'] == createrId %}<em>Автор темы</em>{% endif %}
+						<img src="{{(message['createrAvatar'] != '' ? '/helper/imageresize.php?width=100&height=100&scale=f&url='~message['createrAvatar'] : '/img/noava.png')}}" />
+                                            {% if permissions['moderator'] != 0 %}   
+						<a class="button" onclick="$('#popupModeration{{message['id']}}').show();return false;">Модерация</a>
+							<div class="popupContainer" id="popupModeration{{message['id']}}" {% if (message['moderateStatus'] != '') and (message['moderateStatus'] != 'OK') %}style="display:block"{% endif %}>
+								<div class="popupWindowModeration">
+                                                                <form action="?" method="post" enctype="multipart/form-data">
+                                                                    <input type="hidden" name="actionobject" value="forum" />
+                                                                    <input type="hidden" name="action" value="moderate" />
+                                                                    <input type="hidden" name="actionid" value="{{id}}" />
+                                                                    <input type="hidden" name="actionmessageid" value="{{message['id']}}" />
+									<h4>Модерация сообщения</h4>
+									<p>Причина модерации</p>
+									<p><textarea name="actionfields[text]">{{message['moderateTextValue']}}</textarea>{% if message['moderateTextError'] != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+									<p><label><input type="checkbox" name="actionfields[hide]" value="1" {% if message['moderateHideValue'] != 0 %}checked="checked"{% endif %} />Скрыть сообщение</label></p>
+									<p><label><input type="checkbox" name="actionfields[ban]" value="1" {% if message['moderateBanValue'] != 0 %}checked="checked"{% endif %} />Заблокировать автора</label></p>
+									<p class="tac"><button class="button" type="submit">Отправить</button><button class="button" onclick="$('#popupModeration{{message['id']}}').hide();return false;">Отмена</button></p>
+                                                                </form>
+								</div>
+							</div>
+                                                        {% if message['moderateStatus'] == 'OK' %}
+							<div class="popupContainer" style="display:block">
+								<div class="popupWindowModeration">
+									<h4>Модерация сообщения</h4>
+                                                                        <p class="tac">Сообщение отправлено</p>
+									<p class="tac"><a class="button" href="#" onclick="$(this).closest('.popupContainer').remove();return false;">OK</a></p>
+								</div>
+							</div>
+                                                        {% endif %}
+                                            {% endif %}    
+                                            {% if message['permissions']['edit'] != 0 %}
+						<a class="button" onclick="$('#popupEdit{{message['id']}}').show();return false;">Редактировать</a>
+							<div class="popupContainer" id="popupEdit{{message['id']}}" {% if (message['editStatus'] != '') and (message['editStatus'] != 'OK') %}style="display:block"{% endif %}>
+								<div class="popupWindowModeration">
+                                                                <form action="?" method="post" enctype="multipart/form-data">
+                                                                    <input type="hidden" name="actionobject" value="forum" />
+                                                                    <input type="hidden" name="action" value="edit" />
+                                                                    <input type="hidden" name="actionid" value="{{id}}" />
+                                                                    <input type="hidden" name="actionmessageid" value="{{message['id']}}" />
+									<h4>Редактирование сообщения</h4>
+									<p>Текст сообщения</p>
+									<p><textarea class="addTinyMce" name="actionfields[text]">{{message['editMessageValue']}}</textarea>{% if message['editMessageError'] != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+									<p>Прикреплённые файлы:</p>
+                                                                        <div id="fileAttachments{{message['id']}}">
+                                                                            {% for attach in message['editAttachments'] %}
+                                                                            <p>
+                                                                                <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                                                                                {{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб, <a href="#" onclick="$(this).parent('p').remove();return false;">удалить</a>)
+                                                                            </p>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                        {% if message['editAttachmentsError'] != '' %}<span class="error">Ошибка загрузки файлов</span>{% endif %}
+									<p><button class="button" id="fileAttachmentsAdd{{message['id']}}" onclick="return false;">Добавить файлы</button></p>
+									<p class="tac"><button class="button" type="submit">Отправить</button><button class="button" onclick="$('#popupEdit{{message['id']}}').hide();return false;">Отмена</button></p>
+                                                                </form>
+								</div>
+							</div>
+                                                        {% if message['editStatus'] == 'OK' %}
+							<div class="popupContainer" style="display:block">
+								<div class="popupWindowModeration">
+									<h4>Редактирование сообщения</h4>
+                                                                        <p class="tac">Сообщение изменено</p>
+									<p class="tac"><a class="button" href="#" onclick="$(this).closest('.popupContainer').remove();return false;">OK</a></p>
+								</div>
+							</div>
+                                                        {% endif %}
+                                                        <script>
+                                                            $(function () 
+                                                            {
+                                                                new AjaxUpload('#fileAttachmentsAdd{{message['id']}}', 
+                                                                {
+                                                                    action: '{{path('forum_forum_front_attachmentsupload')}}',
+                                                                    name: 'files',
+                                                                    multiply: true,
+                                                                    onSubmit: function(file, extension)
+                                                                    {
+                                                                        $('#preloader').show();
+                                                                    },
+                                                                    onComplete: function(file, response)
+                                                                    {
+                                                                        $('#preloader').hide();
+                                                                        if (!response) response = "[{id:'', error:'Ошибка загрузки файла'}]";
+                                                                        var answers = $.parseJSON(response);
+                                                                        var key;
+                                                                        for (key in answers)
+                                                                        {
+                                                                            var answer = answers[key];
+                                                                            if(answer.id)
+                                                                            {
+                                                                                    $('#fileAttachments{{message['id']}}').append(
+                                                                                        '<p>'+
+                                                                                        '    <input type="hidden" name="actionfields[attachments][]" value="'+answer.id+'" />'+
+                                                                                        '    '+answer.filename+' ('+answer.filesizeformat+' кб, <a href="#" onclick="$(this).parent(\'p\').remove();return false;">удалить</a>)'+
+                                                                                        '</p>');
+                                                                            } else
+                                                                            {
+                                                                                    alert(answer.error);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                });
+                                                            });
+                                                        </script>
+                                            {% endif %}
+					</td>
+					<td class="forumColMessage">
+						<div class="messageInfo">{{message['createDate'] | date('d.m.Y H:i')}}{% if message['modifyDate'] != message['createDate'] %}, изменено {{message['modifyDate'] | date('d.m.Y H:i')}} {% endif %} <a href="?page={{page}}#message{{message['id']}}">#{{message['id']}}</a> <a href="#" onclick="citeMessageToEditor('Сообщение {{(message['createrId'] != null ? message['createrFullName'] : 'Гость')}} от {{message['createDate'] | date('d.m.Y H:i')}}:',this);return false;">Цитировать</a></div>
+                                                {% if message['isVisible'] == 0 %}[сообщение скрыто]<br />{% endif %}
+                                                {{message['content'] | raw}}
+                                                {#
+                                                {% if message['attachments']|length > 0 %}
+						<div class="messageAttachments">
+                                                    {% for attach in message['attachments'] %}
+                                                    {% if attach['permissions']['download'] != 0 %}
+                                                    <a href="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}">{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб)</a><br/>
+                                                    {% else %}
+                                                    <span>{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб) [это вложение вам запрещено скачивать]</span>
+                                                    {% endif %}
+                                                    {% endfor %}
+						</div>
+                                                {% endif %}#}
+                                                {% if message['attachments']|length > 0 %}
+						<div class="messageAttachments">
+                                                    <div class="messageAttachmentsMultimedia">
+                                                    {% for attach in message['attachments'] %}
+                                                    {% if attach['permissions']['download'] != 0 %}
+                                                        {% if attach['isImage'] != 0 %}
+                                                        <a href="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}" rel="lightbox[photo]"><img src="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}" title="{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб)" /></a>
+                                                        {% elseif ('.flv' in attach['fileName']) or ('.mp4' in attach['fileName']) or ('.webm' in attach['fileName']) or ('.ogv' in attach['fileName']) or ('.ts' in attach['fileName']) or ('.m3u8' in attach['fileName'])%}
+                                                            {% set videotype = '' %}
+                                                            {% if '.flv' in attach['fileName'] %}{% set videotype = 'video/flash' %}{% endif %}
+                                                            {% if '.mp4' in attach['fileName'] %}{% set videotype = 'video/mp4' %}{% endif %}
+                                                            {% if '.ogv' in attach['fileName'] %}{% set videotype = 'video/ogg' %}{% endif %}
+                                                            {% if '.ts' in attach['fileName'] %}{% set videotype = 'video/mp2t' %}{% endif %}
+                                                            {% if '.m3u8' in attach['fileName'] %}{% set videotype = 'application/x-mpegurl' %}{% endif %}
+                                                            {% if '.webm' in attach['fileName'] %}{% set videotype = 'video/webm' %}{% endif %}
+                                                        <div class="forumViedoFlowplayer">
+                                                            <video controls="controls" width="300" height="250">
+                                                                <source type="{{videotype}}" src="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}">
+                                                            </video>
+                                                        </div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                    </div>
+                                                    {% for attach in message['attachments'] %}
+                                                    {% if attach['permissions']['download'] != 0 %}
+                                                        {% if attach['isImage'] != 0 %}
+                                                        {% elseif ('.flv' in attach['fileName']) or ('.mp4' in attach['fileName']) or ('.webm' in attach['fileName']) or ('.ogv' in attach['fileName']) or ('.ts' in attach['fileName']) or ('.m3u8' in attach['fileName'])%}
+                                                        {% else %}
+                                                        <a href="{{path('forum_forum_front_attachmentsdownload')}}?id={{attach['id']}}">{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб)</a><br/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                    <span>{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб) [это вложение вам запрещено скачивать]</span>
+                                                    {% endif %}
+                                                    {% endfor %}
+						</div>
+                                                {% endif %}
+                                                {% if message['moderatorId'] != null %}
+                                                    <div class="messageModeration">{{message['moderatorMessage']}}<br />Модератор: <span class="mirclubTransliteration">{{message['moderatorFullName']}}</span></div>
+                                                {% endif %}
+					</td>
+				</tr>
+                            {% endfor %}    
+			</table>
+                        <div class="paginatorWrap">
+                        {% if (pageCount > 1) %}
+                            {% set to = page + 1 %}
+                            {% set from = page - 1 %}
+                            {% if (to >= pageCount) %}
+                                {% set to = pageCount - 1 %}
+                            {% endif %}
+                            {% if (from < 0) %}
+                                {% set from = 0 %}
+                            {% endif %}
+                            {% if (from > 0) %}
+                                <a href="?page=0">1</a>
+                            {% endif %}
+                            {% if (from > 1) %}
+                                ...
+                            {% endif %}
+                            {% for i in from..to %}
+                                {% if i == page %}
+                                <a href="#" class="active">{{i+1}}</a>
+                                {% else %}
+                                <a href="?page={{i}}">{{i+1}}</a>
+                                {% endif %}
+                            {% endfor %}
+                            {% if (to < (pageCount - 2)) %}
+                            ...
+                            {% endif %}
+                            {% if (to < (pageCount - 1)) %}
+                                <a href="?page={{pageCount - 1}}">{{pageCount}}</a>
+                            {% endif %}
+                        {% endif %}
+                        </div>
+                        
+                        {#   &lt;blockquote&gt;sdafasd&lt;/blockquote&gt;   #}
+                    {% if permissions['post'] != 0 %}
+			<div class="messageAdd">
+                                {% if status == 'OK' %}
+                                <p class="tac">Сообщение отправлено</p>
+                                {% endif %}
+                        <form action="?" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="actionobject" value="forum" />
+                            <input type="hidden" name="action" value="post" />
+                            <input type="hidden" name="actionid" value="{{id}}" />
+				<p>Текст сообщения</p>
+				<p><textarea id="addMessageEditor" class="addTinyMce" autocomplete="off" name="actionfields[text]">{{postMessageValue}}</textarea>{% if postMessageError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+				<p>Прикреплённые файлы:</p>
+				<div id="fileAttachmentsNew">
+                                    {% for attach in postAttachments %}
+                                    <p>
+                                        <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                                        {{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} кб, <a href="#" onclick="$(this).parent('p').remove();return false;">удалить</a>)
+                                    </p>
+                                    {% endfor %}
+				</div>
+                                {% if postAttachmentsError != '' %}<span class="error">Ошибка загрузки файлов</span>{% endif %}
+				<p><button class="button" id="fileAttachmentsAddNew" onclick="return false;">Добавить файлы</button></p>
+                                <script>
+                                    $(function () 
+                                    {
+                                        new AjaxUpload('#fileAttachmentsAddNew', 
+                                        {
+                                            action: '{{path('forum_forum_front_attachmentsupload')}}',
+                                            name: 'files',
+                                            multiply: true,
+                                            onSubmit: function(file, extension)
+                                            {
+                                                $('#preloader').show();
+                                            },
+                                            onComplete: function(file, response)
+                                            {
+                                                $('#preloader').hide();
+                                                if (!response) response = "[{id:'', error:'Ошибка загрузки файла'}]";
+                                                var answers = $.parseJSON(response);
+                                                var key;
+                                                for (key in answers)
+                                                {
+                                                    var answer = answers[key];
+                                                    if(answer.id)
+                                                    {
+                                                            $('#fileAttachmentsNew').append(
+                                                                '<p>'+
+                                                                '    <input type="hidden" name="actionfields[attachments][]" value="'+answer.id+'" />'+
+                                                                '    '+answer.filename+' ('+answer.filesizeformat+' кб, <a href="#" onclick="$(this).parent(\'p\').remove();return false;">удалить</a>)'+
+                                                                '</p>');
+                                                    } else
+                                                    {
+                                                            alert(answer.error);
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    });
+                                </script>
+                                    {% if captchaEnabled != 0 %}
+                                    <p><span>Введите строку с картинки</span><input type="text" name="actionfields[captcha]" value="" />{% if captchaError != '' %}<span class="error">Поле заполнено неверно</span>{% endif %}</p>
+                                    <p><img src="{{captchaPath}}&rand={{random()}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));"/></p>
+                                    {% endif %}
+				<p class="tac"><button class="button" type="submit">Отправить</button></p>
+				<script>
+					tinymce.init({
+						selector: "textarea.addTinyMce",
+						language : 'ru',
+						height: 100,
+						menubar: false,
+						convert_urls: false,
+						verify_html : true,
+						plugins: ["link"],
+						toolbar: "undo redo | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link"
+					});
+				</script>
+                        </form>
+			</div>
+                    {% endif %}
+
+                        <script>
+                            function citeMessageToEditor(preamb, that)
+                            {
+                                var text = $(that).closest('.forumColMessage').clone();
+                                text.find('div').remove();
+                                text.find('blockquote').remove();
+                                tinymce.get('addMessageEditor').execCommand('mceInsertContent', false, '<blockquote>'+preamb+'<br />'+text.html()+'</blockquote><p></p>');
+                            }
+                        </script>

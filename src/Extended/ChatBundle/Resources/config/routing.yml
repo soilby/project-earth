@@ -1,0 +1,3 @@
+extended_chat_download_attachment:
+    path:  /system/download/chatattachments
+    defaults: { _controller: ExtendedChatBundle:Default:downloadAttachment }

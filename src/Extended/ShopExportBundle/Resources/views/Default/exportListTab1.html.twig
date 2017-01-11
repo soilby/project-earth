@@ -1,0 +1,28 @@
+        <a class="button" href="#" id="deleteSelected0">Удалить выбранные</a>
+        <a href="{{path('extended_shop_export_one_create')}}" class="button">Создать страницу экспорта</a>
+        <table class="tableContent" id="exportList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Имя файла экспорта
+                </th>
+                <th>
+                    Ссылка для скачивания
+                </th>
+                <th>
+                    Скачать
+                </th>
+            </tr>
+            {% for exportpage in exportpages %}
+            <tr>
+                <td><input type="checkbox" class="delete" name="check[{{exportpage.id}}]" value="1" /></td>
+                <td><a href="{{path('extended_shop_export_one_edit')}}?id={{exportpage.id}}">{{exportpage.fileName}}</a></td>
+                <td>http://{{host}}{{path('extended_shop_export_one_external_link')}}?id={{exportpage.id}}</td>
+                <td><a href="{{path('extended_shop_export_one_external_link')}}?id={{exportpage.id}}">Скачать</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#deleteSelected0').click(function () {ajaxActionConfirm('{{path('extended_shop_export_one_ajax')}}', 'delete', '#exportList0 input.delete', '#con_tab1','Удалить выбранные страницы экспорта XML?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

@@ -1,0 +1,4 @@
+services:
+    object.product:
+        class: Shop\ProductBundle\ProductManager
+        arguments: ['@service_container']

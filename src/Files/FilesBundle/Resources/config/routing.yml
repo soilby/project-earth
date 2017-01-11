@@ -1,0 +1,51 @@
+files_files_file_list:
+    path:  /admin/files/
+    defaults: { _controller: FilesFilesBundle:Default:filesFileList }
+
+files_files_file_create:
+    path:  /admin/files/create
+    defaults: { _controller: FilesFilesBundle:Default:filesFileCreate }
+
+files_files_file_edit:
+    path:  /admin/files/edit
+    defaults: { _controller: FilesFilesBundle:Default:filesFileEdit }
+
+files_files_file_ajax:
+    path:  /admin/files/ajax
+    defaults: { _controller: FilesFilesBundle:Default:filesFileAjax }
+
+files_files_file_ajaxavatar:
+    path:  /admin/files/ajaxavatar
+    defaults: { _controller: FilesFilesBundle:Default:filesFileAjaxAvatar }
+
+files_files_file_ajaxfile:
+    path:  /admin/files/ajaxfile
+    defaults: { _controller: FilesFilesBundle:Default:filesFileAjaxFile }
+
+files_files_front_filedownload:
+    path:  /system/download/file
+    defaults: { _controller: FilesFilesBundle:Default:frontFileDownload }
+
+files_files_createpage_create:
+    path:  /admin/files/createpage/create
+    defaults: { _controller: FilesFilesBundle:Default:filesCreatepageCreate }
+
+files_files_createpage_edit:
+    path:  /admin/files/createpage/edit
+    defaults: { _controller: FilesFilesBundle:Default:filesCreatepageEdit }
+
+files_files_front_avatarupload:
+    path:  /system/upload/fileavatar
+    defaults: { _controller: FilesFilesBundle:Default:filesFrontAjaxAvatar }
+
+files_files_front_fileupload:
+    path:  /system/upload/filecontentfile
+    defaults: { _controller: FilesFilesBundle:Default:filesFrontAjaxContentFile }
+
+files_files_editpage_create:
+    path:  /admin/files/editpage/create
+    defaults: { _controller: FilesFilesBundle:Default:filesEditpageCreate }
+
+files_files_editpage_edit:
+    path:  /admin/files/editpage/edit
+    defaults: { _controller: FilesFilesBundle:Default:filesEditpageEdit }

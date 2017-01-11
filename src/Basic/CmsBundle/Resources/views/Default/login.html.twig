@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admincss/base.css" />
+	<link rel="stylesheet" href="/admincss/main.css?update=1" />
+	<link rel="stylesheet" href="/admincss/uniform.default.min.css" />
+	<link rel="stylesheet" href="/admincss/lightbox.css" />
+	<link rel="stylesheet" href="/admincss/chosen.min.css" />
+	<script src="/adminjs/jquery-1.8.1.min.js"></script>
+	<script src="/adminjs/jquery.uniform.min.js"></script>
+        <script src="/adminjs/ajaxupload.3.5.js"></script>
+        <script src="/adminjs/lightbox.js"></script>
+        <script type="text/javascript" src="/adminjs/tinymce/tinymce.min.js"></script>
+	<script src="/adminjs/chosen.jquery.min.js"></script>
+	<script src="/adminjs/main.js?update=1"></script>
+	<script></script>
+	<title>Авторизация</title>
+</head>
+<body>
+<div class="mainHeader">
+	<div class="logo">
+	<img src="/adminimg/logo.gif">
+	</div>
+	<nav>
+	</nav>
+</div>
+<div class="mainContent">
+    <div id="formLogin">    
+        <form action="{{path('basic_cms_check_login')}}" method="POST" name="auth">
+            {% if (error != null) %}
+            <p class="error">Неправильный логин или пароль!</p>
+            {% endif %}
+            <p><span class="widthed">Логин</span><input type="text" name="_username" value="" /></p>
+            <p><span class="widthed">Пароль</span><input type="password" name="_password" value="" /></p>
+            {#<p><input type="checkbox" id="remember_me" name="_remember_me" /><label for="remember_me">Запомнить меня</label></p>#}
+            <p><input type="submit" id="submit" value="Войти" /></p>
+        </form>
+    </div>
+</div>
+<div class="mainFooter">
+Copyright &copy; 2014 by SergSXM
+</div>
+</body>
+</html>

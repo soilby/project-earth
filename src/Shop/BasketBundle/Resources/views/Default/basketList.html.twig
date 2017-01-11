@@ -1,0 +1,50 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Настройки корзины{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Настройки корзины</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    {% if (app.user.checkAccess('basket_configview') == 1) %}
+    <a href="#" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Страницы корзины</a>
+    {% endif %}
+    {% if (app.user.checkAccess('basket_configview') == 1) %}
+    <a href="#" id="tab2" {% if (tab == 1) %}class="active"{% endif %}>Способы оплаты</a>
+    {% endif %}
+    {% if (app.user.checkAccess('basket_configview') == 1) %}
+    <a href="#" id="tab3" {% if (tab == 2) %}class="active"{% endif %}>Способы доставки</a>
+    {% endif %}
+    {% if (app.user.checkAccess('basket_configview') == 1) %}
+    <a href="#" id="tab4" {% if (tab == 3) %}class="active"{% endif %}>Параметры заказа</a>
+    {% endif %}
+</div>
+<div id="tabsContent">
+    {% if (app.user.checkAccess('basket_configview') == 1) %}
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "ShopBasketBundle:Default:basketListTab1.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('basket_configview') == 1) %}
+    <div id="con_tab2" {% if (tab == 1) %}class="active"{% endif %}>
+        {% include "ShopBasketBundle:Default:basketListTab2.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('basket_configview') == 1) %}
+    <div id="con_tab3" {% if (tab == 2) %}class="active"{% endif %}>
+        {% include "ShopBasketBundle:Default:basketListTab3.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('basket_configview') == 1) %}
+    <div id="con_tab4" {% if (tab == 3) %}class="active"{% endif %}>
+        {% include "ShopBasketBundle:Default:basketListTab4.html.twig" %}
+    </div>
+    {% endif %}
+</div>​
+{% endblock %}       
+
+
+

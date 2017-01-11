@@ -1,0 +1,60 @@
+        {% if (app.user.checkAccess('role_edit') == 1) %}<a class="button" href="#" id="deleteSelected">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('role_new') == 1) %}<a href="{{path('basic_cms_role_create')}}" class="button">Создать новую роль</a>{% endif %}
+        <div class="goToRight">
+        <form id="navigationForm">
+            <input type="hidden" name="page0" value="{{page0}}" id="page0" />
+            <input type="hidden" name="tab" value="{{tab}}" id="tab" />
+        </form>
+        </div>
+        <table class="tableContent" id="roleList">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Имя роли
+                </th>
+                <th>
+                    Количество пользователей
+                </th>
+            </tr>
+            {% for role in roles %}
+            <tr>
+                <td><input type="checkbox" class="delete" name="check[{{role.id}}]" value="1" /></td>
+                <td><a href="{{path('basic_cms_role_edit')}}?id={{role.id}}">{{role.name}}</a></td>
+                <td>{{role.usercount}}{% if (errors[role.id] is defined) %}<p class="error">{{errors[role.id]}}</p>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?page0=0" onclick="$('#page0').val(0);location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?page0={{i}}" onclick="$('#page0').val({{i}});location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?page0={{pagecount0 - 1}}" onclick="$('#page0').val({{pagecount0 - 1}});location.href = location.pathname+'?'+$('#navigationForm').serialize();return false;">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#deleteSelected').click(function () {ajaxActionConfirm('{{path('basic_cms_role_ajax')}}', 'delete', '#roleList input.delete', '#con_tab1','Удалить выбранные роли?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

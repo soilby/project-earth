@@ -1,0 +1,125 @@
+        <a class="button" href="#" id="viewedLogs0">Пометить как просмотренные</a>
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="hidden" name="tab" value="0" />
+            <select name="object0">
+                <option value="" {% if filter0 == '' %}selected="selected"{% endif %}>От всех объектов</option>
+                {% for modname,moddescr in modules %}
+                <option value="{{modname}}" {% if object0 == modname %}selected="selected"{% endif %}>{{moddescr}}</option>
+                {% endfor %}
+            </select>
+            <select name="filter0">
+                <option value="" {% if filter0 == '' %}selected="selected"{% endif %}>Все типы событий</option>
+                <option value="create" {% if filter0 == 'create' %}selected="selected"{% endif %}>Создание</option>
+                <option value="edit" {% if filter0 == 'edit' %}selected="selected"{% endif %}>Изменение</option>
+                <option value="moderate" {% if filter0 == 'moderate' %}selected="selected"{% endif %}>Модерация</option>
+                <option value="other" {% if filter0 == 'other' %}selected="selected"{% endif %}>Прочее</option>
+            </select>
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="logsList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Дата события &#9660;</a>
+                    {% else %}
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Дата события &#9650;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Дата события</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Тип &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Тип &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Тип</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?tab=0&sort0=5">Пользователь &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?tab=0&sort0=4">Пользователь &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=4">Пользователь</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Событие &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Событие &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Событие</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    Просмотрено
+                </th>
+            </tr>
+            {% for logitem in logitems0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{logitem.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_logs_view')}}?id={{logitem.id}}">{{logitem.logDate | date('d.m.Y G:i')}}</a>{% if (errors0[logitem.id] is defined) %}<p class="error">{{errors0[logitem.id]}}</p>{% endif %}</td>
+                <td>
+                    {% if logitem.actionType == 'create' %}Создание{% endif %}
+                    {% if logitem.actionType == 'edit' %}Изменение{% endif %}
+                    {% if logitem.actionType == 'moderate' %}Модерация{% endif %}
+                    {% if logitem.actionType == 'other' %}Прочее{% endif %}
+                </td>
+                <td>{{logitem.sourceName}}
+                <td>{{logitem.text}}</td>
+                <td>
+                    {% if logitem.viewed == 1 %}
+                        {{logitem.viewedDate | date('d.m.Y G:i')}} пользователем {{logitem.viewedName}}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#viewedLogs0').click(function () {ajaxAction('{{path('basic_cms_logs_ajax')}}?tab=0', 'viewed', '#logsList0 input.check', '#con_tab1');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

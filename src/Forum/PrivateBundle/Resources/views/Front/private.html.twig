@@ -1,0 +1,136 @@
+<h1>{{title}}</h1>
+<div>
+{% if view == 'list' %}
+    {% if messageMode == 0 %}
+    <div>
+        <a href="?filter=all" {% if filter == 'all' %}style="font-weight:bold"{% endif %}>Все письма</a>
+        <a href="?filter=in" {% if filter == 'in' %}style="font-weight:bold"{% endif %}>Входящие</a>
+        <a href="?filter=out" {% if filter == 'out' %}style="font-weight:bold"{% endif %}>Исходящие</a>
+    </div>
+    {% endif %}
+    <table>
+        <tr>
+            <th>Создано</th>
+            <th>Тема</th>
+            <th>Отправитель</th>
+            <th>Получатель</th>
+            <th>Действия</th>
+        </tr>
+        {% for message in messages %}
+        <tr>
+            <td>{{message['createDate'] | date('d.m.Y')}}</td>
+            <td><a href="?message={{message['id']}}">{{message['title']}}</a></td>
+            <td>{{message['createrFullName']}}</td>
+            <td>{{message['targetFullName']}}</td>
+            <td>
+                <a href="?actionobject=forum&action=privateremove&actionid={{id}}&actionprivateid={{message['id']}}">Удалить</a>
+                <a href="?actionobject=forum&action=privateviewed&actionid={{id}}&actionprivateid={{message['id']}}">Прочитано</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+    {% for i in 0..(pageCount - 1) %}
+        <a href="?filter={{filter}}&page={{i}}" {% if i == page %}style="font-weight:bold"{% endif %}>{{i+1}}</a>
+    {% endfor %}
+    </div>
+{% else %}    
+    <style>
+    .forumTable th, .forumTable td {
+        border: 1px #000 solid;
+    }
+    </style>
+    <script>
+        function displayToggle(id)
+        {
+            if (document.getElementById(id).style.display == "none") document.getElementById(id).style.display = "block"; else document.getElementById(id).style.display = "none";        
+        }
+    </script>
+    <div>
+    {% for i in 0..(pageCount - 1) %}
+        <a href="?message={{messageId}}&page={{i}}" {% if i == page %}style="font-weight:bold"{% endif %}>{{i+1}}</a>
+    {% endfor %}
+    </div>
+    <table class="forumTable">
+        <tr>
+            <th>Отправитель</th>
+            <th>Дата</th>
+            <th>Текст</th>
+        </tr>
+        {% for message in messages|reverse %}
+        <tr>
+            <td>
+                {{message['createrFullName']}}
+                {% if message['premissionEdit'] != 0 %}<a href="#" onclick="displayToggle('editMessage{{message['id']}}');return false;">редактировать</a>{% endif %}
+            </td>
+            <td>{{message['createDate'] | date('d.m.Y')}}</td>
+            <td>
+                {{message['content']}}
+                <br />
+                <br />
+                Вложения:<br />
+                {% for attach in message.attachments %}
+                    <a href="{{path('forum_private_front_attachmentsdownload')}}?id={{attach['id']}}">{{attach['fileName']}} ({{attach['fileSize']}} байт)</a><br/>
+                {% endfor %}
+                <div id="editMessage{{message['id']}}" style="display:none">
+                    {% if message['editStatus'] == 'OK' %}
+                    <p>Сообщение отправлено</p>
+                    {% endif %}
+                    {% if message['editStatus'] != '' %}
+                    <p>{{message['editStatus']}}</p>
+                    {% endif %}
+                    <form action="?message={{messageId}}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="actionobject" value="forum" />
+                        <input type="hidden" name="action" value="privateedit" />
+                        <input type="hidden" name="actionid" value="{{id}}" />
+                        <input type="hidden" name="actionmessageid" value="{{message['id']}}" />
+                        <textarea name="actionfields[text]">{{message['editMessageValue']}}</textarea>
+                        <small>{{message['editMessageError']}}</small>
+                        <p>Прикрепленные файлы</p>
+                        {% for attach in message['editAttachments'] %}
+                        <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                        {{attach['fileName']}} ({{attach['fileSize']}} байт)<br/>
+                        {% endfor %}
+                        <input type="file" name="actionfiles[attachments][]" />
+                        <small>{{message['editAttachmentsError']}}</small>
+                        <button type="submit">Сохранить</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <p>Отправить сообщение</p>
+    {% if status == 'OK' %}
+    <p>Сообщение отправлено</p>
+    {% endif %}
+    <form action="?message={{messageId}}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="actionobject" value="forum" />
+        <input type="hidden" name="action" value="privatepost" />
+        <input type="hidden" name="actionid" value="{{id}}" />
+        <input type="hidden" name="actionreply" value="{{postReply}}" />
+        <input type="hidden" name="actionuser" value="{{postUser}}" />
+        <input type="text" name="actionfields[title]" value="{{postTitleValue}}" />
+        <small>{{postTitleError}}</small>
+        <textarea name="actionfields[text]">{{postMessageValue}}</textarea>
+        <small>{{postMessageError}}</small>
+        <p>Прикрепленные файлы</p>
+        {% for attach in postAttachments %}
+        <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+        {{attach['fileName']}} ({{attach['fileSize']}} байт)<br/>
+        {% endfor %}
+        <input type="file" name="actionfiles[attachments][]" />
+        <small>{{postAttachmentsError}}</small>
+        {% if captchaEnabled != 0 %}
+        <p>
+        Введите строку с картинки
+        <img src="{{captchaPath}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));"/>
+        <input type="text" name="actionfields[captcha]" value="" />
+        <small>{{captchaError}}</small>
+        </p>
+        {% endif %}
+        <button type="submit">Отправить</button>
+    </form>
+{% endif %}
+</div>

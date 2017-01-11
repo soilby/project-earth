@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admincss/base.css" />
+	<link rel="stylesheet" href="/admincss/main.css?update=1" />
+	<link rel="stylesheet" href="/admincss/uniform.default.min.css" />
+	<link rel="stylesheet" href="/admincss/lightbox.css" />
+	<link rel="stylesheet" href="/admincss/chosen.min.css" />
+	<script src="/adminjs/jquery-1.8.1.min.js"></script>
+	<script src="/adminjs/jquery.uniform.min.js"></script>
+        <script src="/adminjs/ajaxupload.3.5.js"></script>
+        <script src="/adminjs/lightbox.js"></script>
+        <script type="text/javascript" src="/adminjs/tinymce/tinymce.min.js"></script>
+	<script src="/adminjs/chosen.jquery.min.js"></script>
+	<script src="/adminjs/main.js?update=1"></script>
+	<script></script>
+	<title>{% block title %}Embedded.CMS{% endblock %}</title>
+</head>
+<body>
+    <div id="preloader">
+        <div>&nbsp;</div>
+    </div>
+<div class="mainHeader">
+	<div class="logo">
+	<a href="{{path('basic_cms_index')}}"><img src="/adminimg/logo.gif"></a>
+	<div>
+	<p>Пользователь: {{app.user.fullName}}</p>
+	<a href="{{path('basic_cms_logout')}}">Выйти</a>
+	</div>
+	</div>
+	<nav>
+	{% block mainmenu %}{% endblock %}
+	</nav>
+</div>
+<div class="mainContent">
+<div class="breadcrumbs">{% block breadcrumbs %}{% endblock %}</div>
+{% block content %}{% endblock %}    
+</div>
+<div class="mainFooter">
+Copyright &copy; 2014 by SergSXM
+</div>
+</body>
+</html>

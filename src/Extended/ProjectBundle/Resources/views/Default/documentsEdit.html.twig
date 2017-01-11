@@ -1,0 +1,133 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование документа к мастерской{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('extended_project_list')}}">Мастерские</a>
+    <a href="{{path('extended_project_documents_list')}}?id={{project.id}}">Просмотр документов мастерской &laquo;{{project.title}}&raquo;</a>
+    <span>Редактирование документа &laquo;{{document['title']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+</div>
+<form action="{{path('extended_project_documents_edit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('project_editall') == 1) and (project.createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('project_editown') == 1) and (project.createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('project_viewall') == 1) and (project.createrId != app.user.id)) %}<a class="button" href="{{path('extended_project_documents_list')}}?id={{project.id}}">Отмена</a>{% endif %}
+                {% if ((app.user.checkAccess('project_viewown') == 1) and (project.createrId == app.user.id)) %}<a class="button" href="{{path('extended_project_documents_list')}}?id={{project.id}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="document[enabled]" value="1" {% if (document['enabled'] != 0) %}checked="checked"{% endif %} />Опубликован</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{documenterror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Заголовок<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="document[title]" value="{{document['title']}}" /></td>
+                    <td class="cfgError">{{documenterror['title']}}</td>
+                </tr>
+                {% for locale in locales %}
+                <tr>
+                    <td>Заголовок ({{locale['fullName']}})</td>
+                    <td><input type="text" name="document[titleLocales][{{locale['shortName']}}]" value="{{document['titleLocales'][locale['shortName']]}}" /></td>
+                    <td class="cfgError"></td>
+                </tr>
+                {% endfor %}
+                {#<tr>
+                    <td>Локаль документа</td>
+                    <td>
+                        <select name="document[locale]">
+                            <option value="" {% if document['locale'] == '' %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for locale in locales %}
+                            <option value="{{locale['shortName']}}" {% if document['locale'] == locale['shortName'] %}selected="selected"{% endif %}>{{locale['fullName']}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{documenterror['locale']}}</td>
+                </tr>#}
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="document[readOnly]" value="1" {% if (document['readOnly'] != 0) %}checked="checked"{% endif %} />Только для чтения</label><span class="helpContainerButton" data-id="readOnly">?</span></td>
+                    <td class="cfgError">{{documenterror['readOnly']}}</td>
+                </tr>
+                <tr>
+                    {#<td colspan="2"><label><input type="checkbox" name="document[isPublic]" value="1" {% if (document['isPublic'] != 0) %}checked="checked"{% endif %} />Публичный доступ</label><span class="helpContainerButton" data-id="isPublic">?</span></td>#}
+                    <td>Доступ к документу</td>
+                    <td>
+                        <select name="document[isPublic]">
+                            <option value="1" {% if document['isPublic'] == 1 %}selected="selected"{% endif %}>Все пользователи</option>
+                            <option value="2" {% if document['isPublic'] == 2 %}selected="selected"{% endif %}>Зарегистрированные пользователи</option>
+                            <option value="0" {% if document['isPublic'] == 0 %}selected="selected"{% endif %}>Только участники мастерской</option>
+                            <option value="3" {% if document['isPublic'] == 3 %}selected="selected"{% endif %}>Только мастера мастерской</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{documenterror['isPublic']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Текст документа:<span class="helpContainerButton" data-id="content">?</span></p>
+            <p class="globalError">{{documenterror['content']}}</p>
+            <br />
+            <textarea name="document[content]" id="documentContent">{{document['content']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#documentContent",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            {% for locale in locales %}
+            <div class="mb20">
+            <p>Текст документа ({{locale['fullName']}}):</p>
+            <p class="globalError"></p>
+            <br />
+            <textarea name="document[contentLocales][{{locale['shortName']}}]" id="documentContent-{{locale['shortName']}}">{{document['contentLocales'][locale['shortName']]}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#documentContent-{{locale['shortName']}}",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            {% endfor %}
+        </div>
+</div>​
+</form>
+<script>
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет разрешить или запретить отображение документа.</div>
+    <div id="helpContainer-title">Задает название документа.</div>
+    <div id="helpContainer-content">Задаёт текст документа.</div>
+    <div id="helpContainer-readOnly">При включении запрещается редактирование данного документа.</div>
+    <div id="helpContainer-isPublic">При включении доступ к документу будут иметь все пользователи сайта, а не только из списка пользователей мастерской.</div>
+</div>
+{% endblock %}       
+
+
+

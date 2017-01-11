@@ -1,0 +1,93 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Статистика страницы{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_statistics')}}">Статистика</a>
+    <span>Статистика страницы &laquo;{{info['url']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Статистика страницы</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" class="active">
+        <div class="saveButtons">
+            <a class="button" href="{{path('basic_cms_statistics')}}">Назад</a>
+        </div>
+        <p>Адрес страницы: {{info.url}}</p>
+        <p>Описание страницы: {{info.description}}</p>
+        <br />
+        <p>Дата последнего посещения: {{(statistic.visitDate != null ? (statistic.visitDate | date('d.m.Y G:i')) : 'Страница не посещалась')}}</p>
+        <p>Общее количество посещений: {{statistic.allVisits}}</p>
+        <br />
+        <p>График посещений</p>
+        <br />
+        <label><input name="grafic" autocomplete="off" type="radio" checked="checked" onclick="$('#statDay').show();$('#statWeek').hide();$('#statMonth').hide();" />По дням</label>
+        <label><input name="grafic" autocomplete="off" type="radio" onclick="$('#statDay').hide();$('#statWeek').show();$('#statMonth').hide();" />По неделям</label>
+        <label><input name="grafic" autocomplete="off" type="radio" onclick="$('#statDay').hide();$('#statWeek').hide();$('#statMonth').show();" />По месяцам</label>
+        <br />
+        <br />
+        
+        
+        <table class="statisticWrap" id="statDay">
+            <tr>
+                {% for i in 11..0 %}
+                <td><div class="statisticBar{% if statistic['daygraf'][i]['tend'] > 0 %} green{% endif %}{% if statistic['daygraf'][i]['tend'] < 0 %} red{% endif %}" style="height:{{statistic['daygraf'][i]['count'] * 200 // statistic['daygraf']['max']}}px;"></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for i in 11..0 %}
+                <td>{{statistic['daygraf'][i]['name']}}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for i in 11..0 %}
+                <td style="font-weight:bold">{{statistic['daygraf'][i]['count'] | number_format(0,',',' ')}}</td>
+                {% endfor %}
+            </tr>
+        </table>
+        
+        <table class="statisticWrap" id="statWeek" style="display:none">
+            <tr>
+                {% for i in 11..0 %}
+                <td><div class="statisticBar{% if statistic['weekgraf'][i]['tend'] > 0 %} green{% endif %}{% if statistic['weekgraf'][i]['tend'] < 0 %} red{% endif %}" style="height:{{statistic['weekgraf'][i]['count'] * 200 // statistic['weekgraf']['max']}}px;"></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for i in 11..0 %}
+                <td>{{statistic['weekgraf'][i]['name']}}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for i in 11..0 %}
+                <td style="font-weight:bold">{{statistic['weekgraf'][i]['count'] | number_format(0,',',' ')}}</td>
+                {% endfor %}
+            </tr>
+        </table>
+        
+        <table class="statisticWrap" id="statMonth" style="display:none">
+            <tr>
+                {% for i in 11..0 %}
+                <td><div class="statisticBar{% if statistic['monthgraf'][i]['tend'] > 0 %} green{% endif %}{% if statistic['monthgraf'][i]['tend'] < 0 %} red{% endif %}" style="height:{{statistic['monthgraf'][i]['count'] * 200 // statistic['monthgraf']['max']}}px;"></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for i in 11..0 %}
+                <td>{{statistic['monthgraf'][i]['name']}}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for i in 11..0 %}
+                <td style="font-weight:bold">{{statistic['monthgraf'][i]['count'] | number_format(0,',',' ')}}</td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+</div>​
+{% endblock %}       
+
+
+

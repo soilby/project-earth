@@ -1,0 +1,16 @@
+<div>
+<h1>{{title}}</h1>
+<small>Создано {{createDate | date('d.m.Y')}} пользователем {{createrFullName}}</small>
+{% for item in items %}
+<div>
+    {% for fieldname, field in item %}
+        <p>{{fieldname}}: {{field.timestamp is defined ? field | date('d.m.Y') : field}}</p>
+    {% endfor %}
+</div>
+{% endfor %}
+<div>
+{% for i in 0..(pageCount-1) %}
+    <a href="?page={{i}}">{{i+1}}</a>
+{% endfor %}
+</div>
+</div>

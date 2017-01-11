@@ -1,0 +1,32 @@
+        {% if (app.user.checkAccess('user_registerpage') == 1) %}<a class="button" href="#" id="unblockedReg3">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('user_registerpage') == 1) %}<a class="button" href="#" id="blockedReg3">Выключить</a>{% endif %}
+        {% if (app.user.checkAccess('user_registerpage') == 1) %}<a class="button" href="#" id="deleteReg3">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('user_registerpage') == 1) %}<a href="{{path('basic_cms_user_registerpage_create')}}" class="button">Создать страницу регистрации</a>{% endif %}
+        <table class="tableContent" id="regpageList3">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Включено
+                </th>
+                <th>
+                    URL страницы
+                </th>
+            </tr>
+            {% for registerpage in registerpages %}
+            <tr>
+                <td><input type="checkbox" name="check[{{registerpage.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_user_registerpage_edit')}}?id={{registerpage.id}}">{{registerpage.title}}</a>{% if (errors3[registerpage.id] is defined) %}<p class="error">{{errors3[registerpage.id]}}</p>{% endif %}</td>
+                <td>{{(registerpage.enabled != 0 ? 'Да' : 'Нет')}}</td>
+                <td>{{registerpage.url}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#unblockedReg3').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=3', 'unblockedreg', '#regpageList3 input.check', '#con_tab4');return false;});
+            $('#blockedReg3').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=3', 'blockedreg', '#regpageList3 input.check', '#con_tab4');return false;});
+            $('#deleteReg3').click(function () {ajaxActionConfirm('{{path('basic_cms_user_ajax')}}?tab=3', 'deletereg', '#regpageList3 input.check', '#con_tab4','Удалить выбранные страницы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

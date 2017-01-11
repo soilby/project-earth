@@ -1,0 +1,32 @@
+        {% if (app.user.checkAccess('forum_createpage') == 1) %}<a class="button" href="#" id="unblockedPage1">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('forum_createpage') == 1) %}<a class="button" href="#" id="blockedPage1">Выключить</a>{% endif %}
+        {% if (app.user.checkAccess('forum_createpage') == 1) %}<a class="button" href="#" id="deletePage1">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('forum_createpage') == 1) %}<a href="{{path('forum_forum_createpage_create')}}" class="button">Создать новую страницу создания форума</a>{% endif %}
+        <table class="tableContent" id="pageList1">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                        Название
+                </th>
+                <th>
+                        Включено
+                </th>
+                <th>
+                        URL страницы
+                </th>
+            </tr>
+            {% for createpage in createpages1 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{createpage.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('forum_forum_createpage_edit')}}?id={{createpage.id}}">{{createpage.title}}</a>{% if (errors1[createpage.id] is defined) %}<p class="error">{{errors1[createpage.id]}}</p>{% endif %}</td>
+                <td>{{createpage.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{createpage.url}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#blockedPage1').click(function () {ajaxAction('{{path('forum_forum_topic_ajax')}}?tab=1', 'blockedpage', '#pageList1 input.check', '#con_tab2');return false;});
+            $('#unblockedPage1').click(function () {ajaxAction('{{path('forum_forum_topic_ajax')}}?tab=1', 'unblockedpage', '#pageList1 input.check', '#con_tab2');return false;});
+            $('#deletePage1').click(function () {ajaxActionConfirm('{{path('forum_forum_topic_ajax')}}?tab=1', 'deletepage', '#pageList1 input.check', '#con_tab2','Удалить выбранные страницы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

@@ -1,0 +1,11 @@
+services:
+    addone.product.basket:
+        class: Shop\BasketBundle\BasketManager
+        arguments: ['@service_container']
+    plugin.basket.payment.hand:
+        class: Shop\BasketBundle\HandPayment
+        arguments: ['@service_container']
+    plugin.basket.shipment.hand:
+        class: Shop\BasketBundle\HandShipment
+        arguments: ['@service_container']
+    

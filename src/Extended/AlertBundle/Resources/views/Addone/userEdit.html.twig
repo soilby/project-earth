@@ -1,0 +1,24 @@
+<table class="cfgTable">
+    <tr>
+        <td colspan="3">Подписки на события</td>
+    </tr>
+    {% for alertname, alertdescription in alerts %}
+    <tr>
+        <td colspan="3">
+            <label><input type="checkbox" name="alerts[]" value="{{alertname}}" {{(alertname in subscribes ? 'checked="checked"' : '')}} autocomplete="off" />{{alertdescription | raw}}</label><br />
+        </td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td>Язык писем</td>
+        <td>
+            <select name="alertsLocale">
+                <option value="" {% if alertsLocale == '' %}selected="selected"{% endif %}>По умолчанию</option>
+                {% for item in alertsLocales %}
+                    <option value="{{item['shortName']}}" {% if alertsLocale == item['shortName'] %}selected="selected"{% endif %}>{{item['fullName']}}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="cfgError"></td>
+    </tr>
+</table>

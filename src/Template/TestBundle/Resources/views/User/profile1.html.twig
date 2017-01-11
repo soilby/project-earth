@@ -1,0 +1,33 @@
+<h1>{{title}}</h1>
+
+{% if status != 'OK' %}
+    <p>Где-то ошибка в данных</p>
+{% endif %}
+{% if saveStatus == 'OK' %}
+    <p>Данные успешно сохранены</p>
+{% endif %}
+<form action="" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="actionobject" value="user" />
+    <input type="hidden" name="action" value="profile" />
+    <input type="hidden" name="actionid" value="{{id}}" />
+    <p>Логин {{user.login}}</p>
+    {% if allowPasswordChange != 0 %}
+    <p>Пароль <input type="text" name="actionfields[password]" value="" /></p>
+    <p>Еще раз пароль <input type="text" name="actionfields[passwordRepeat]" value="" /></p>
+    <small>{{passwordError}}</small>
+    {% endif %}
+    {% if allowEmailChange != 0 %}
+    <p>E-mail <input type="text" name="actionfields[email]" value="{{email}}" /></p>
+    <small>{{emailError}}</small>
+    {% endif %}
+    <p>Полное имя <input type="text" name="actionfields[fullName]" value="{{fullName}}" /></p>
+    <small>{{fullNameError}}</small>
+    <p>Аватар <img src="{{avatar}}" /><input type="hidden" name="actionfields[avatar]" value="{{avatar}}" /> <input type="file" name="actionfiles[avatar]" /></p>
+    <small>{{avatarError}}</small>
+    {% for parameter in profile %}
+        <p>{{parameter['description']}} <input type="text" name="actionfields[profile][{{parameter['name']}}]" value="{{parameter['value']}}" /></p>
+        <small>{{parameter['error']}}</small>
+    {% endfor %}
+    <p><input type="submit" value="Ok" /></p>
+</form>
+

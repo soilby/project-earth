@@ -1,0 +1,22 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Настройка полей профиля пользователей{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Профиль пользователя</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="$('#tab').val(0);return false;" id="tab1" class="active">Поля профиля прользователей</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" class="active">
+        {% include "AddoneProfileBundle:Default:parameterListTab1.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

@@ -1,0 +1,4 @@
+services:
+    object.backup:
+        class: Addone\BackupBundle\BackupManager
+        arguments: ['@service_container']

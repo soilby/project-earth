@@ -1,0 +1,141 @@
+        {% if (app.user.checkAccess('form_letterviewall') == 1) %}<a class="button" href="#" id="status0Orders0">Пометить как "Ожидает обработки"</a>{% endif %}
+        <a class="button" href="#" id="refreshOrders0">Обновить</a>
+        <div class="goToRight">
+        <form id="searchForm0">
+            <input type="hidden" name="tab" value="0" />
+            <input type="text" name="search0" value="{{search0}}" />
+            <input type="submit" value="Найти" />
+        </form>
+        </div>
+        <table class="tableContent" id="orderList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    {% if (sort0 == 2) %}
+                        <a href="?tab=0&sort0=3">Сумма заказа &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 3) %}
+                        <a href="?tab=0&sort0=2">Сумма заказа &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=2">Сумма заказа</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 1) %}
+                        <a href="?tab=0&sort0=0">Дата создания &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 0) %}
+                        <a href="?tab=0&sort0=1">Дата создания &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=0">Дата создания</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 4) %}
+                        <a href="?tab=0&sort0=5">Статус &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 5) %}
+                        <a href="?tab=0&sort0=4">Статус &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=4">Статус</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+                <th>
+                    {% if (sort0 == 6) %}
+                        <a href="?tab=0&sort0=7">Обработал &#9650;</a>
+                    {% else %}
+                    {% if (sort0 == 7) %}
+                        <a href="?tab=0&sort0=6">Обработал &#9660;</a>
+                    {% else %}
+                        <a href="?tab=0&sort0=6">Обработал</a>
+                    {% endif%}
+                    {% endif%}
+                </th>
+            </tr>
+            {% for order in orders0 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{order.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('shop_basket_orderview')}}?id={{order.id}}&tab=0">{{order.summ}}</a>{% if (errors0[order.id] is defined) %}<p class="error">{{errors0[order.id]}}</p>{% endif %}</td>
+                <td>{{order.createDate | date('d.m.Y G:i')}}</td>
+                <td>
+                    {% if (order.payStatus == 2) %}
+                        {% if ((app.user.checkAccess('basket_ordereditnew') != 0) and ((order.viewUserId == app.user.id) or (order.viewUserId == null)) or (app.user.checkAccess('basket_ordereditall') != 0)) %}
+                        <select autocomplete="off" onchange="changeOrderStauts0({{order.id}}, this);" name="temp[]">
+                            <option value="0" {% if (order.status == 0) %}selected="selected"{% endif %}>Ожидает обработки</option>
+                            <option value="1" {% if (order.status == 1) %}selected="selected"{% endif %}>В работе</option>
+                            <option value="2" {% if (order.status == 2) %}selected="selected"{% endif %}>Обработан</option>
+                            <option value="3" {% if (order.status == 3) %}selected="selected"{% endif %}>Отменен</option>
+                        </select>
+                        {% else %}
+                            {% if (order.status == 0) %}Ожидает обработки{% endif %}
+                            {% if (order.status == 1) %}В работе{% endif %}
+                            {% if (order.status == 2) %}Обработан{% endif %}
+                            {% if (order.status == 3) %}Отменен{% endif %}
+                        {% endif %}
+                    {% else %}
+                        Не оплачен
+                    {% endif %}
+                </td>
+                <td>{{order.fullName}}{% if (order.viewDate != null) %} ({{order.viewDate | date('d.m.Y G:i')}}){% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if (pagecount0 > 1) %}
+            {% set to = page0 + 1 %}
+            {% set from = page0 - 1 %}
+            {% if (to >= pagecount0) %}
+                {% set to = pagecount0 - 1 %}
+            {% endif %}
+            {% if (from < 0) %}
+                {% set from = 0 %}
+            {% endif %}
+            {% if (from > 0) %}
+                <a class="button" href="?tab=0&page0=0">1</a>
+            {% endif %}
+            {% if (from > 1) %}
+                ...
+            {% endif %}
+            {% for i in from..to %}
+                {% if i == page0 %}
+                <input type="button" onclick="return false;" disabled="disabled" value="{{i+1}}" />
+                {#<a class="button" href="#" onclick="return false;">[]</a>#}
+                {% else %}
+                <a class="button" href="?tab=0&page0={{i}}">{{i+1}}</a>
+                {% endif %}
+            {% endfor %}
+            {% if (to < (pagecount0 - 2)) %}
+            ...
+            {% endif %}
+            {% if (to < (pagecount0 - 1)) %}
+                <a class="button" href="?tab=0&page0={{pagecount0 - 1}}">{{pagecount0}}</a>
+            {% endif %}
+        {% endif %}
+        <script type="text/javascript">
+            $('#status0Orders0').click(function () {ajaxAction('{{path('shop_basket_orderajax')}}?tab=0', 'status0', '#orderList0 input.check', '#con_tab1');return false;});
+            $('#refreshOrders0').click(function () {ajaxAction('{{path('shop_basket_orderajax')}}?tab=0', 'refresh', '#orderList0 input.check', '#con_tab1');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+            
+            function changeOrderStauts0(id, that)
+            {
+                var status = $(that).val();
+                $.ajax({
+                    type: "POST",
+                    url: '{{path('shop_basket_orderajaxstatus')}}',
+                    data: "id="+id+"&status="+status,
+                    error: function(){
+                        alert('Ошибка обращения к серверу');
+                    },
+                    success: function(data){
+                        var answer = $.parseJSON(data);
+                        if (answer['result'] != 'OK') alert(answer['result']); else
+                            {
+                                $(that).closest('td').next('td').html(answer['userName']+' ('+answer['date']+')');
+                            }
+                    }
+                });	      
+            }
+            
+        </script>

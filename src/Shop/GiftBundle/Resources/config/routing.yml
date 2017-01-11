@@ -1,0 +1,3 @@
+shop_gift_ajaxproducts:
+    path:  /admin/products/gift/ajaxproducts
+    defaults: { _controller: ShopGiftBundle:Default:giftAjaxProducts }

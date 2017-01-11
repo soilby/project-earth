@@ -1,0 +1,164 @@
+<h1>{{title}}</h1>
+{% if saveStatus == 'OK' %}
+    <p class="alert alert-success">{% if currentLocale == 'en' %}Data saved successfully...{% else %}Данные успешно сохранены...{% endif %}</p>
+{% endif %}
+<div class="row">
+<form action="?" method="post" enctype="multipart/form-data" class="col-md-6 col-md-offset-3 col-sm-12 form-horizontal">
+    <input type="hidden" name="actionobject" value="user" />
+    <input type="hidden" name="action" value="profile" />
+    <input type="hidden" name="actionid" value="{{id}}" />
+
+    <div class="form-group">
+        <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Login{% else %}Логин{% endif %}</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" disabled name="temp" value="{{user.login}}" />
+        </div>
+    </div>
+    {% if allowPasswordChange != 0 %}
+        <div class="form-group">
+            <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Password{% else %}Пароль{% endif %}</label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control" placeholder="{% if currentLocale == 'en' %}Password{% else %}Пароль{% endif %}" name="actionfields[password]" value="" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Password repeat{% else %}Повторение пароля{% endif %}</label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control" placeholder="{% if currentLocale == 'en' %}Password repeat{% else %}Повторение пароля{% endif %}" name="actionfields[passwordRepeat]" value="" />
+                {% if passwordError == 'repeat' %}
+                    <p class="form-error">{% if currentLocale == 'en' %}Passwords do not match{% else %}Пароли не совпадают{% endif %}</p>
+                {% endif %}
+                {% if passwordError == 'preg' %}
+                    <p class="form-error">{% if currentLocale == 'en' %}Password must contain from 5 to 30 letters or numbers{% else %}Пароль должен содержать от 5 до 30 латинский букв или цифр{% endif %}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}                                    
+    {% if allowEmailChange != 0 %}
+        <div class="form-group">
+            <label class="col-sm-4 control-label">E-mail</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" placeholder="E-mail" name="actionfields[email]" value="{{email}}" />
+                {% if currentLocale == 'en' %}
+                    {% if emailError != '' %}<p class="form-error">Error{% if emailError == 'preg' %}: e-mail address is not entered correctly{% endif %}{% if emailError == 'exist' %}: e-mail address is already in use by another user{% endif %}</p>{% endif %}
+                {% else %}
+                    {% if emailError != '' %}<p class="form-error">Ошибка{% if emailError == 'preg' %}: адрес электронной почты введён некорректно{% endif %}{% if emailError == 'exist' %}: адрес электронной почты уже используется другим пользователем{% endif %}</p>{% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    <div class="form-group">
+        <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}First and last name{% else %}Имя и фамилия{% endif %}</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" placeholder="{% if currentLocale == 'en' %}First and last name{% else %}Имя и фамилия{% endif %}" name="actionfields[fullName]" value="{{fullName}}" />
+            {% if currentLocale == 'en' %}
+                {% if fullNameError != '' %}<p class="form-error">Error{% if fullNameError == 'preg' %}: name must contain between 5 and 99 allowed characters{% endif %}{% if fullNameError == 'exist' %}: user with the same name already exists{% endif %}</p>{% endif %}
+            {% else %}
+                {% if fullNameError != '' %}<p class="form-error">Ошибка{% if fullNameError == 'preg' %}: имя должно содержать от 5 до 99 разрешенных символов{% endif %}{% if fullNameError == 'exist' %}: пользователь с таким именем уже существует{% endif %}</p>{% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Avatar{% else %}Аватар{% endif %}</label>
+        <div class="col-sm-8">
+            <input id="avatarInput" type="hidden" name="actionfields[avatar]" value="{{avatar}}" />
+            <p>
+                <img id="avatarImg" src="{{ (avatar != '' ? avatar : '/img/noava.png') }}" style="max-width:100px; max-height:100px;" />
+            </p>
+            <p>
+                <a href="#" id="avatarLoad" class="btn btn-primary">{% if currentLocale == 'en' %}Change{% else %}Изменить{% endif %}</a>
+                <a onclick="avatarClear();
+                        return false;" href="#" class="btn btn-default">{% if currentLocale == 'en' %}Remove{% else %}Удалить{% endif %}</a>
+            </p>
+            <p id="avatarError" class="form-error">{% if avatarError != '' %}{% if currentLocale == 'en' %}Error: file not found{% else %}Ошибка: файл не найден{% endif %}{% endif %}</p>
+
+        </div>
+    </div> 
+    {% if profile is defined %}
+        {% for parameter in profile %}
+            {% if ((parameter['name']|split('_'))[1] | default('')) != 'register' %}
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">{{parameter['description']}}</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" placeholder="{{parameter['description']}}" name="actionfields[profile][{{parameter['name']}}]" value="{{parameter['value']}}" />
+                        {% if parameter['error'] != '' %}<p class="form-error">{% if currentLocale == 'en' %}Error: field is not valid{% else %}Ошибка: поле заполнено неверно{% endif %}</p>{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if alerts is defined %}
+        <div class="form-group">
+            <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Subscribes{% else %}Подписки на события{% endif %}</label>
+            <div class="col-sm-8">
+                {% for alert in alerts %}
+                    <div class="checkbox"><label><input type="checkbox" name="actionfields[alerts][]" value="{{alert['name']}}" {{(alert['value'] ? 'checked="checked"' : '')}} autocomplete="off" />{{alert['description'] | raw}}</label></div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    {% if alertsLocale is defined %}
+        <div class="form-group">
+            <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}E-mail language{% else %}Язык писем{% endif %}</label>
+            <div class="col-sm-8">
+                <select name="actionfields[alertsLocale]" class="form-control">
+                    <option value="" {% if alertsLocale == '' %}selected="selected"{% endif %}>По умолчанию</option>
+                    {% for item in alertsLocales %}
+                        <option value="{{item['shortName']}}" {% if alertsLocale == item['shortName'] %}selected="selected"{% endif %}>{{item['fullName']}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    {% endif %}
+    <p class="text-center"><button class="btn btn-primary" type="submit">{% if currentLocale == 'en' %}Submit{% else %}Отправить{% endif %}</button></p>
+</form>
+</div>
+<script>
+    function avatarClear()
+    {
+        $('#avatarImg').attr('src', '/img/noava.png');
+        $('#avatarInput').val('');
+        $('#avatarError').html('');
+    }
+    $(function ()
+    {
+        new AjaxUpload('#avatarLoad',
+                {
+                    action: '{{path('basic_cms_front_avatar_user')}}',
+                    name: 'avatar',
+                    inputFilter: 'image/jpeg,image/png,image/gif',
+                    onSubmit: function (file, extension)
+                    {
+                        $('#preloader').show();
+                    },
+                    onComplete: function (file, response)
+                    {
+                        $('#preloader').hide();
+                        if (!response)
+                            response = "{file:'', error:'{% if currentLocale == 'en' %}Error loading file{% else %}Ошибка загрузки файла{% endif %}'}";
+                        var answer = $.parseJSON(response);
+                        if (answer.file)
+                        {
+                            $('#avatarImg').attr('src', answer.file);
+                            $('#avatarInput').val(answer.file);
+                            $('#avatarError').html('');
+                        } else
+                        {
+                            $('#avatarError').html(answer.error);
+                        }
+                    }
+                });
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+

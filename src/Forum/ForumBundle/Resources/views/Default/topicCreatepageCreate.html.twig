@@ -1,0 +1,398 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание новой страницы создания форума{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('forum_forum_topic_list')}}">Форум</a>
+    <span>Создание новой страницы создания форума</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Параметры нового форума</a>
+</div>
+<form action="{{path('forum_forum_createpage_create')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_createpage') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_createpage') == 1) or (app.user.checkAccess('forum_list') == 1) %}<a class="button" href="{{path('forum_forum_topic_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[enabled]" value="1" {% if (createpage['enabled'] != 0) %}checked="checked"{% endif %} />Включено</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{createpageerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Название<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="createpage[title][default]" value="{{createpage['title']['default']}}" /></td>
+                    <td class="cfgError">{{createpageerror['title']['default']}}</td>
+                </tr>
+                {% for locale in locales %}
+                <tr>
+                    <td>Название ({{locale['fullName']}})</td>
+                    <td><input type="text" name="createpage[title][{{locale['shortName']}}]" value="{{createpage['title'][locale['shortName']]}}" /></td>
+                    <td class="cfgError">{{createpageerror['title'][locale['shortName']]}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[captchaEnabled]" value="1" {% if (createpage['captchaEnabled'] != 0) %}checked="checked"{% endif %} />Включить защиту капчей</label><span class="helpContainerButton" data-id="captchaEnabled">?</span></td>
+                    <td class="cfgError">{{createpageerror['captchaEnabled']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[onlyAutorized]" value="1" {% if (createpage['onlyAutorized'] != 0) %}checked="checked"{% endif %} />Разрешать создавать форум только авторизованным пользователям</label><span class="helpContainerButton" data-id="onlyAutorized">?</span></td>
+                    <td class="cfgError">{{createpageerror['onlyAutorized']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_createpage') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_createpage') == 1) or (app.user.checkAccess('forum_list') == 1) %}<a class="button" href="{{path('forum_forum_topic_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_createpage') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_createpage') == 1) or (app.user.checkAccess('forum_list') == 1) %}<a class="button" href="{{path('forum_forum_topic_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumEnabled]" value="1" {% if (createpage['forumEnabled'] != 0) %}checked="checked"{% endif %} />Опубликовать новый форум</label><span class="helpContainerButton" data-id="enabledNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumEnabled']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumIsClosed]" value="1" {% if (createpage['forumIsClosed'] != 0) %}checked="checked"{% endif %} />Тема закрыта</label><span class="helpContainerButton" data-id="isClosedNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumIsClosed']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumIsImportant]" value="1" {% if (createpage['forumIsImportant'] != 0) %}checked="checked"{% endif %} />Пометить тему как важную</label><span class="helpContainerButton" data-id="isImportantNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumIsImportant']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumIsVisible]" value="1" {% if (createpage['forumIsVisible'] != 0) %}checked="checked"{% endif %} />Отображать первое сообщение</label><span class="helpContainerButton" data-id="isVisibleNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumIsVisible']}}</td>
+                </tr>
+                
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumCaptchaEnabled]" value="1" {% if (createpage['forumCaptchaEnabled'] != 0) %}checked="checked"{% endif %} />Включить капчу для публикации сообщения</label><span class="helpContainerButton" data-id="captchaEnabledNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumCaptchaEnabled']}}</td>
+                </tr>
+                
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumOnlyAutorizedView]" value="1" {% if (createpage['forumOnlyAutorizedView'] != 0) %}checked="checked"{% endif %} />Для просмотра требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedViewNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumOnlyAutorizedView']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumOnlyAutorizedImage]" value="1" {% if (createpage['forumOnlyAutorizedImage'] != 0) %}checked="checked"{% endif %} />Для просмотра изображений требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedImageNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumOnlyAutorizedImage']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumOnlyAutorizedDownload]" value="1" {% if (createpage['forumOnlyAutorizedDownload'] != 0) %}checked="checked"{% endif %} />Для просмотра вложений требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedDownloadNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumOnlyAutorizedDownload']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumOnlyAutorizedPost]" value="1" {% if (createpage['forumOnlyAutorizedPost'] != 0) %}checked="checked"{% endif %} />Для публикации сообщения требуется авторизация</label><span class="helpContainerButton" data-id="onlyAutorizedPostNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumOnlyAutorizedPost']}}</td>
+                </tr>
+                <tr>
+                    <td>Разрешенные теги<span class="helpContainerButton" data-id="allowTagsNew">?</span></td>
+                    <td><textarea name="createpage[forumAllowTags]" class="metaTextArea">{{createpage['forumAllowTags']}}</textarea></td>
+                    <td class="cfgError">{{createpageerror['forumAllowTags']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumAllowStyleProp]" value="1" {% if (createpage['forumAllowStyleProp'] != 0) %}checked="checked"{% endif %} />Разрешить стилизацию тегов с помощью свойства style</label><span class="helpContainerButton" data-id="allowStylePropNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumAllowStyleProp']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[forumReplaceUrls]" value="1" {% if (createpage['forumReplaceUrls'] != 0) %}checked="checked"{% endif %} />Заменять пути URL на перенаправления</label><span class="helpContainerButton" data-id="replaceUrlsNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['forumReplaceUrls']}}</td>
+                </tr>
+                <tr>
+                    <td>Кол-во сообщений на странице<span class="helpContainerButton" data-id="messageInPageNew">?</span></td>
+                    <td><input type="text" name="createpage[forumMessageInPage]" value="{{createpage['forumMessageInPage']}}" /></td>
+                    <td class="cfgError">{{createpageerror['forumMessageInPage']}}</td>
+                </tr>
+                <tr>
+                    <td>Выбор категории для нового форума<span class="helpContainerButton" data-id="categoryNew">?</span></td>
+                    <td>
+                        <select name="createpage[categoryMode]" onchange="if ($(this).val() == 2) $('#categorySelectWrap').show(); else $('#categorySelectWrap').hide();">
+                            <option value="0" {% if (createpage['categoryMode'] == 0) %}selected="selected"{% endif %}>Не присоединять к категории</option>
+                            <option value="1" {% if (createpage['categoryMode'] == 1) %}selected="selected"{% endif %}>Принимать категорию через параметр categoryId</option>
+                            <option value="2" {% if (createpage['categoryMode'] == 2) %}selected="selected"{% endif %}>Задать фиксированную категорию</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{createpageerror['categoryMode']}}</td>
+                </tr>
+                <tr id="categorySelectWrap" {% if (createpage['categoryMode'] != 2) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        <select name="createpage[categoryId]" class="quickSearch uniformOff">
+                        {% for category in taxonomyinfo %}
+                            <option value="{{category['id']}}" {% if createpage['categoryId'] == category['id'] %}selected="selected"{% endif %} {% if (category['enabled'] == 0) or (category['enableAdd'] == 0) %}disabled="disabled"{% endif %} >{% if category['nesting'] > 0 %}{% for i in 1..category['nesting'] %}&#9658; {% endfor %}{% endif %}{{category['title']}}</option>
+                        {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{createpageerror['categoryId']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="createpage[seopageEnable]" value="1" {% if (createpage['seopageEnable'] != 0) %}checked="checked"{% endif %} />Создавать страницу просмотра для нового форума</label><span class="helpContainerButton" data-id="seopageEnabledNew">?</span></td>
+                    <td class="cfgError">{{createpageerror['seopageEnable']}}</td>
+                </tr>
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrlNew">?</span></td>
+                    <td><input type="text" name="createpage[seopageUrl]" value="{{createpage['seopageUrl']}}" /></td>
+                    <td class="cfgError">{{createpageerror['seopageUrl']}}</td>
+                </tr>
+                <tr><td colspan="3"><p class="miniNote">Доступны подстановки //id//, //title//</p></td></tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocaleNew">?</span></td>
+                    <td>
+                        <select name="regpage[seopageLocale]">
+                            <option value="" {% if (createpage['seopageLocale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (createpage['seopageLocale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{createpageerror['seopageLocale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayoutNew">?</span></td>
+                    <td>
+                        <select name="createpage[seopageLayout]">
+                            <option value="" {% if (createpage['seopageLayout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (createpage['seopageLayout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{createpageerror['seopageLayout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplateNew">?</span></td>
+                    <td>
+                        <select name="createpage[seopageTemplate]">
+                            <option value="" {% if (createpage['seopageTemplate'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in forumtemplates %}
+                                <option value="{{templatekey}}" {% if (createpage['seopageTemplate'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{createpageerror['seopageTemplate']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModulesNew">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="createpage[seopageModules][]" value="{{module['id']}}" {% if (module['id'] in createpage['seopageModules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{createpageerror['seopageModules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccessNew">?</span></td>
+                    <td>
+                        <select name="createpage[seopageAccessOn]" onchange="if ($(this).val() == 0) $('#accessUserRoleWrap').hide(); else $('#accessUserRoleWrap').show();">
+                            <option value="0" {% if (createpage['seopageAccessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (createpage['seopageAccessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{createpageerror['seopageAccessOn']}}</td>
+                </tr>
+                <tr id="accessUserRoleWrap" {% if (createpage['seopageAccessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="createpage[seopageAccess][]" value="{{role['id']}}" {% if (role['id'] in createpage['seopageAccess']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{createpageerror['seopageAccess']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+                <p>Модераторы форума (кроме унаследованных от категорий):<span class="helpContainerButton" data-id="moderatorsNew">?</span></p>
+                <ul class="cfgSimpleList" id="forumModerators">
+                    {% for moder in createpage['forumModerators'] %}
+                    <li>{{moder.login}} / {{moder.fullName}} (<a href="#" onclick="$(this).parent('li').remove();return false;">удалить</a>)<input type="hidden" name="moderators[]" value="{{moder.id}}" />{% if moder.error != '' %}<p class="globalError">{{moder.error}}</p>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+                <button onclick="loadUsersToPopup(0);$('#popupCfgWindow').show();return false;">Добавить модератора</button>
+            </div>
+        </div>
+</div>​
+</form>
+<div class="popupCfgWindow" id="popupCfgWindow">
+    <div id="usersItemPopup">
+    </div>
+</div>
+<script>
+
+    function loadUsersToPopupAddModerator(login, fullName, id)
+    {
+        $('#forumModerators').append('<li>'+login+' / '+fullName+' (<a href="#" onclick="$(this).parent(\'li\').remove();return false;">удалить</a>)<input type="hidden" name="moderators[]" value="'+id+'" /></li>');
+    }
+
+
+
+    function loadUsersToPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('forum_forum_topic_ajaxloadusers')}}',
+            data: "page="+page+"&search="+($('#searchFromUsers').length > 0 ? $('#searchFromUsers').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadUsersToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['users'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'loadUsersToPopupAddModerator(\''+addslashes(answer['users'][key]['login'])+'\',\''+addslashes(answer['users'][key]['fullName'])+'\',\''+addslashes(answer['users'][key]['id'])+'\');'+
+'$(\'#popupCfgWindow\').hide();return false;'+
+'" href="#">'+answer['users'][key]['login']+' / '+answer['users'][key]['fullName']+'</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#usersItemPopup').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromUsers" id="searchFromUsers" value="'+($('#searchFromUsers').length > 0 ? htmlentities($('#searchFromUsers').val()) : '')+'"/><button onclick="loadUsersToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#popupCfgWindow\').hide();return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#usersItemPopup input, #usersItemPopup button, #usersItemPopup a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+
+
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить страницу создания форумов.</div>
+    <div id="helpContainer-title">Задаёт название страницы создания форумов.</div>
+    <div id="helpContainer-captchaEnabled">Включает защиту капчей для создания нового форума, что позволяет обезопасить сайт от роботов (спам-роботов или роботов для перебора паролей).</div>
+    <div id="helpContainer-onlyAutorizedView">При включенном значении только авторизованные пользователи смогут создавать форум через данную страницу.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+    <div id="helpContainer-enabledNew">Позволяет включить или выключить создаваемый форум.</div>
+    <div id="helpContainer-isImportantNew">Позволяет пометить создаваемый форум как важный. При сортировке по умолчанию важные темы находятся в начале списка.</div>
+    <div id="helpContainer-isClosedNew">Позволяет закрыть создаваемый форум. Публикация сообщений в закрытую тему невозможна.</div>
+    <div id="helpContainer-isVisibleNew">Позволяет разрешить или запретить отображение первого сообщения. Если отображение сообщения запрещено, то оно будет видимо только модераторам данного форума.</div>
+    <div id="helpContainer-captchaEnabledNew">Включает защиту капчей для публикации сообщений в создаваемом форуме, что позволяет обезопасить сайт от роботов (спам-роботов или роботов для перебора паролей).</div>
+    <div id="helpContainer-onlyAutorizedViewNew">При включенном значении только авторизованные пользователи смогут просматривать создаваемый форум.</div>
+    <div id="helpContainer-onlyAutorizedImageNew">При включенном значении только авторизованные пользователи смогут просматривать вложения к сообщениям, являющиеся изображениями.</div>
+    <div id="helpContainer-onlyAutorizedDownloadNew">При включенном значении только авторизованные пользователи смогут скачивать вложения к сообщениям, не являющиеся изображениями.</div>
+    <div id="helpContainer-onlyAutorizedPostNew">При включенном значении только авторизованные пользователи смогут публиковать сообщения в создаваемый форум.</div>
+    <div id="helpContainer-allowTagsNew">Поле позволяет задать HTML-теги, разрешенные для использования в форуме. Теги перечисляются через запятую.</div>
+    <div id="helpContainer-allowStylePropNew">Позволяет включить дополнительную стилизацию HTML-тегов с помощью свойства style.</div>
+    <div id="helpContainer-replaceUrlsNew">При включенном значении все ссылки в сообщении будут заменяться на JavaScript. Это позволяет исключить индексацию данных ссылок поисковыми машинами. Рекомендуется включать данную опцию.</div>
+    <div id="helpContainer-messageInPageNew">Задаёт количество сообщений на одной странице создаваемого форума.</div>
+    <div id="helpContainer-categoryNew">Позволяет задать категорию, к которой будет принадлежать создаваемый форум.</div>
+    <div id="helpContainer-moderatorsNew">Задаёт модераторов создаваемого форума. При этом итоговый перечень модераторов будет содержать супер-администраторов сайта, модератов, назначенных для категории, в которую входит создаваемый форум, и модераторов из этого списка.</div>
+    <div id="helpContainer-seopageEnabledNew">При включении создаёт отдельную страницу сайта для данного объекта.</div>
+    <div id="helpContainer-seopageUrlNew">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocaleNew">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayoutNew">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplateNew">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModulesNew">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccessNew">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+</div>
+{% endblock %}       
+
+
+

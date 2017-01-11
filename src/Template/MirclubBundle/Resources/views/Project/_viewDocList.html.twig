@@ -1,0 +1,52 @@
+{% for docgroup in documentGroups %}
+    <div>
+        <ul class="documentListForProject">
+            {% set masterFind = 0 %}
+            {% set masterFlag = 0 %}
+            {% for tempdocumentkey,tmpdocument in (documents | reverse) %}
+                {% if ((premissions.read != 0) or (tmpdocument.isPublic != 0)) and (tmpdocument.parentId == docgroup.parentId) %}
+                    {% if masterFlag == 0 %}
+                        {% set masterFind = tempdocumentkey %}
+                    {% endif %}
+                    {% if tmpdocument.isMaster %}
+                        {% set masterFlag = 1 %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% set loopfirst = 0 %}
+            {% set firstdockey = 0 %}
+            {% for tempdocumentkey,tmpdocument in (documents | reverse) %}
+                {% if ((premissions.read != 0) or (tmpdocument.isPublic != 0)) and (tmpdocument.parentId == docgroup.parentId) and (tempdocumentkey <= masterFind) %}
+                    {% set firstdockey = tempdocumentkey %}
+                    {% if loopfirst == 1 %}<li style="border-top: 1px solid rgba(170, 170, 68, 0.7);margin-top: -1px;list-style:none;"><a href="#" onclick="$(this).find('span').toggle().closest('ul').find('.document-hidden').toggle();return false;"><span>[+]</span><span style="display:none">[-]</span></a></li>{% endif %}
+                    <li {% if loopfirst != 0 %}class="document-hidden" style="display:none"{% endif %}><a href="?document={{tmpdocument.parentId}}&version={{tmpdocument.id}}" {% if tmpdocument.isMaster %}style="font-weight:bold"{% endif %}>{{tmpdocument.title[0] | default('')}} (версия от {{tmpdocument.createDate | date('d.m.Y H:i')}} <span class="mirclubTransliteration">{{tmpdocument.createrFullName}}</span>)
+                            {% if (tmpdocument['title'] | length) > 1 %}
+                                {% for i in 1..(tmpdocument['title'] | length - 1) %}
+                                    {{tmpdocument['title'][i]}} (version dated {{tmpdocument.createDate | date('d.m.Y H:i')}} <span class="mirclubTransliterationImportant">{{tmpdocument.createrFullName}}</span>)
+                                {% endfor %}
+                            {% endif %}
+                        </a>
+                        {% if premissions.config != 0 %} (<a href="?actionobject=project&action=remove&actionid={{tmpdocument.id}}" onclick="return confirm('{{currentLocale == 'en' ? 'Remove document' : 'Удалить документ'}} {{tmpdocument.title[0] | default('')}} (версия от {{tmpdocument.createDate | date('d.m.Y H:i')}} {{tmpdocument.createrFullName}})?')">{{currentLocale == 'en' ? 'remove' : 'удалить'}}</a>) {% endif %}
+                    </li>
+                    {% set loopfirst = loopfirst + 1 %}
+                {% endif %}
+            {% endfor %}
+            {% if loopfirst == 1 %}
+                <li style="border-top: 1px solid rgba(170, 170, 68, 0.7);margin-top: -1px;list-style:none;">&nbsp;</li>
+                {% endif %}
+                {% if premissions.config != 0 %}
+                <li style="list-style:none;">{{currentLocale == 'en' ? 'Settings' : 'Настройки'}} <a href="#" onclick="$(this).find('span').toggle().closest('ul').find('.config-hidden').toggle();
+                        return false;"><span>[+]</span><span style="display:none">[-]</span></a></li>
+                <li style="list-style:none;display:none;" class="config-hidden form-inline">
+                    {{currentLocale == 'en' ? 'Visible for ' : 'Виден'}} 
+                    <select class="form-control" autocomplete="off" onchange="location.href = '?actionobject=project&action=changepublic&actionid={{(documents | reverse)[firstdockey]['id']}}&actionvalue=' + $(this).val();">
+                        <option value="1" {% if (documents | reverse)[firstdockey]['isPublic'] == 1 %}selected="selected"{% endif %}>{{currentLocale == 'en' ? 'all users' : 'всем'}}</option>
+                        <option value="2" {% if (documents | reverse)[firstdockey]['isPublic'] == 2 %}selected="selected"{% endif %}>{{currentLocale == 'en' ? 'registred users' : 'зарегистрированным'}}</option>
+                        <option value="0" {% if (documents | reverse)[firstdockey]['isPublic'] == 0 %}selected="selected"{% endif %}>{{currentLocale == 'en' ? 'members of workshop' : 'участникам мастерской'}}</option>
+                        <option value="3" {% if (documents | reverse)[firstdockey]['isPublic'] == 3 %}selected="selected"{% endif %}>{{currentLocale == 'en' ? 'masters of workshop' : 'мастерам мастерской'}}</option>
+                    </select>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endfor %}

@@ -1,0 +1,7 @@
+addone_backup_homepage:
+    path:  /admin/backup/
+    defaults: { _controller: AddoneBackupBundle:Default:index }
+
+addone_backup_makebackup:
+    path:  /admin/backup/makebackup
+    defaults: { _controller: AddoneBackupBundle:Default:makeBackup }

@@ -1,0 +1,44 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование локали{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_locale_list')}}">Локализация</a>
+    <span>Редактирование локали &laquo;{{locale['fullName']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Основные данные</a>
+</div>
+<form action="{{path('basic_cms_locale_edit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('locale_edit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('locale_edit') == 1) %}<a class="button" href="{{path('basic_cms_locale_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Код локали<span class="helpContainerButton" data-id="shortName">?</span></td>
+                    <td><input type="text" name="locale[shortName]" value="{{locale['shortName']}}" /></td>
+                    <td class="cfgError">{{localeerror['shortName']}}</td>
+                </tr>
+                <tr>
+                    <td>Название локали<span class="helpContainerButton" data-id="fullName">?</span></td>
+                    <td><input type="text" name="locale[fullName]" value="{{locale['fullName']}}" /></td>
+                    <td class="cfgError">{{localeerror['fullName']}}</td>
+                </tr>
+            </table>
+        </div>
+</div>​
+</form>
+<div id="helpContainer">
+    <div id="helpContainer-shortName">Задаёт буквенный код локали (должен состоят из двух латинских букв, например ru, en). Код локали участвует в определении требуемого языка пользователя по адресной строке. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-fullName">Задаёт человеко-понятное название локали в системе.</div>
+</div>
+{% endblock %}       
+
+
+

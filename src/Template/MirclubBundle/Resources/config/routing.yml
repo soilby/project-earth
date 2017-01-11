@@ -1,0 +1,24 @@
+template_mirclub_index:
+    path:  /admin/template/mirclub
+    defaults: { _controller: TemplateMirclubBundle:Default:imageList }
+    
+template_mirclub_uploadajax:
+    path:  /admin/template/mirclub/uploadajax
+    defaults: { _controller: TemplateMirclubBundle:Default:galerryAjaxImage }
+    
+template_mirclub_uploadurl:
+    path:  /admin/template/mirclub/uploadurl
+    defaults: { _controller: TemplateMirclubBundle:Default:galerryUrlImage }
+
+template_mirclub_deleteajax:
+    path:  /admin/template/mirclub/deleteajax
+    defaults: { _controller: TemplateMirclubBundle:Default:galerryAjaxDelete }
+    
+template_mirclub_changerandomajax:
+    path:  /admin/template/mirclub/changerandomajax
+    defaults: { _controller: TemplateMirclubBundle:Default:galerryAjaxChangeRandom }
+
+template_mirclub_image_edit:
+    path:  /admin/template/mirclub/edit
+    defaults: { _controller: TemplateMirclubBundle:Default:imageEdit }
+    

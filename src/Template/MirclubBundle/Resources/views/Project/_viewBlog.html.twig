@@ -1,0 +1,137 @@
+<style>
+    .villageBlogPost {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 5px 0;
+    }
+    .villageBlogPost .title {
+        font-size: 16px;
+    }
+    .villageBlogPost .info {
+        font-size: 11px;
+        font-style: italic;
+        color: #777;
+    }
+    .villageBlogWrap {
+        border: 1px solid #aaa;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+</style>
+<div class="villageBlogWrap">
+{% if blogPosts | length > 0 %}
+    <p class="pt20">{% if currentLocale == 'en' %}Workshop blog:{% else %}Блог мастерской:{% endif %}</p>
+    <div>
+        <p><a href="#" onclick="$('.villageBlogPost .description, .villageBlogPost .content').toggle();return false;">{{currentLocale == 'en' ? 'Show/hide all posts' : 'Показать/скрыть все посты'}}</a></p>
+    </div>
+{% endif %}
+<div class="villageBlog">
+    {% for item in blogPosts %}
+        <div class="villageBlogPost">
+            <p class="title">{{item.title | default('')}}</p>
+            <p class="info">
+                {% if currentLocale == 'en' %}
+                    Posted at {{(item.createDate | default('now')) | date('d.m.Y H:i')}} by user {{item.createrFullName | default('Unknown')}}
+                {% else %} 
+                    Опубликовано в {{(item.createDate | default('now')) | date('d.m.Y H:i')}} пользователем {{item.createrFullName | default('Unknown')}}
+                {% endif %}
+            </p>
+            <div class="description">
+                {% if ((item.description | default('')) | striptags) != '' %}
+                    {{item.description | default('') | raw}}
+                {% else %}
+                    {{((item.content | default('')) | striptags | textlimit(200)) | raw}}
+                {% endif %}
+                <p><a href="#" onclick="$(this).closest('.description').hide().closest('.villageBlogPost').find('.content').show();return false;">{{currentLocale == 'en' ? 'Show full text...' : 'Показать весь текст...'}}</a></p>
+            </div>
+            <div class="content" style="display:none">
+                {{item.description | default('') | raw}}
+                {% if ((item.description | default('')) | striptags) != '' %}<p><br /></p>{% endif %}
+                    {{item.content | default('') | raw}}
+                <p><a href="#" onclick="$(this).closest('.content').hide().closest('.villageBlogPost').find('.description').show();
+                        return false;">{{currentLocale == 'en' ? 'Hide full text...' : 'Свернуть весь текст...'}}</a></p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% if (blogPosts | length > 0) and (currentUser) %}
+    <p>
+        <a class="btn btn-default" onclick="$(this).parent().next('.row').show();return false;">{% if currentLocale == 'en' %}Add post{% else %}Добавить пост{% endif %}</a>
+    </p>
+    {% set blogType = 'project' %}
+    {% set blogId = id %}
+    <div class="row" style="display:none">
+        <form action="/myblogs.html?blogtype={{blogType}}&blog={{blogId}}" method="POST" enctype="multipart/form-data" class="col-md-6 col-md-offset-3 col-sm-12 form-horizontal">
+                {% for locale in locales %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Title{% else %}Заголовок{% endif %} ({{locale['fullName']}})</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="title[{{locale['shortName']}}]" value="{{textPageLocales[locale['shortName']].title | default('')}}" />
+                            <p class="form-error">{{errors['title_'~locale['shortName']] | default('')}}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Title{% else %}Заголовок{% endif %} (Русский)</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="title[default]" value="{{textPage.title | default('')}}" />
+                        <p class="form-error">{{errors['title_default'] | default('')}}</p>
+                    </div>
+                </div>
+
+                {% for locale in locales %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Description{% else %}Описание{% endif %} ({{locale['fullName']}})</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control addTinyMce"  name="description[{{locale['shortName']}}]">{{textPageLocales[locale['shortName']].description | default('')}}</textarea>
+                            <p class="form-error">{{errors['description_'~locale['shortName']] | default('')}}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Description{% else %}Описание{% endif %} (Русский)</label>
+                    <div class="col-sm-8">
+                        <textarea class="form-control addTinyMce" name="description[default]">{{textPage.description | default('')}}</textarea>
+                        <p class="form-error">{{errors['description_default'] | default('')}}</p>
+                    </div>
+                </div>
+
+
+                {% for locale in locales %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Content{% else %}Содержание{% endif %} ({{locale['fullName']}})</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control addTinyMce" name="content[{{locale['shortName']}}]">{{textPageLocales[locale['shortName']].content | default('')}}</textarea>
+                            <p class="form-error">{{errors['content_'~locale['shortName']] | default('')}}</p>
+                        </div>
+                    </div>
+
+                {% endfor %}
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">{% if currentLocale == 'en' %}Content{% else %}Содержание{% endif %} (Русский)</label>
+                    <div class="col-sm-8">
+                        <textarea class="form-control addTinyMce" name="content[default]">{{textPage.content | default('')}}</textarea>
+                        <p class="form-error">{{errors['content_default'] | default('')}}</p>
+                    </div>
+                </div>
+                <p class="text-center"><button class="btn btn-primary" type="submit">{% if currentLocale == 'en' %}Submit{% else %}Отправить{% endif %}</button></p>
+        </form>
+    </div>
+    <script>
+        tinymce.init({
+            selector: "textarea.addTinyMce",
+            language: '{{currentLocale != '' ? currentLocale : 'ru'}}',
+            height: 100,
+            menubar: false,
+            convert_urls: false,
+            verify_html: true,
+            plugins: [
+                "link"
+            ],
+            toolbar: "undo redo | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link"
+        });
+    </script>
+{% endif %}
+</div>

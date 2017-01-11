@@ -1,0 +1,29 @@
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="shipmentOn2">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('bakset_configedit') == 1) %}<a class="button" href="#" id="shipmentOff2">Выключить</a>{% endif %}
+        <table class="tableContent" id="shipmentList2">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Описание
+                </th>
+                <th>
+                    Включен
+                </th>
+            </tr>
+            {% for shipment in shipments2 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{shipment.name}}]" class="check" value="1"></td>
+                <td><a href="{{path('shop_basket_shipmentedit')}}?id={{shipment.name}}">{{shipment.name}}</a>{% if (errors2[shipment.name] is defined) %}<p class="error">{{errors2[shipment.name]}}</p>{% endif %}</td>
+                <td>{{shipment.description}}</td>
+                <td>{{shipment.enabled != 0 ? 'Да' : 'Нет'}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#shipmentOn2').click(function () {ajaxAction('{{path('shop_basket_shipmentajax')}}?tab=2', 'on', '#shipmentList2 input.check', '#con_tab3');return false;});
+            $('#shipmentOff2').click(function () {ajaxAction('{{path('shop_basket_shipmentajax')}}?tab=2', 'off', '#shipmentList2 input.check', '#con_tab3');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

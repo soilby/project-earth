@@ -1,0 +1,38 @@
+        {% if (app.user.checkAccess('product_currencyedit') == 1) %}<a class="button" href="#" id="setMainCurrency0">Сделать основной</a>{% endif %}
+        {% if (app.user.checkAccess('product_currencyedit') == 1) %}<a class="button" href="#" id="deleteCurrency0">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('product_currencyedit') == 1) %}<a href="{{path('shop_product_currency_create')}}" class="button">Создать валюту</a>{% endif %}
+        <table class="tableContent" id="currencyList0">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Основная
+                </th>
+                <th>
+                    Включена
+                </th>
+                <th>
+                    Курс к основной
+                </th>
+                <th>
+                    Вид формата
+                </th>
+            </tr>
+            {% for currency in currencies %}
+            <tr>
+                <td><input type="checkbox" name="check[{{currency.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('shop_product_currency_edit')}}?id={{currency.id}}">{{currency.name}}</a>{% if (errors[currency.id] is defined) %}<p class="error">{{errors[currency.id]}}</p>{% endif %}</td>
+                <td>{{currency.main != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{currency.enabled != 0 ? 'Да' : 'Нет'}}</td>
+                <td>{{currency.exchangeIndex}}</td>
+                <td>{{currency.prefix}}{{(99999999.999 | floor(currency.minNote)) | number_format(currency.decimalSigns, currency.decimalSep, currency.thousandSep)}}{{currency.postfix}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#setMainCurrency0').click(function () {ajaxAction('{{path('shop_product_currency_ajax')}}', 'setmain', '#currencyList0 input.check', '#con_tab1');return false;});
+            $('#deleteCurrency0').click(function () {ajaxActionConfirm('{{path('shop_product_currency_ajax')}}', 'delete', '#currencyList0 input.check', '#con_tab1','Удалить выбранные валюты?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

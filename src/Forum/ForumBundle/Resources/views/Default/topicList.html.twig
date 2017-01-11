@@ -1,0 +1,50 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Форум{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Форум</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    {% if (app.user.checkAccess('forum_list') == 1) %}
+    <a href="#" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Список форумов</a>
+    {% endif %}
+    {% if (app.user.checkAccess('forum_createpage') == 1) %}
+    <a href="#" id="tab2" {% if (tab == 1) %}class="active"{% endif %}>Страницы создания форумов</a>
+    {% endif %}
+    {% if (app.user.checkAccess('forum_list') == 1) %}
+    <a href="#" id="tab3" {% if (tab == 2) %}class="active"{% endif %}>Модераторы</a>
+    {% endif %}
+    {% if (app.user.checkAccess('forum_commentsview') == 1) %}
+    <a href="#" id="tab4" {% if (tab == 3) %}class="active"{% endif %}>Комментарии к страницам сайта</a>
+    {% endif %}
+</div>
+<div id="tabsContent">
+    {% if (app.user.checkAccess('forum_list') == 1) %}
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "ForumForumBundle:Default:topicListTab1.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('forum_createpage') == 1) %}
+    <div id="con_tab2" {% if (tab == 1) %}class="active"{% endif %}>
+        {% include "ForumForumBundle:Default:topicListTab2.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('forum_list') == 1) %}
+    <div id="con_tab3" {% if (tab == 2) %}class="active"{% endif %}>
+        {% include "ForumForumBundle:Default:topicListTab3.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('forum_commentsview') == 1) %}
+    <div id="con_tab4" {% if (tab == 3) %}class="active"{% endif %}>
+        {% include "ForumForumBundle:Default:topicListTab4.html.twig" %}
+    </div>
+    {% endif %}
+</div>​
+{% endblock %}       
+
+
+

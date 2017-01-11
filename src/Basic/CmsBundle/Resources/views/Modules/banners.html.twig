@@ -1,0 +1,430 @@
+{#<div class="bannerTree">
+    <ul>
+        {% if (parameters['items']|length) > 0 %}
+            {% for i in 0..(parameters['items']|length - 1) %}
+                <li class="noselect"><span class="moveButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#" {% if (parameters['items'][i]['enabled'] == 0) %}class="disabled"{% endif %}>{{parameters['items'][i]['name']['default']}}</a>
+                    {% for locale in locales %}
+                        <input type="hidden" name="parameters[temp][]" class="itemLocaleName{{locale['shortName']}}" value="{{parameters['items'][i]['name'][locale['shortName']]}}" />
+                    {% endfor %}
+                    <input type="hidden" name="parameters[temp][]" class="itemEnabled" value="{{parameters['items'][i]['enabled']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemType" value="{{parameters['items'][i]['type']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemObject" value="{{parameters['items'][i]['object']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemAction" value="{{parameters['items'][i]['action']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemId" value="{{parameters['items'][i]['contentId']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemContentName" value="{{parameters['items'][i]['contentName']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemUrl" value="{{parameters['items'][i]['url']}}" />
+                    {% if (parameters['items'][i]['error'] != '') %}<span class="ml20 globalError">{{parameters['items'][i]['error']}}</span>{% endif %}
+                </li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>
+#}
+<div id="bannerCfgTable" class="noselect">
+    {% for item in parameters['banners'] %}
+        <div class="bannerItem">
+            <p><a href="#">{{(item['name']['default'] != '' ? item['name']['default'] : 'Название не задано')}}</a></p>
+            <div class="bannerWrap"><img src="{{(item['image'] == '' ? '/adminimg/noava.jpg' : item['image'])}}" /></div>
+            <label><input type="checkbox" name="parameters[temp][]" class="bannerEnabled" onclick="updateBannerIerarhy();" autocomplate="off" {% if (item['enabled'] != 0) %}checked="checked"{% endif %}>Опубликован</label>
+            <button onclick="deleteBanner(this);return false;">Удалить</button>
+                {% for locale in locales %}
+                    <input type="hidden" name="parameters[temp][]" class="bannerLocaleName{{locale['shortName']}}" value="{{item['name'][locale['shortName']]}}" />
+                    <input type="hidden" name="parameters[temp][]" class="bannerLocaleDescription{{locale['shortName']}}" value="{{item['description'][locale['shortName']] | default('')}}" />
+                {% endfor %}
+                <input type="hidden" name="parameters[temp][]" class="bannerName" value="{{item['name']['default']}}" />
+                <input type="hidden" name="parameters[temp][]" class="bannerDescription" value="{{item['description']['default'] | default('')}}" />
+                <input type="hidden" name="parameters[temp][]" class="bannerImage" value="{{item['image']}}" />
+                <input type="hidden" name="parameters[temp][]" class="bannerType" value="{{item['type']}}" />
+                <input type="hidden" name="parameters[temp][]" class="bannerObject" value="{{item['object']}}" />
+                <input type="hidden" name="parameters[temp][]" class="bannerAction" value="{{item['action']}}" />
+                <input type="hidden" name="parameters[temp][]" class="bannerId" value="{{item['contentId']}}" />
+                <input type="hidden" name="parameters[temp][]" class="bannerContentName" value="{{item['contentName']}}" />
+                <input type="hidden" name="parameters[temp][]" class="bannerUrl" value="{{item['url']}}" />
+            <div><span class="globalError">{{item['error']}}</span></div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="mt20"><a class="button" id="itemBannerAdd" onclick="return false;">Добавить баннер</a><p class="globalError" id="itemBannerAddError"></p></div>
+
+<div id="bannersFromWrap">
+</div>
+
+<div class="popupCfgWindow" id="popupBannerCfgWindow">
+    <div id="bannerItemPopup">
+    </div>
+</div>
+
+<script>
+    window.movebannerelement = null;
+    window.editedbanneritem = null;
+    window.ajaxuploadinpopup = null;
+    function deleteBanner(that)
+    {
+        $(that).closest('.bannerItem').remove();
+        updateBannerIerarhy();
+    }
+    function moveItemParametersFromPopup()
+    {
+        var name = $('#popupItemName').val();
+        var description = $('#popupItemDescription').val();
+        var enabled = ($('#popupItemEnabled').is(':checked') ? 1 : 0);
+        var type = $('#popupItemType:checked').val();
+        var object = $('#popupItemObject').val();
+        var action = $('#popupItemAction').val();
+        var id = $('#popupItemId').val();
+        var url = $('#popupItemUrl').val();
+        var contentname = $('#popupItemContent').val();
+        var image = $('#popupItemImage').val();
+        {% for locale in locales %}
+        var namelocale{{locale['shortName']}} = $('#popupItemName{{locale['shortName']}}').val();
+        var descriptionlocale{{locale['shortName']}} = $('#popupItemDescription{{locale['shortName']}}').val();
+        {% endfor %}
+        var errors = false;
+        $('td.cfgError').html('');
+        var regname = /^[-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{0,999}$/i;
+        var regnamelocale = /^[-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{0,999}$/i;
+        var regdescr = /^[\s\S]{0,65535}$/i;
+        var regdescrlocale = /^[\s\S]{0,65535}$/i;
+        if (!regname.test(name)) {$('#popupItemName').closest('td').next('td.cfgError').html('Поле должно содержать до 999 разрешённых символов');errors = true;}
+        if (!regdescr.test(description)) {$('#popupItemDescription').closest('td').next('td.cfgError').html('Поле должно содержать до 65535 символов');errors = true;}
+        {% for locale in locales %}
+        if (!regnamelocale.test(namelocale{{locale['shortName']}})) {$('#popupItemName{{locale['shortName']}}').closest('td').next('td.cfgError').html('Поле должно содержать до 999 разрешённых символов либо отсутствовать');errors = true;}
+        if (!regdescrlocale.test(descriptionlocale{{locale['shortName']}})) {$('#popupItemDescription{{locale['shortName']}}').closest('td').next('td.cfgError').html('Поле должно содержать до 65535 символов либо отсутствовать');errors = true;}
+        {% endfor %}
+        if (type == 0)
+        {
+            var regurl = /^[-_A-z0-9\?\:\;\+\=\@\#\$\%\&\~\.\\\/]{1,999}$/i;
+            if (!regurl.test(url)) {$('#popupItemUrl').closest('td').next('td.cfgError').html('Поле должно содержать от 1 до 999 разрешённых символов');errors = true;}
+        } else
+        {
+            if ((object == '') || (action == '') || (id == '')) {$('#popupItemContent').closest('td').next('td.cfgError').html('Выберите страницу для отображения');errors = true;}
+        }
+        if (errors == false)
+        {
+            {% for locale in locales %}
+            $(window.editedbanneritem).find('input.bannerLocaleName{{locale['shortName']}}').val(namelocale{{locale['shortName']}});
+            $(window.editedbanneritem).find('input.bannerLocaleDescription{{locale['shortName']}}').val(descriptionlocale{{locale['shortName']}});
+            {% endfor %}
+            $(window.editedbanneritem).find('a').html((name != '' ? name : 'Название не задано'));
+            $(window.editedbanneritem).find('input.bannerName').val(name);
+            $(window.editedbanneritem).find('input.bannerDescription').val(description);
+            $(window.editedbanneritem).find('.bannerWrap img').attr('src',image);
+            $(window.editedbanneritem).find('input.bannerImage').val(image);
+            if (enabled != 0) $(window.editedbanneritem).find('input.bannerEnabled').attr('checked','checked'); else $(window.editedbanneritem).find('input.bannerEnabled').removeAttr('checked');
+            $(window.editedbanneritem).find('input.bannerType').val(type);
+            $(window.editedbanneritem).find('input.bannerObject').val(object);
+            $(window.editedbanneritem).find('input.bannerAction').val(action);
+            $(window.editedbanneritem).find('input.bannerId').val(id);
+            $(window.editedbanneritem).find('input.bannerUrl').val(url);
+            $(window.editedbanneritem).find('input.bannerContentName').val(contentname);
+            $(window.editedbanneritem).find('.globalError').html('');
+            $.uniform.update($(window.editedbanneritem).find('input, button, a.button'));
+            window.editedbanneritem = null;
+        }
+        return !errors;
+    }
+    
+    function loadPagesToPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('basic_cms_module_ajax_menupages')}}',
+            data: "page="+page+"&search="+($('#searchFromPages').length > 0 ? $('#searchFromPages').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadPagesToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadPagesToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['pages'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'$(\'#popupItemObject\').val(\''+addslashes(answer['pages'][key]['contentType'])+'\');'+
+'$(\'#popupItemAction\').val(\''+addslashes(answer['pages'][key]['contentAction'])+'\');'+
+'$(\'#popupItemId\').val(\''+addslashes(answer['pages'][key]['contentId'])+'\');'+
+'$(\'#popupItemContent\').val(\''+addslashes(answer['pages'][key]['description'])+'\');'+
+'$(\'#popupItemUrl\').val(\''+addslashes(answer['pages'][key]['url'])+'\');'+
+'$(\'#bannerItemCfgPageSelect\').slideUp(300);$(\'#bannerItemCfgTable\').slideDown(300);return false;'+
+'" href="#">'+answer['pages'][key]['description']+'('+answer['pages'][key]['url']+')</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#bannerItemCfgPageSelect').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromPages" id="searchFromPages" value="'+($('#searchFromPages').length > 0 ? htmlentities($('#searchFromPages').val()) : '')+'"/><button onclick="loadPagesToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#bannerItemCfgPageSelect\').slideUp(300);$(\'#bannerItemCfgTable\').slideDown(300);return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#bannerItemCfgPageSelect input, #bannerItemCfgPageSelect button, #bannerItemCfgPageSelect a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+    
+    function updateBannerIerarhy()
+    {
+        var index = 0;
+        $('#bannersFromWrap').html('');
+        $('#bannerCfgTable').children('div.bannerItem').each(function (i, element)
+        {
+            var inputdata = '';
+            var name = $(element).find('input.bannerName').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][name][default]" value="'+htmlentities(name)+'" />';
+            var description = $(element).find('input.bannerDescription').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][description][default]" value="'+htmlentities(description)+'" />';
+            var image = $(element).find('input.bannerImage').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][image]" value="'+htmlentities(image)+'" />';
+            var enabled = ($(element).find('input.bannerEnabled').is(':checked') ? 1 : 0);
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][enabled]" value="'+enabled+'" />';
+            var type = $(element).find('input.bannerType').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][type]" value="'+htmlentities(type)+'" />';
+            var object = $(element).find('input.bannerObject').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][object]" value="'+htmlentities(object)+'" />';
+            var action = $(element).find('input.bannerAction').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][action]" value="'+htmlentities(action)+'" />';
+            var id = $(element).find('input.bannerId').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][contentId]" value="'+htmlentities(id)+'" />';
+            var url = $(element).find('input.bannerUrl').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][url]" value="'+htmlentities(url)+'" />';
+//            var contentname = $(element).find('input.bannerContentName').val();
+            {% for locale in locales %}
+            var namelocale{{locale['shortName']}} = $(element).find('input.bannerLocaleName{{locale['shortName']}}').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][name][{{locale['shortName']}}]" value="'+htmlentities(namelocale{{locale['shortName']}})+'" />';
+            var descriptionlocale{{locale['shortName']}} = $(element).find('input.bannerLocaleDescription{{locale['shortName']}}').val();
+            inputdata += '<input type="hidden" name="parameters[banners]['+index+'][description][{{locale['shortName']}}]" value="'+htmlentities(descriptionlocale{{locale['shortName']}})+'" />';
+            {% endfor %}
+            $('#bannersFromWrap').append(inputdata);
+            index++;
+        });
+
+        $('#bannerCfgTable .bannerItem a').unbind('click').click(function () 
+        {
+            var element = $(this).closest('.bannerItem');
+            window.editedbanneritem = element;
+            var name = $(element).find('input.bannerName').val();
+            var description = $(element).find('input.bannerDescription').val();
+            var image = $(element).find('input.bannerImage').val();
+            var enabled = ($(element).find('input.bannerEnabled').is(':checked') ? 1 : 0);
+            var type = $(element).find('input.bannerType').val();
+            var object = $(element).find('input.bannerObject').val();
+            var action = $(element).find('input.bannerAction').val();
+            var id = $(element).find('input.bannerId').val();
+            var url = $(element).find('input.bannerUrl').val();
+            var contentname = $(element).find('input.bannerContentName').val();
+            var localenames = '';
+            var localedescriptions = '';
+            {% for locale in locales %}
+            var namelocale{{locale['shortName']}} = $(element).find('input.bannerLocaleName{{locale['shortName']}}').val();
+            localenames = localenames +
+'                        <tr>'+
+'                            <td>Название ({{locale['fullName']}})</td>'+
+'                            <td><input type="text" name="popupItemName{{locale['shortName']}}" id="popupItemName{{locale['shortName']}}" value="'+htmlentities(namelocale{{locale['shortName']}})+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>';
+            var descriptionlocale{{locale['shortName']}} = $(element).find('input.bannerLocaleDescription{{locale['shortName']}}').val();
+            localedescriptions = localedescriptions +
+'                        <tr>'+
+'                            <td>Описание ({{locale['fullName']}})</td>'+
+'                            <td><textarea name="popupItemDescription{{locale['shortName']}}" id="popupItemDescription{{locale['shortName']}}">'+htmlentities(descriptionlocale{{locale['shortName']}})+'</textarea></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>';
+            {% endfor %}
+            $('#bannerItemPopup').html(
+'                <div id="bannerItemCfgTable">'+
+'                    <table class="cfgTable">'+
+'                        <tr>'+
+'                            <td>Изображение</td>'+
+'                            <td><span id="popupAvatarWrap"><img src="'+(image != '' ? image : '/adminimg/noava.jpg')+'" style="max-width:100px;max-height:100px;" /></span><br /><a class="button" href="#" id="popupChangeImageItem" onclick="return false">Изменить</a><input type="hidden" name="popupItemImage" id="popupItemImage" value="'+htmlentities(image)+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr>'+
+'                            <td colspan="2"><label><input type="checkbox" name="popupItemEnabled" id="popupItemEnabled" value="1" '+(enabled != 0 ? 'checked="checked"' : '')+' />Пункт включен</label></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr>'+
+'                            <td>Название</td>'+
+'                            <td><input type="text" name="popupItemName" id="popupItemName" value="'+htmlentities(name)+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+                        localenames+
+'                        <tr>'+
+'                            <td>Описание</td>'+
+'                            <td><textarea name="popupItemDescription" id="popupItemDescription">'+htmlentities(description)+'</textarea></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+localedescriptions+
+'                        <tr>'+
+'                            <td>Тип пункта меню</td>'+
+'                            <td><label><input type="radio" name="popupItemType" id="popupItemType" value="0" '+(type == 0 ? 'checked="checked"' : '')+' onclick="$(\'#popupItemContentTr\').hide();$(\'#popupItemUrlTr\').show();" />указанный URL</label><br /><label><input type="radio" name="popupItemType" id="popupItemType" value="1" '+(type != 0 ? 'checked="checked"' : '')+' onclick="$(\'#popupItemContentTr\').show();$(\'#popupItemUrlTr\').hide();" />cтраница сайта</label></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr id="popupItemUrlTr" '+(type != 0 ? 'style="display:none"' : '')+'>'+
+'                            <td>URL</td>'+
+'                            <td><input type="text" name="popupItemUrl" id="popupItemUrl" value="'+htmlentities(url)+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr id="popupItemContentTr" '+(type == 0 ? 'style="display:none"' : '')+'>'+
+'                            <td>Страница сайта</td>'+
+'                                <input type="hidden" name="popupItemObject" id="popupItemObject" value="'+htmlentities(object)+'" />'+
+'                                <input type="hidden" name="popupItemAction" id="popupItemAction" value="'+htmlentities(action)+'" />'+
+'                                <input type="hidden" name="popupItemId" id="popupItemId" value="'+htmlentities(id)+'" />'+
+'                            <td><input type="text" stype="width:80ex" name="popupItemContent" id="popupItemContent" disabled="disabled" value="'+htmlentities(contentname)+'" /><button onclick="loadPagesToPopup(0);$(\'#bannerItemCfgPageSelect\').slideDown(300);$(\'#bannerItemCfgTable\').slideUp(300);return false;">Выбрать</button></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr>'+
+'                            <td colspan="3"><button onclick="if (moveItemParametersFromPopup() == true) {$(\'#popupBannerCfgWindow\').hide();window.ajaxuploadinpopup.destroy;$(\'#bannerItemPopup\').html(\'\');}return false;">Сохранить</button><button onclick="$(\'#popupBannerCfgWindow\').hide();window.ajaxuploadinpopup.destroy;$(\'#bannerItemPopup\').html(\'\');return false;">Отмена</button></td>'+
+'                        </tr>'+
+'                    </table>'+
+'                </div>'+
+'                <div id="bannerItemCfgPageSelect" style="display:none;">'+
+'                </div>');
+            $('#bannerItemCfgTable input, #bannerItemCfgTable button, #bannerItemCfgTable a.button').not('.uniformOff').uniform();
+            window.ajaxuploadinpopup = new AjaxUpload('#popupChangeImageItem', 
+            {
+                action: '{{path('basic_cms_module_ajax_bannerload')}}',
+                name: 'banner',
+                inputFilter: 'image/jpeg,image/png,image/gif',
+                onSubmit: function(file, extension)
+                {
+                    $('#preloader').show();
+                },
+                onComplete: function(file, response)
+                {
+                    $('#preloader').hide();
+                    if (!response) response = "{file:'', error:'Ошибка загрузки файла'}";
+                    var answer = $.parseJSON(response);
+                    if(answer.file)
+                    {
+                        $('#popupAvatarWrap img').attr('src', answer.file);
+                        $('#popupItemImage').val(answer.file);
+                    } else
+                    {
+                        alert(answer.error);
+                    }
+                }
+            });
+            $('#popupBannerCfgWindow').show();
+        });
+        $('#bannerCfgTable div.bannerWrap').unbind('mousedown').unbind('mouseenter');
+        $('#bannerCfgTable div.bannerWrap').mousedown(function()
+        {
+            window.movebannerelement = $(this).closest('div.bannerItem');
+            $(window.movebannerelement).parent().find('div.bannerWrap').mouseenter(function () 
+            {
+                if (window.movebannerelement != null)
+                {
+                    var elements = $(window.movebannerelement).parent().find('div.bannerItem');
+                    var indexnew = elements.index($(this).closest('div.bannerItem'));
+                    var indexold = elements.index($(window.movebannerelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.movebannerelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.movebannerelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+            return false;
+        });
+    }
+    updateBannerIerarhy();
+    $(document).mouseup(function () {window.movebannerelement = null; updateBannerIerarhy();});
+    
+$(function () 
+{
+    new AjaxUpload('#itemBannerAdd', 
+    {
+        action: '{{path('basic_cms_module_ajax_bannerload')}}',
+        name: 'banner',
+        inputFilter: 'image/jpeg,image/png,image/gif',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "{file:'', error:'Ошибка загрузки файла'}";
+            var answer = $.parseJSON(response);
+            if(answer.file)
+            {
+                    var localenames = '';
+                    var localedescriptions = '';
+                    {% for locale in locales %}
+                    localenames = localenames + '<input type="hidden" name="parameters[temp][]" class="bannerLocaleName{{locale['shortName']}}" value="" />';
+                    localedescriptions = localedescriptions + '<input type="hidden" name="parameters[temp][]" class="bannerLocaleDescription{{locale['shortName']}}" value="" />';
+                    {% endfor %}
+                    $('        <div class="bannerItem">'+
+                        '            <p><a href="#">Название не задано</a></p>'+
+                        '            <div class="bannerWrap"><img src="'+answer.file+'" /></div>'+
+                        '            <label><input type="checkbox" name="parameters[temp][]" class="bannerEnabled" onclick="updateBannerIerarhy();" autocomplate="off" checked="checked">Опубликован</label>'+
+                        '            <button onclick="deleteBanner(this);return false;">Удалить</button>'+localenames+localedescriptions+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerName" value="" />'+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerDescription" value="" />'+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerImage" value="'+answer.file+'" />'+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerType" value="0" />'+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerObject" value="" />'+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerAction" value="" />'+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerId" value="" />'+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerContentName" value="" />'+
+                        '                <input type="hidden" name="parameters[temp][]" class="bannerUrl" value="#" />'+
+                        '            <div><span class="globalError"></span></div>'+
+                        '        </div>').appendTo('#bannerCfgTable').find('input, button, a.button').not('.uniformOff').uniform();
+                    updateBannerIerarhy();
+                    $('#itemBannerAddError').html('');
+            } else
+            {
+                    $('#itemBannerAddError').html(answer.error);
+            }
+        }
+    });
+});        
+        
+        
+{#        
+- отправка формы      
+#}        
+{#    
+    
+    function submitMenuFormUl(ul, nesting, form, index)
+    {
+        $(ul).children('li').each(function (i, element)
+        {
+            var name = $(element).children('a').html();
+            var enabled = $(element).children('input.itemEnabled').val();
+            var type = $(element).children('input.itemType').val();
+            var object = $(element).children('input.itemObject').val();
+            var action = $(element).children('input.itemAction').val();
+            var id = $(element).children('input.itemId').val();
+            var url = $(element).children('input.itemUrl').val();
+            var localenames = '';
+            {% for locale in locales %}
+            var namelocale{{locale['shortName']}} = $(element).children('input.itemLocaleName{{locale['shortName']}}').val();
+            localenames = localenames + '<input type="hidden" name="parameters[items]['+index+'][name][{{locale['shortName']}}]" value="'+namelocale{{locale['shortName']}}+'" />';
+            {% endfor %}
+            $(form).append('<input type="hidden" name="parameters[items]['+index+'][nesting]" value="'+nesting+'" />'+
+                           '<input type="hidden" name="parameters[items]['+index+'][enabled]" value="'+enabled+'" />'+
+                           '<input type="hidden" name="parameters[items]['+index+'][type]" value="'+type+'" />'+
+                           '<input type="hidden" name="parameters[items]['+index+'][object]" value="'+object+'" />'+
+                           '<input type="hidden" name="parameters[items]['+index+'][action]" value="'+action+'" />'+
+                           '<input type="hidden" name="parameters[items]['+index+'][contentId]" value="'+id+'" />'+
+                           '<input type="hidden" name="parameters[items]['+index+'][url]" value="'+url+'" />'+
+                           '<input type="hidden" name="parameters[items]['+index+'][name][default]" value="'+name+'" />'+localenames);
+            index++;
+            if ($(element).children('ul').length != 0) index = submitMenuFormUl($(element).children('ul'), nesting + 1, form, index);
+        });
+        return index;
+    }
+    
+    $('#bannerCfgTable').closest('form').bind('submit', function () {submitBannerFormTable('.bannerCfgTable>ul', 0, this, 0);$('.menuTree>ul input').remove();});#}
+</script>

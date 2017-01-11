@@ -1,0 +1,36 @@
+<div class="earth-main-slider">
+    <h3>{{title}}</h3>
+    <div class="earth-main-slider_wrap">
+        <ul>
+            {% for item in items %}
+                <li>
+                    <p class="title"><a href="{{item['url'] | default('#')}}">{{item['title'] | default('')}}</a></p>
+                    <p class="datetime">{% if item['createDate'] is defined %}{{item['createDate'] | date('d.m.Y')}}{% endif %}</p>
+                    <p class="description">{{(item['description'] | default('')) | striptags}}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="earth-main-slider_pager">
+        {% for item in items %}
+            <a data-slide-index="{{loop.index0}}" href="#">&nbsp;</a>
+        {% endfor %}
+    </div>
+    <span class="earth-main-slider_left"></span>
+    <span class="earth-main-slider_right"></span>
+</div>
+<script>
+    $(function () {
+        $('.earth-main-slider_wrap > ul').bxSlider({
+            pagerCustom: '.topNewsSliderPager',
+            useCSS: false,
+            nextSelector: '.earth-main-slider_right',
+            prevSelector: '.earth-main-slider_left',
+            nextText: '<i class="glyphicon glyphicon-chevron-right"></i>',
+            prevText: '<i class="glyphicon glyphicon-chevron-left"></i>',
+            auto: true,
+            autoHover: true,
+            pause: 10000
+        });
+    });
+</script>    

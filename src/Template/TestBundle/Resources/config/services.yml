@@ -1,0 +1,4 @@
+services:
+    template.test:
+        class: Template\TestBundle\TemplateTest
+        arguments: ['@service_container']

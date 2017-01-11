@@ -1,0 +1,16 @@
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="pay[enabled]" value="1" {% if (pay['enabled'] != 0) %}checked="checked"{% endif %} />Включен</label></td>
+                    <td class="cfgError">{{payerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Постоянная составляющая наценки</td>
+                    <td><input type="text" name="pay[price]" value="{{pay['price']}}" /></td>
+                    <td class="cfgError">{{payerror['price']}}</td>
+                </tr>
+                <tr>
+                    <td>Процент наценки</td>
+                    <td><input type="text" name="pay[margin]" value="{{pay['margin']}}" /></td>
+                    <td class="cfgError">{{payerror['margin']}}</td>
+                </tr>
+            </table>

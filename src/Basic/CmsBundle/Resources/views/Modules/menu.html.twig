@@ -1,0 +1,343 @@
+<div class="menuTree">
+    {#<p><span class="moveButton unactive">&nbsp</span><span class="ierarhLeftButton unactive">&nbsp</span><span class="ierarhRightButton unactive">&nbsp</span><span class="deleteButton unactive">&nbsp</span><a href="#" id="mainCategoryName">{{tax['title']}}</a></p>#}
+    <ul>
+        {% if (parameters['items']|length) > 0 %}
+            {% for i in 0..(parameters['items']|length - 1) %}
+                <li class="noselect"><span class="moveButton">&nbsp</span><span class="ierarhLeftButton">&nbsp</span><span class="ierarhRightButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#" {% if (parameters['items'][i]['enabled'] == 0) %}class="disabled"{% endif %}>{{parameters['items'][i]['name']['default']}}</a>
+                    {% for locale in locales %}
+                        <input type="hidden" name="parameters[temp][]" class="itemLocaleName{{locale['shortName']}}" value="{{parameters['items'][i]['name'][locale['shortName']]}}" />
+                    {% endfor %}
+                    <input type="hidden" name="parameters[temp][]" class="itemEnabled" value="{{parameters['items'][i]['enabled']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemType" value="{{parameters['items'][i]['type']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemObject" value="{{parameters['items'][i]['object']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemAction" value="{{parameters['items'][i]['action']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemId" value="{{parameters['items'][i]['contentId']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemContentName" value="{{parameters['items'][i]['contentName']}}" />
+                    <input type="hidden" name="parameters[temp][]" class="itemUrl" value="{{parameters['items'][i]['url']}}" />
+                    {% if (parameters['items'][i]['error'] != '') %}<span class="ml20 globalError">{{parameters['items'][i]['error']}}</span>{% endif %}
+                {%if ((i < parameters['items']|length-1) and (parameters['items'][i+1]['nesting'] > parameters['items'][i]['nesting']))%}
+                <ul>
+                {%else%}
+                </li>
+                {%endif%}
+                {%if ((i < parameters['items']|length-1) and (parameters['items'][i+1]['nesting'] < parameters['items'][i]['nesting']))%}
+                    {% for j in 0..(parameters['items'][i]['nesting'] - parameters['items'][i+1]['nesting'] - 1) %}
+                    </ul></li>
+                    {% endfor %}
+                {%endif%}
+            {% endfor %}
+            {%if (parameters['items'][parameters['items']|length-1]['nesting'] > 0)%}
+                {% for j in 0..(parameters['items'][parameters['items']|length-1]['nesting'] - 1) %}
+                </ul></li>
+                {% endfor %}
+            {%endif%}
+        {% endif %}
+    </ul>
+</div>
+<div class="mt20"><input type="text" name="itemName" id="itemName" onkeypress="if (event.keyCode == 13) {$('#itemNameAdd').click();return false;} else return true;" /><button type="button" id="itemNameAdd" onclick="return false">Добавить пункт меню</button><p class="globalError" id="itemNameError"></p></div>
+
+<div class="popupCfgWindow" id="popupCfgWindow">
+    <div id="menuItemPopup">
+    </div>
+</div>
+
+
+
+<script>
+    window.moveelement = null;
+    window.editeditem = null;
+    
+    function moveItemParametersFromPopup()
+    {
+        var name = $('#popupItemName').val();
+        var enabled = ($('#popupItemEnabled').is(':checked') ? 1 : 0);
+        var type = $('#popupItemType:checked').val();
+        var object = $('#popupItemObject').val();
+        var action = $('#popupItemAction').val();
+        var id = $('#popupItemId').val();
+        var url = $('#popupItemUrl').val();
+        var contentname = $('#popupItemContent').val();
+        {% for locale in locales %}
+        var namelocale{{locale['shortName']}} = $('#popupItemName{{locale['shortName']}}').val();
+        {% endfor %}
+        var errors = false;
+        $('td.cfgError').html('');
+        var regname = /^[-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{3,999}$/i;
+        var regnamelocale = /^([-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{3,999})?$/i;
+        if (!regname.test(name)) {$('#popupItemName').closest('td').next('td.cfgError').html('Поле должно содержать от 3 до 999 разрешённых символов');errors = true;}
+        {% for locale in locales %}
+        if (!regnamelocale.test(namelocale{{locale['shortName']}})) {$('#popupItemName{{locale['shortName']}}').closest('td').next('td.cfgError').html('Поле должно содержать от 3 до 999 разрешённых символов либо отсутствовать');errors = true;}
+        {% endfor %}
+        if (type == 0)
+        {
+            var regurl = /^[-_A-z0-9\?\:\;\+\=\@\#\$\%\&\~\.\\\/]{1,999}$/i;
+            if (!regurl.test(url)) {$('#popupItemUrl').closest('td').next('td.cfgError').html('Поле должно содержать от 1 до 999 разрешённых символов');errors = true;}
+        } else
+        {
+            if ((object == '') || (action == '') || (id == '')) {$('#popupItemContent').closest('td').next('td.cfgError').html('Выберите страницу для отображения');errors = true;}
+        }
+        if (errors == false)
+        {
+            {% for locale in locales %}
+            $(window.editeditem).children('input.itemLocaleName{{locale['shortName']}}').val(namelocale{{locale['shortName']}});
+            {% endfor %}
+            $(window.editeditem).children('a').html(name);
+            $(window.editeditem).children('input.itemEnabled').val(enabled);
+            $(window.editeditem).children('input.itemType').val(type);
+            $(window.editeditem).children('input.itemObject').val(object);
+            $(window.editeditem).children('input.itemAction').val(action);
+            $(window.editeditem).children('input.itemId').val(id);
+            $(window.editeditem).children('input.itemUrl').val(url);
+            $(window.editeditem).children('input.itemContentName').val(contentname);
+            if (enabled == 0) $(window.editeditem).children('a').addClass('disabled'); else $(window.editeditem).children('a').removeClass('disabled');
+            window.editeditem = null;
+        }
+        return !errors;
+    }
+    
+    function loadPagesToPopup(page)
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('basic_cms_module_ajax_menupages')}}',
+            data: "page="+page+"&search="+($('#searchFromPages').length > 0 ? $('#searchFromPages').val() : ''),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                var pagestring = '';
+                var buttons = '';
+                if (parseInt(answer['page']) > 0) buttons = buttons + '                        <a class="pagePrevButton" onclick="loadPagesToPopup('+(parseInt(answer['page'])-1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pagePrevButton unactive" onclick="return false;">&nbsp</a>';
+                if (parseInt(answer['page']) < parseInt(answer['pagecount']) - 1) 
+                                                  buttons = buttons + '                        <a class="pageNextButton" onclick="loadPagesToPopup('+(parseInt(answer['page'])+1)+');return false;">&nbsp</a>';
+                                             else buttons = buttons + '                        <a class="pageNextButton unactive" onclick="return false;">&nbsp</a>';
+                for (var key in answer['pages'])
+                {
+                    pagestring = pagestring+
+'                        <a onclick="'+
+'$(\'#popupItemObject\').val(\''+addslashes(answer['pages'][key]['contentType'])+'\');'+
+'$(\'#popupItemAction\').val(\''+addslashes(answer['pages'][key]['contentAction'])+'\');'+
+'$(\'#popupItemId\').val(\''+addslashes(answer['pages'][key]['contentId'])+'\');'+
+'$(\'#popupItemContent\').val(\''+addslashes(answer['pages'][key]['description'])+'\');'+
+'$(\'#popupItemUrl\').val(\''+addslashes(answer['pages'][key]['url'])+'\');'+
+'$(\'#menuItemCfgPageSelect\').slideUp(300);$(\'#menuItemCfgTable\').slideDown(300);return false;'+
+'" href="#">'+answer['pages'][key]['description']+'('+answer['pages'][key]['url']+')</a>';
+                }
+                if (pagestring == '') pagestring = 'Ничего не найдено...';
+                $('#menuItemCfgPageSelect').html(
+'                    <div class="pb20">Выберите страницу:'+
+'                    <span class="flr"><input type="text" name="searchFromPages" id="searchFromPages" value="'+($('#searchFromPages').length > 0 ? htmlentities($('#searchFromPages').val()) : '')+'"/><button onclick="loadPagesToPopup(0);return false;">Найти</button></span></div>'+
+'                    <div class="pageSelector">'+
+                        pagestring+
+'                    </div>'+
+'                    <div class="pageSelectorPaginator">'+
+                        buttons+
+'                        Страница '+(parseInt(answer['page'])+1)+' из '+parseInt(answer['pagecount'])+
+'                        <span class="flr"><button onclick="$(\'#menuItemCfgPageSelect\').slideUp(300);$(\'#menuItemCfgTable\').slideDown(300);return false;">Отмена</button></span>'+
+'                    </div>');
+                $('#menuItemCfgPageSelect input, #menuItemCfgPageSelect button, #menuItemCfgPageSelect a.button').not('.uniformOff').uniform();
+            }
+        });	      
+    }
+    
+    function updateIerarhy()
+    {
+        $('.menuTree li>a').unbind('click').click(function () 
+        {
+        //    alert('Для редактирования категорий необходимо сохранить иерархию классификации');
+            var element = $(this).closest('li');
+            window.editeditem = element;
+            var name = $(element).children('a').html();
+            var enabled = $(element).children('input.itemEnabled').val();
+            var type = $(element).children('input.itemType').val();
+            var object = $(element).children('input.itemObject').val();
+            var action = $(element).children('input.itemAction').val();
+            var id = $(element).children('input.itemId').val();
+            var url = $(element).children('input.itemUrl').val();
+            var contentname = $(element).children('input.itemContentName').val();
+            var localenames = '';
+            {% for locale in locales %}
+            var namelocale{{locale['shortName']}} = $(element).children('input.itemLocaleName{{locale['shortName']}}').val();
+            localenames = localenames +
+'                        <tr>'+
+'                            <td>Название ({{locale['fullName']}})</td>'+
+'                            <td><input type="text" name="popupItemName{{locale['shortName']}}" id="popupItemName{{locale['shortName']}}" value="'+htmlentities(namelocale{{locale['shortName']}})+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>';
+            {% endfor %}
+            $('#menuItemPopup').html(
+'                <div id="menuItemCfgTable">'+
+'                    <table class="cfgTable">'+
+'                        <tr>'+
+'                            <td colspan="2"><label><input type="checkbox" name="popupItemEnabled" id="popupItemEnabled" value="1" '+(enabled != 0 ? 'checked="checked"' : '')+' />Пункт включен</label></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr>'+
+'                            <td>Название</td>'+
+'                            <td><input type="text" name="popupItemName" id="popupItemName" value="'+htmlentities(name)+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+                        localenames+
+'                        <tr>'+
+'                            <td>Тип пункта меню</td>'+
+'                            <td><label><input type="radio" name="popupItemType" id="popupItemType" value="0" '+(type == 0 ? 'checked="checked"' : '')+' onclick="$(\'#popupItemContentTr\').hide();$(\'#popupItemUrlTr\').show();" />указанный URL</label><br /><label><input type="radio" name="popupItemType" id="popupItemType" value="1" '+(type != 0 ? 'checked="checked"' : '')+' onclick="$(\'#popupItemContentTr\').show();$(\'#popupItemUrlTr\').hide();" />cтраница сайта</label></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr id="popupItemUrlTr" '+(type != 0 ? 'style="display:none"' : '')+'>'+
+'                            <td>URL</td>'+
+'                            <td><input type="text" name="popupItemUrl" id="popupItemUrl" value="'+htmlentities(url)+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr id="popupItemContentTr" '+(type == 0 ? 'style="display:none"' : '')+'>'+
+'                            <td>Страница сайта</td>'+
+'                                <input type="hidden" name="popupItemObject" id="popupItemObject" value="'+htmlentities(object)+'" />'+
+'                                <input type="hidden" name="popupItemAction" id="popupItemAction" value="'+htmlentities(action)+'" />'+
+'                                <input type="hidden" name="popupItemId" id="popupItemId" value="'+htmlentities(id)+'" />'+
+'                            <td><input type="text" stype="width:80ex" name="popupItemContent" id="popupItemContent" disabled="disabled" value="'+htmlentities(contentname)+'" /><button onclick="loadPagesToPopup(0);$(\'#menuItemCfgPageSelect\').slideDown(300);$(\'#menuItemCfgTable\').slideUp(300);return false;">Выбрать</button></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr>'+
+'                            <td colspan="3"><button onclick="if (moveItemParametersFromPopup() == true) {$(\'#popupCfgWindow\').hide();$(\'#menuItemPopup\').html(\'\');}return false;">Сохранить</button><button onclick="$(\'#popupCfgWindow\').hide();$(\'#menuItemPopup\').html(\'\');return false;">Отмена</button></td>'+
+'                        </tr>'+
+'                    </table>'+
+'                </div>'+
+'                <div id="menuItemCfgPageSelect" style="display:none;">'+
+'                </div>');
+            $('#menuItemCfgTable input, #menuItemCfgTable button, #menuItemCfgTable a.button').not('.uniformOff').uniform();
+            $('#popupCfgWindow').show();
+        });
+        $('.menuTree span.ierarhLeftButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.menuTree span.ierarhRightButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.menuTree span.deleteButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.menuTree li ul li').children('span.ierarhLeftButton').removeClass('unactive');
+        $('.menuTree li+li').children('span.ierarhRightButton').removeClass('unactive');
+        $('.menuTree ul>li>span.deleteButton').removeClass('unactive');
+        $('.menuTree span.moveButton').unbind('mousedown').unbind('mouseenter').removeClass('active');
+        
+        $('.menuTree span.ierarhLeftButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                                  mouseleave(function () {$(this).removeClass('active');}).
+                                                                  click(function () 
+        {
+            var element = $(this).closest('li').parent().closest('li');
+            var length = $(this).closest('li').parent().children('li').length;
+            var parent = $(this).closest('li').parent();
+            if (element.length != 0)
+            {
+                var savetr = $(this).closest('li').detach();
+                if (length == 1) parent.remove();
+                element.after(savetr);
+            }
+            updateIerarhy();
+        });
+        $('.menuTree span.ierarhRightButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                                   mouseleave(function () {$(this).removeClass('active');}).
+                                                                   click(function () 
+        {
+            var element = $(this).closest('li').prev();
+            if (element.length != 0)
+            {
+                var savetr = $(this).closest('li').detach();
+                if (element.children('ul').length == 0) $('<ul></ul>').appendTo(element);
+                element.children('ul').append(savetr);
+            }
+            updateIerarhy();
+        });
+        $('.menuTree span.deleteButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                              mouseleave(function () {$(this).removeClass('active');}).
+                                                              click(function () 
+        {
+            if (confirm('Вы действительно хотите удалить пункт меню?')) 
+            {
+                var length = $(this).closest('li').parent().children('li').length;
+                var parent = $(this).closest('li').parent();
+                $(this).closest('li').remove();
+                if ((length == 1) && (parent.get(0) != $('.menuTree > ul').get(0))) parent.remove();
+            }
+            updateIerarhy();
+        });
+        $('.menuTree span.moveButton').not('.unactive').mousedown(function()
+        {
+            $(this).addClass('active');
+            $(this).closest('li').find('ul').hide();
+            window.moveelement = $(this).closest('li');
+            $(window.moveelement).parent().children().children('span.moveButton').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().children();
+                    var indexnew = elements.index($(this).closest('li'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+        });
+    }
+    updateIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateIerarhy(); $('.menuTree ul').show();});
+    $('#itemNameAdd').click(function ()
+    {
+        var name = $('#itemName').val();
+        var regname = /^[-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{3,999}$/i;
+        if (!regname.test(name)) $('#itemNameError').html('Имя должно содержать от 3 до 999 разрешенных символов'); else 
+        {
+            var localenames = '';
+            {% for locale in locales %}
+            localenames = localenames + '<input type="hidden" name="parameters[temp][]" class="itemLocaleName{{locale['shortName']}}" value="" />';
+            {% endfor %}
+            $('#itemNameError').html('');
+            $('#itemName').val('');
+            $('<li class="noselect"><span class="moveButton">&nbsp</span><span class="ierarhLeftButton">&nbsp</span><span class="ierarhRightButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#">'+name+'</a>'+
+                    '<input type="hidden" name="parameters[temp][]" class="itemEnabled" value="1" />'+
+                    '<input type="hidden" name="parameters[temp][]" class="itemType" value="0" />'+
+                    '<input type="hidden" name="parameters[temp][]" class="itemObject" value="" />'+
+                    '<input type="hidden" name="parameters[temp][]" class="itemAction" value="" />'+
+                    '<input type="hidden" name="parameters[temp][]" class="itemId" value="" />'+
+                    '<input type="hidden" name="parameters[temp][]" class="itemContentName" value="" />'+
+                    '<input type="hidden" name="parameters[temp][]" class="itemUrl" value="#" />'+localenames+
+                    '</li>').appendTo('.menuTree > ul');
+            updateIerarhy();
+        }
+        return false;
+    });
+    function submitMenuFormUl(ul, nesting, form, index)
+    {
+        $(ul).children('li').each(function (i, element)
+        {
+            if ($(element).children('input').length > 0)
+            {
+                var name = $(element).children('a').html();
+                var enabled = $(element).children('input.itemEnabled').val();
+                var type = $(element).children('input.itemType').val();
+                var object = $(element).children('input.itemObject').val();
+                var action = $(element).children('input.itemAction').val();
+                var id = $(element).children('input.itemId').val();
+                var url = $(element).children('input.itemUrl').val();
+                var localenames = '';
+                {% for locale in locales %}
+                var namelocale{{locale['shortName']}} = $(element).children('input.itemLocaleName{{locale['shortName']}}').val();
+                localenames = localenames + '<input type="hidden" name="parameters[items]['+index+'][name][{{locale['shortName']}}]" value="'+namelocale{{locale['shortName']}}+'" />';
+                {% endfor %}
+                $(form).append('<input type="hidden" name="parameters[items]['+index+'][nesting]" value="'+nesting+'" />'+
+                               '<input type="hidden" name="parameters[items]['+index+'][enabled]" value="'+enabled+'" />'+
+                               '<input type="hidden" name="parameters[items]['+index+'][type]" value="'+type+'" />'+
+                               '<input type="hidden" name="parameters[items]['+index+'][object]" value="'+object+'" />'+
+                               '<input type="hidden" name="parameters[items]['+index+'][action]" value="'+action+'" />'+
+                               '<input type="hidden" name="parameters[items]['+index+'][contentId]" value="'+id+'" />'+
+                               '<input type="hidden" name="parameters[items]['+index+'][url]" value="'+url+'" />'+
+                               '<input type="hidden" name="parameters[items]['+index+'][name][default]" value="'+name+'" />'+localenames);
+                index++;
+                if ($(element).children('ul').length != 0) index = submitMenuFormUl($(element).children('ul'), nesting + 1, form, index);
+            }
+        });
+        return index;
+    }
+    
+    $('.menuTree').closest('form').bind('submit', function () {submitMenuFormUl('.menuTree>ul', 0, this, 0);$('.menuTree>ul input').remove();});
+</script>

@@ -1,0 +1,22 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Локализация{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Локализация</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="$('#tab').val(0);return false;" id="tab1" class="active">Список локалей</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" class="active">
+        {% include "BasicCmsBundle:Default:localeListTab1.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

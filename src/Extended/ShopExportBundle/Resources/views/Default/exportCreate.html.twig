@@ -1,0 +1,79 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание новой страницы экспорта{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('extended_shop_export')}}">Экспорт продукции</a>
+    <span>Создание новой страницы экспорта</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Основные данные</a>
+</div>
+<form action="{{path('extended_shop_export_one_create')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <div class="saveButtons">
+                <button type="submit">Сохранить</button>
+                <a class="button" href="{{path('extended_shop_export')}}">Отмена</a>
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Имя файла при скачивании</td>
+                    <td><input type="text" name="page[fileName]" value="{{page['fileName']}}" /></td>
+                    <td class="cfgError">{{pageerror['fileName']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="page[onlyOnStock]" value="1" {% if (page['onlyOnStock'] != 0) %}checked="checked"{% endif %} />Включать товары только в наличии</label></td>
+                    <td class="cfgError">{{pageerror['onlyOnStock']}}</td>
+                </tr>
+                <tr>
+                    <td>Валюта для экспорта</td>
+                    <td>
+                        <select name="page[currency]">
+                            {% for currency in currencies %}
+                                <option value="{{currency['id']}}" {% if (currency['id'] == page['currency']) %}selected="selected"{% endif %}>{{currency['name']}}</option>
+                            {% endfor %}
+                        </select>
+                    
+                    </td>
+                    <td class="cfgError">{{pageerror['currency']}}</td>
+                </tr>
+            </table>
+            <div class="mt20 categoryTree">
+                <p>Выбранные категории:</p>
+                <p class="globalError">{{pageerror['categories']}}</p>
+                <ul>
+                    {% if (categories|length) > 0 %}
+                        {% for i in 0..(categories|length - 1) %}
+                            <li><input type="checkbox" name="page[categories][]" value="{{categories[i]['id']}}" autocomplate="off" {% if (categories[i]['id'] in page['categories']) %}checked="checked"{% endif %} />
+                                <span {% if (categories[i]['enabled'] == 0) %}class="disabled"{% endif %}>{{categories[i]['name']}}</span>
+                            {% if (categories[i]['error'] != '') %}<span class="ml20 globalError">{{categories[i]['error']}}</span>{% endif %}
+                            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] > categories[i]['nesting']))%}
+                            <ul>
+                            {%else%}
+                            </li>
+                            {%endif%}
+                            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] < categories[i]['nesting']))%}
+                                {% for j in 0..(categories[i]['nesting'] - categories[i+1]['nesting'] - 1) %}
+                                </ul></li>
+                                {% endfor %}
+                            {%endif%}
+                        {% endfor %}
+                        {%if (categories[categories|length-1]['nesting'] > 0)%}
+                            {% for j in 0..(categories[categories|length-1]['nesting'] - 1) %}
+                            </ul></li>
+                            {% endfor %}
+                        {%endif%}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+</div>​
+</form>
+{% endblock %}       
+
+
+

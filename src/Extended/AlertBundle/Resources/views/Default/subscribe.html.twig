@@ -1,0 +1,66 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Рассылка{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Рассылка</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Рассылка сообщения пользователям</a>
+</div>
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            <form action="{{path('extended_alert_subscribe')}}" method="post">
+                {% if result %}
+                    <p style="color:#800;">Сообщение отправлено!!!</p>
+                {% endif %}
+                <table class="cfgTable">
+                    <tr>
+                        <td>От кого</td>
+                        <td>
+                            <input name="from" value="{{from}}" />
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Заголовок</td>
+                        <td>
+                            <input name="subject" value="{{subject}}" />
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Сообщение</td>
+                        <td>
+                            <textarea name="message" id="subscribe_message">{{message}}</textarea>
+                        </td>
+                        <td></td>
+                    </tr>
+                </table>
+                <button class="button" type="submit">Отправить сообщение</button>
+            </form>                            
+                <script>
+                tinymce.init({
+                    selector: "textarea#subscribe_message",
+                    language : 'ru',
+                    height: 400,
+                    convert_urls: false,
+                    verify_html : false,
+                    plugins: [
+                        "advlist autolink lists image charmap print preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "media table contextmenu paste textcolor",
+                        "jbimages link"
+                    ],
+                    toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+                });
+                </script>
+        </div>
+</div>​
+{% endblock %}       
+
+
+

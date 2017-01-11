@@ -1,0 +1,58 @@
+			<h1>{{title}}</h1>
+                        <form class="searchForm" method="get" action="/forumsearch.html">
+                                <input type="text" name="search" value="{{searchText}}" />
+                                <button type="submit">Поиск</button>
+                        </form>
+			<p class="tableTitle">
+                            Найдено {{itemCount}} сообщений
+                        </p>
+                        {% if (searchItems | length > 0) %}
+			<table class="forumCatTable">
+                            {% for item in searchItems %}
+				<tr>
+					<td class="forumColTitle">
+						<p class="forumTitle"><a href="{{item['url']}}">{{item['title']}}</a><p>
+                                                <p class="forumDescription">{{item['description'] | striptags | textlimit(500) | raw}}</p>
+					</td>
+					<td class="forumColLastMsg">
+						{{(item['createrId'] != null ? '<span class="mirclubTransliteration">'~item['createrFullName']~'</span>' : 'Гость') | raw}}<br />
+						<a href="{{item['url']}}">{{item['modifyDate'] | date('d.m.Y H:i')}}</a>
+					</td>
+				</tr>
+                            {% endfor %}
+			</table>
+                        {% else %}
+                        <p class="tac m15">Ничего не найдено</p>
+                        {% endif %}
+                        <div class="paginatorWrap">
+                        {% if (pageCount > 1) %}
+                            {% set to = page + 1 %}
+                            {% set from = page - 1 %}
+                            {% if (to >= pageCount) %}
+                                {% set to = pageCount - 1 %}
+                            {% endif %}
+                            {% if (from < 0) %}
+                                {% set from = 0 %}
+                            {% endif %}
+                            {% if (from > 0) %}
+                                <a href="?search={{searchText}}&page=0">1</a>
+                            {% endif %}
+                            {% if (from > 1) %}
+                                ...
+                            {% endif %}
+                            {% for i in from..to %}
+                                {% if i == page %}
+                                <a href="#" class="active">{{i+1}}</a>
+                                {% else %}
+                                <a href="?search={{searchText}}&page={{i}}">{{i+1}}</a>
+                                {% endif %}
+                            {% endfor %}
+                            {% if (to < (pageCount - 2)) %}
+                            ...
+                            {% endif %}
+                            {% if (to < (pageCount - 1)) %}
+                                <a href="?search={{searchText}}&page={{pageCount - 1}}">{{pageCount}}</a>
+                            {% endif %}
+                        {% endif %}
+                        </div>
+                        

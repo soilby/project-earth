@@ -1,0 +1,42 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Файлы{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Файлы</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    {% if (app.user.checkAccess('file_list') == 1) %}
+    <a href="#" id="tab1" {% if (tab == 0) %}class="active"{% endif %}>Список файлов</a>
+    {% endif %}
+    {% if (app.user.checkAccess('file_createpage') == 1) %}
+    <a href="#" id="tab2" {% if (tab == 1) %}class="active"{% endif %}>Страницы создания файлов</a>
+    {% endif %}
+    {% if (app.user.checkAccess('file_editpage') == 1) %}
+    <a href="#" id="tab3" {% if (tab == 2) %}class="active"{% endif %}>Страницы редактирования файлов</a>
+    {% endif %}
+</div>
+<div id="tabsContent">
+    {% if (app.user.checkAccess('file_list') == 1) %}
+    <div id="con_tab1" {% if (tab == 0) %}class="active"{% endif %}>
+        {% include "FilesFilesBundle:Default:fileListTab1.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('file_createpage') == 1) %}
+    <div id="con_tab2" {% if (tab == 1) %}class="active"{% endif %}>
+        {% include "FilesFilesBundle:Default:fileListTab2.html.twig" %}
+    </div>
+    {% endif %}
+    {% if (app.user.checkAccess('file_editpage') == 1) %}
+    <div id="con_tab3" {% if (tab == 2) %}class="active"{% endif %}>
+        {% include "FilesFilesBundle:Default:fileListTab3.html.twig" %}
+    </div>
+    {% endif %}
+</div>​
+{% endblock %}       
+
+
+

@@ -1,0 +1,214 @@
+                <br />
+                <p><strong>Выбор столбцов данных:</strong></p>
+                <br />
+                <form action="" method="post" id="tableRowCfgForm">
+                <table class="tableContent">
+                    <tr>
+                        {% for x,item in cellmatrix %}
+                        <td>
+                            <select name="tablerowcfg[{{x}}]">
+                                <option value="">[Нет]</option>
+                                <option value="title">Название</option>
+                                <option value="description">Описание</option>
+                                <option value="price">Цена</option>
+                                <option value="onStock">Наличие</option>
+                                <option value="avatar">Аватар</option>
+                                <option value="article">Артикул</option>
+                                <option value="category">Категория</option>
+                            </select>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% for y in 1..12 %}
+                    <tr>
+                        {% for item in cellmatrix %}
+                        <td>{{item[y] | default('')}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+                </form>
+                <button onclick="return false;" id="import3NexStep2">Далее</button>
+                
+<script type="text/javascript">
+    $('#import3NexStep2').click(function () 
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('extended_shop_import_three_loadtablecfg')}}',
+            data: $('#tableRowCfgForm').serialize(),
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                $('#import3ImportData').html(data);    
+            }
+        });	      
+        
+        return false;
+    });
+    $('#import3ImportData input, #import3ImportData button, #import3ImportData a.button, #import3ImportData select, #import3ImportData textarea').not('.uniformOff').uniform();
+</script>
+                
+                
+                
+{#                <br />
+                <p><strong>Основная информация:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    <tr>
+                        <td>Название файла</td>
+                        <td>{{info['filename']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Количество продуктов</td>
+                        <td>{{info['products']}}</td>
+                    </tr>
+                </table>
+                <form id="import2ConfigForm">
+                <br />
+                <p><strong>Соответствие категорий:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    {% for cat in categories %}
+                    <tr>
+                        <td class="hintLabel">Категория №{{cat['id']}} ({{cat['count']}} товаров)<div class="hintWrap">{{cat['name'] | raw}}</div></td>
+                        <td>
+                            <select name="categories[{{cat['id']}}]">
+                                <option value="">Не импортировать</option>
+                                {% for ourcat in ourcategories %}
+                                <option value="{{ourcat['id']}}" {% if (importcfg[cat['id']] | default('') == ourcat['id']) %}selected="selected"{% endif %}>{% if (ourcat['nesting'] > 0) %}{% for i in 0..(ourcat['nesting']-1) %}- {% endfor %}{% endif %}{{ourcat['title']}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br />
+                <p><strong>Выбор валюты:</strong></p>
+                <br />
+                <table class="cfgTable">
+                    <tr>
+                        <td>Выберите валюту в файле</td>
+                        <td>
+                            <select name="currency">
+                                {% for currency in currencies %}
+                                <option value="{{currency['id']}}" {% if (currency['id'] == curcfg) %}selected="selected"{% endif %}>{{currency['name']}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <p><strong>Параметры страницы:</strong></p>
+                <br />
+                <table class="cfgTable">
+                <tr>
+                    <td>Основной шаблон</td>
+                    <td>
+                        <select name="layout">
+                            <option value="" {% if (layoutcfg == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (layoutcfg == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента</td>
+                    <td>
+                        <select name="template">
+                            <option value="" {% if (templatecfg == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (templatecfg == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули</td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="modules[]" value="{{module['id']}}" {% if (module['id'] in modulecfg) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                </tr>
+                {% endif %}
+                </table>
+                </form>
+                <br />
+                <p><strong>Импорт:</strong></p>
+                <br />
+                <div id="progress2Wrap">
+                    <button id="import2StartImport" onclick="return false;">Начать импорт</button>
+                </div>
+<script type="text/javascript">
+    window.lastproduct2 = 0;
+
+    function import2ProcessBlock()
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('extended_shop_import_two_process')}}',
+            data: "start="+window.lastproduct2+'&'+$('#import2ConfigForm').serialize(),
+            global: false,
+            error: function(){
+                import2ProcessBlock();
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                if (answer['result'] != 'OK') import2ProcessBlock(); else
+                {
+                    if (answer['status'] == 'OK')
+                    {
+                        $('#progress2Wrap').html('<div class="progressBar"><p style="width:'+parseInt(answer['percent'])+'%"></p></div>');
+                        window.lastproduct2 = parseInt(answer['start']);
+                    }
+                    if (answer['status'] == 'Fine')
+                    {
+                        $('#progress2Wrap').html('<p>Импорт завершен.</p>');
+                    } else import2ProcessBlock();
+                }
+            }
+        });	      
+    }
+    
+    $('#import2StartImport').click(function () 
+    {
+        $('#import2ConfigForm').hide();
+        $('#progress2Wrap').html('<div class="progressBar"><p style="width:0%"></p></div>');
+        import2ProcessBlock();
+        return false;
+    });
+    $('#import2ImportData input, #import2ImportData button, #import2ImportData a.button, #import2ImportData select, #import2ImportData textarea').not('.uniformOff').uniform();
+    
+    new AjaxUpload('#import2LoadPicFile', 
+    {
+        action: '{{path('extended_shop_import_two_loadpicfile')}}',
+        name: 'file',
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) 
+            {
+                $('#import2PicFileName').html('Ошибка открытия файла');
+                $('#import2PicFileCount').html('');
+            } else
+            {
+                var answer = $.parseJSON(response);
+                $('#import2PicFileName').html(answer['name']);
+                $('#import2PicFileCount').html(answer['count']);
+            }
+        }
+    });
+    
+</script>
+                
+  #}              
+
+

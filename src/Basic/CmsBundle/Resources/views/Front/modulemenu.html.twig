@@ -1,0 +1,27 @@
+<ul>
+    {% if (items|length) > 0 %}
+        {% for i in 0..(items|length - 1) %}
+            <li>
+                {% if (items[i]['enabled'] != 0) %}
+                <a href="{{items[i]['url']}}">{{items[i]['name']}}</a>
+                {% else %}
+                <span>{{items[i]['name']}}</span>
+                {% endif %}
+            {%if ((i < items|length-1) and (items[i+1]['nesting'] > items[i]['nesting']))%}
+            <ul>
+            {%else%}
+            </li>
+            {%endif%}
+            {%if ((i < items|length-1) and (items[i+1]['nesting'] < items[i]['nesting']))%}
+                {% for j in 0..(items[i]['nesting'] - items[i+1]['nesting'] - 1) %}
+                </ul></li>
+                {% endfor %}
+            {%endif%}
+        {% endfor %}
+        {%if (items[items|length-1]['nesting'] > 0)%}
+            {% for j in 0..(items[items|length-1]['nesting'] - 1) %}
+            </ul></li>
+            {% endfor %}
+        {%endif%}
+    {% endif %}
+</ul>

@@ -1,0 +1,39 @@
+			<div class="projectItems" id="subProjectItems">
+                            <p class="tac"><img src="/img/ajaxloader.gif" style="width:50px;height:50px;" /></p>
+			</div>
+
+<script>                        
+function projectLoadSubProjects(url, page)
+{
+    if (url != '')
+    {
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: "page="+page+"&ajax=position&ajaxposition=content",
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                $('#subProjectItems').html('');
+                $('<div>'+data+'</div>').find('.projectItems>div').appendTo('#subProjectItems');
+            }
+        });	      
+    } else $('#subProjectItems').html('');
+}
+    
+$(function () {
+    var title = $('#projectTitle').text();
+    var url = '';
+    {% if (categories|length) > 0 %}
+    {% for cat in categories %}
+    if (title == '{{cat['title'] | raw}}') url = '{{cat['url']}}';
+    {% endfor %}
+    {% endif %}
+    projectLoadSubProjects(url, 0);
+});  
+</script>
+
+
+<ul>
+</ul>

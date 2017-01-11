@@ -1,0 +1,13 @@
+			<h1>{{title}}</h1>
+			<div class="catalogOneProduct">
+				<div class="imageWrap">
+					<img src="{{ avatar != '' ? avatar : '/img/product.png' }}" />
+				</div>
+				<div class="infoWrap">
+					<p>Цена: <strong>{% if (formatPriceWithDiscount[0] | default('0')) != 0 %}{{formatPriceWithDiscount[0]}}{% else %}уточняйте{% endif %}</strong></p>
+					<p>Создатель: <strong class="mirclubTransliteration">{{createrFullName}}</strong></p>
+				</div>
+				<div class="descriptionWrap tinymceContent">
+					{{description | raw}}
+				</div>
+			</div>

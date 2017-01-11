@@ -1,0 +1,48 @@
+        <a class="button" href="#" id="deleteSubcribes1">Удалить выбранные</a>
+        <table class="tableContent" id="subscribeList1">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    E-mail
+                </th>
+                <th>
+                    Подписка на события
+                </th>
+            </tr>
+            {% for scid,scitem in subscribe1 %}
+            <tr>
+                <td><input type="checkbox" name="check[{{scid}}]" class="check" value="1"></td>
+                <td>{{scitem.email}}{% if (errors1[scid] is defined) %}<p class="error">{{errors1[scid]}}</p>{% endif %}</td>
+                <td>{{scitem.actions}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <table class="cfgTable mt20" id="subscribeCreate1">
+            <tr>
+                <td>E-mail</td>
+                <td><input type="text" name="email" value="{{email1}}" /></td>
+                <td class="cfgError">{% if (errors1['email'] is defined) %}{{errors1['email']}}{% endif %}</td>
+            </tr>
+            <tr>
+                <td colspan="2">Подписаться на события</td>
+                <td class="cfgError">{% if (errors1['actions'] is defined) %}{{errors1['actions']}}{% endif %}</td>
+            </tr>
+            {% for mname,mdescr in modules %}
+            <tr>
+                <td>{{mdescr}}</td>
+                <td>
+                    <label><input type="checkbox" name="actions[]" value="{{mname}}.create" autocomplete="off" {% if '{{mname}}.create' in actions1 %}checked="checked"{% endif %} />Создание</label>
+                    <label><input type="checkbox" name="actions[]" value="{{mname}}.edit" autocomplete="off" {% if '{{mname}}.edit' in actions1 %}checked="checked"{% endif %} />Изменение</label>
+                    <label><input type="checkbox" name="actions[]" value="{{mname}}.moderate" autocomplete="off" {% if '{{mname}}.moderate' in actions1 %}checked="checked"{% endif %} />Модерация</label>
+                    <label><input type="checkbox" name="actions[]" value="{{mname}}.other" autocomplete="off" {% if '{{mname}}.other' in actions1 %}checked="checked"{% endif %} />Прочее</label>
+                </td>
+                <td class="cfgError"></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a class="button" href="#" id="createSubcribes1">Добавить оповещение</a>
+        <script type="text/javascript">
+            $('#deleteSubcribes1').click(function () {ajaxActionConfirm('{{path('basic_cms_logs_ajax')}}?tab=1', 'delete', '#subscribeList1 input.check', '#con_tab2','Удалить выбранные оповещения?');return false;});
+            $('#createSubcribes1').click(function () {ajaxAction('{{path('basic_cms_logs_ajax')}}?tab=1', 'create', '#subscribeCreate1 input', '#con_tab2');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

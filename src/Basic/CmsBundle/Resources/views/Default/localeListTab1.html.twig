@@ -1,0 +1,24 @@
+        {% if (app.user.checkAccess('locale_edit') == 1) %}<a class="button" href="#" id="deleteSelected">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('locale_edit') == 1) %}<a href="{{path('basic_cms_locale_create')}}" class="button">Создать новую локаль</a>{% endif %}
+        <table class="tableContent" id="localeList">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Код локали
+                </th>
+                <th>
+                    Название локали
+                </th>
+            </tr>
+            {% for locale in locales %}
+            <tr>
+                <td><input type="checkbox" class="delete" name="check[{{locale.id}}]" value="1" /></td>
+                <td><a href="{{path('basic_cms_locale_edit')}}?id={{locale.id}}">{{locale.shortName}}</a></td>
+                <td>{{locale.fullName}}{% if (errors[locale.id] is defined) %}<p class="error">{{errors[locale.id]}}</p>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#deleteSelected').click(function () {ajaxActionConfirm('{{path('basic_cms_locale_ajax')}}', 'delete', '#localeList input.delete', '#con_tab1','Удалить выбранные локали?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

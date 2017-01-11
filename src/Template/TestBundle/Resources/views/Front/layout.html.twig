@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{meta['title']}}</title>
+    <meta name="keywords" content="{{meta['keywords']}}" />
+    <meta name="description" content="{{meta['description']}}" />
+    {% if meta['robotindex'] == true %}
+    <meta name="robots" content="index, follow"/>
+    {% else %}
+    <meta name="robots" content="noindex, nofollow"/>
+    {% endif %}
+</head>
+<body>
+    {% if (top is defined) %}{{top | raw}}{% endif %}
+    {{content | raw}}
+</body>
+</html>

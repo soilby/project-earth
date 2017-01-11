@@ -1,0 +1,38 @@
+        {% if (app.user.checkAccess('user_authpage') == 1) %}<a class="button" href="#" id="defaultAuth1">Сделать по умолчанию</a>{% endif %}
+        {% if (app.user.checkAccess('user_authpage') == 1) %}<a class="button" href="#" id="unblockedAuth1">Включить</a>{% endif %}
+        {% if (app.user.checkAccess('user_authpage') == 1) %}<a class="button" href="#" id="blockedAuth1">Выключить</a>{% endif %}
+        {% if (app.user.checkAccess('user_authpage') == 1) %}<a class="button" href="#" id="deleteAuth1">Удалить выбранные</a>{% endif %}
+        {% if (app.user.checkAccess('user_authpage') == 1) %}<a href="{{path('basic_cms_user_authpage_create')}}" class="button">Создать страницу авторизации</a>{% endif %}
+        <table class="tableContent" id="authpageList1">
+            <tr>
+                <th><input type="checkbox" name="idall" value="1" onclick="checkAll(this)" /></th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Включено
+                </th>
+                <th>
+                    По умолчанию
+                </th>
+                <th>
+                    URL страницы
+                </th>
+            </tr>
+            {% for authpage in authpages %}
+            <tr>
+                <td><input type="checkbox" name="check[{{authpage.id}}]" class="check" value="1"></td>
+                <td><a href="{{path('basic_cms_user_authpage_edit')}}?id={{authpage.id}}">{{authpage.title}}</a>{% if (errors1[authpage.id] is defined) %}<p class="error">{{errors1[authpage.id]}}</p>{% endif %}</td>
+                <td>{{(authpage.enabled != 0 ? 'Да' : 'Нет')}}</td>
+                <td>{{(authpage.isDefault != 0 ? 'Да' : 'Нет')}}</td>
+                <td>{{authpage.url}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script type="text/javascript">
+            $('#defaultAuth1').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=1', 'defaultauth', '#authpageList1 input.check', '#con_tab2');return false;});
+            $('#unblockedAuth1').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=1', 'unblockedauth', '#authpageList1 input.check', '#con_tab2');return false;});
+            $('#blockedAuth1').click(function () {ajaxAction('{{path('basic_cms_user_ajax')}}?tab=1', 'blockedauth', '#authpageList1 input.check', '#con_tab2');return false;});
+            $('#deleteAuth1').click(function () {ajaxActionConfirm('{{path('basic_cms_user_ajax')}}?tab=1', 'deleteauth', '#authpageList1 input.check', '#con_tab2','Удалить выбранные страницы?');return false;});
+            $('input, button, a.button, select, textarea').not('.uniformOff').uniform();
+        </script>

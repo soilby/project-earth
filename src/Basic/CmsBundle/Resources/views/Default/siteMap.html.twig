@@ -1,0 +1,65 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Карта сайта{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <span>Карта сайта</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" class="active">Хлебные крошки</a>
+    <a href="#" onclick="return false;" id="tab2">Обновление карты сайта</a>
+</div>
+<div id="tabsContent">
+        <div id="con_tab1" class="active">
+            {% include "BasicCmsBundle:Default:siteMapTab1.html.twig" %}
+        </div>
+        <div id="con_tab2">
+            <p>Обновление карты сайта для поисковых систем</p>
+            <div id="progressWrap">
+            <button id="startProgress" onclick="return false;">Обновить</button>
+            </div>
+        </div>
+</div>​
+<script>
+    window.lastpageid = 0;
+
+    function updatePages()
+    {
+        $.ajax({
+            type: "POST",
+            url: '{{path('basic_cms_sitemap_generate')}}',
+            data: "id="+window.lastpageid,
+            global: false,
+            error: function(){
+                updatePages();
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                if (answer['result'] != 'OK') updatePages(); else
+                {
+                    if (answer['status'] == 'OK')
+                    {
+                        $('#progressWrap').html('<div class="progressBar"><p style="width:'+parseInt(answer['percent'])+'%"></p></div>');
+                        window.lastpageid = parseInt(answer['id']);
+                    }
+                    if (answer['status'] == 'Fine')
+                    {
+                        $('#progressWrap').html('<p>Генерация завершена.</p>');
+                    } else updatePages();
+                }
+            }
+        });	      
+    }
+
+    $(function () {
+        $('#startProgress').click(function () {updatePages();return false;});
+    });
+    
+</script>
+{% endblock %}       
+
+
+

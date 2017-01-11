@@ -1,0 +1,178 @@
+<div class="menuTree" id="productSizeTree">
+    <ul>
+        {% if (sizes|length) > 0 %}
+            {% for i in 0..(sizes|length - 1) %}
+                <li class="noselect"><span class="moveButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#" {% if (sizes[i]['enabled'] == 0) %}class="disabled"{% endif %}>{{sizes[i]['name']['default']}}</a>
+                    {% for locale in locales %}
+                        <input type="hidden" name="parameters[temp][]" class="itemLocaleName{{locale['shortName']}}" value="{{sizes[i]['name'][locale['shortName']]}}" />
+                    {% endfor %}
+                    <input type="hidden" name="parameters[temp][]" class="itemEnabled" value="{{sizes[i]['enabled']}}" />
+                    {% if (sizes[i]['error'] != '') %}<span class="ml20 globalError">{{sizes[i]['error']}}</span>{% endif %}
+                </li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>
+<div class="mt20"><input type="text" name="itemName" id="productSizeName" onkeypress="if (event.keyCode == 13) {$('#productSizeNameAdd').click();return false;} else return true;" /><button type="button" id="productSizeNameAdd" onclick="return false">Добавить размер</button><p class="globalError" id="productSizeNameError"></p></div>
+
+<div class="popupCfgWindow" id="productSizePopupCfgWindow">
+    <div id="productSizeMenuItemPopup">
+    </div>
+</div>
+
+
+
+<script>
+    window.productsizemoveelement = null;
+    window.productsizeediteditem = null;
+    
+    function productSizeMoveItemParametersFromPopup()
+    {
+        var name = $('#productSizePopupItemName').val();
+        var enabled = ($('#productSizePopupItemEnabled').is(':checked') ? 1 : 0);
+        {% for locale in locales %}
+        var namelocale{{locale['shortName']}} = $('#productSizePopupItemName{{locale['shortName']}}').val();
+        {% endfor %}
+        var errors = false;
+        $('td.cfgError').html('');
+        var regname = /^[-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{1,999}$/i;
+        var regnamelocale = /^([-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{1,999})?$/i;
+        if (!regname.test(name)) {$('#productSizePopupItemName').closest('td').next('td.cfgError').html('Поле должно содержать от 1 до 999 разрешённых символов');errors = true;}
+        {% for locale in locales %}
+        if (!regnamelocale.test(namelocale{{locale['shortName']}})) {$('#productSizePopupItemName{{locale['shortName']}}').closest('td').next('td.cfgError').html('Поле должно содержать от 1 до 999 разрешённых символов либо отсутствовать');errors = true;}
+        {% endfor %}
+        if (errors == false)
+        {
+            {% for locale in locales %}
+            $(window.productsizeediteditem).children('input.itemLocaleName{{locale['shortName']}}').val(namelocale{{locale['shortName']}});
+            {% endfor %}
+            $(window.productsizeediteditem).children('a').html(name);
+            $(window.productsizeediteditem).children('input.itemEnabled').val(enabled);
+            if (enabled == 0) $(window.productsizeediteditem).children('a').addClass('disabled'); else $(window.productsizeediteditem).children('a').removeClass('disabled');
+            window.productsizeediteditem = null;
+        }
+        return !errors;
+    }
+    
+    function productSizeUpdateIerarhy()
+    {
+        $('#productSizeTree li>a').unbind('click').click(function () 
+        {
+            var element = $(this).closest('li');
+            window.productsizeediteditem = element;
+            var name = $(element).children('a').html();
+            var enabled = $(element).children('input.itemEnabled').val();
+            var localenames = '';
+            {% for locale in locales %}
+            var namelocale{{locale['shortName']}} = $(element).children('input.itemLocaleName{{locale['shortName']}}').val();
+            localenames = localenames +
+'                        <tr>'+
+'                            <td>Название ({{locale['fullName']}})</td>'+
+'                            <td><input type="text" name="popupItemName{{locale['shortName']}}" id="productSizePopupItemName{{locale['shortName']}}" value="'+htmlentities(namelocale{{locale['shortName']}})+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>';
+            {% endfor %}
+            $('#productSizeMenuItemPopup').html(
+'                <div id="productSizeMenuItemCfgTable">'+
+'                    <table class="cfgTable">'+
+'                        <tr>'+
+'                            <td colspan="2"><label><input type="checkbox" name="productSizePopupItemEnabled" id="productSizePopupItemEnabled" value="1" '+(enabled != 0 ? 'checked="checked"' : '')+' />Пункт включен</label></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+'                        <tr>'+
+'                            <td>Название</td>'+
+'                            <td><input type="text" name="productSizePopupItemName" id="productSizePopupItemName" value="'+htmlentities(name)+'" /></td>'+
+'                            <td class="cfgError"></td>'+
+'                        </tr>'+
+                        localenames+
+'                        <tr>'+
+'                            <td colspan="3"><button onclick="if (productSizeMoveItemParametersFromPopup() == true) {$(\'#productSizePopupCfgWindow\').hide();$(\'#productSizeMenuItemPopup\').html(\'\');}return false;">Сохранить</button><button onclick="$(\'#productSizePopupCfgWindow\').hide();$(\'#productSizeMenuItemPopup\').html(\'\');return false;">Отмена</button></td>'+
+'                        </tr>'+
+'                    </table>'+
+'                </div>');
+            $('#productSizeMenuItemCfgTable input, #productSizeMenuItemCfgTable button, #productSizeMenuItemCfgTable a.button').not('.uniformOff').uniform();
+            $('#productSizePopupCfgWindow').show();
+        });
+        $('#productSizeTree span.deleteButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('#productSizeTree ul>li>span.deleteButton').removeClass('unactive');
+        $('#productSizeTree span.moveButton').unbind('mousedown').unbind('mouseenter').removeClass('active');
+        
+        $('#productSizeTree span.deleteButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                              mouseleave(function () {$(this).removeClass('active');}).
+                                                              click(function () 
+        {
+            if (confirm('Вы действительно хотите удалить размер?')) 
+            {
+                var length = $(this).closest('li').parent().children('li').length;
+                var parent = $(this).closest('li').parent();
+                $(this).closest('li').remove();
+                if ((length == 1) && (parent.get(0) != $('#productSizeTree > ul').get(0))) parent.remove();
+            }
+            productSizeUpdateIerarhy();
+        });
+        $('#productSizeTree span.moveButton').not('.unactive').mousedown(function()
+        {
+            $(this).addClass('active');
+            $(this).closest('li').find('ul').hide();
+            window.productsizemoveelement = $(this).closest('li');
+            $(window.productsizemoveelement).parent().children().children('span.moveButton').mouseenter(function () 
+            {
+                if (window.productsizemoveelement != null)
+                {
+                    var elements = $(window.productsizemoveelement).parent().children();
+                    var indexnew = elements.index($(this).closest('li'));
+                    var indexold = elements.index($(window.productsizemoveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.productsizemoveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.productsizemoveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+        });
+    }
+    productSizeUpdateIerarhy();
+    $(document).mouseup(function () {window.productsizemoveelement = null; productSizeUpdateIerarhy(); $('#productSizeTree ul').show();});
+    $('#productSizeNameAdd').click(function ()
+    {
+        var name = $('#productSizeName').val();
+        var regname = /^[-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{1,999}$/i;
+        if (!regname.test(name)) $('#productSizeNameError').html('Имя должно содержать от 1 до 999 разрешенных символов'); else 
+        {
+            var localenames = '';
+            {% for locale in locales %}
+            localenames = localenames + '<input type="hidden" name="parameters[temp][]" class="itemLocaleName{{locale['shortName']}}" value="" />';
+            {% endfor %}
+            $('#productSizeNameError').html('');
+            $('#productSizeName').val('');
+            $('<li class="noselect"><span class="moveButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#">'+name+'</a>'+
+                    '<input type="hidden" name="parameters[temp][]" class="itemEnabled" value="1" />'+localenames+
+                    '</li>').appendTo('#productSizeTree > ul');
+            productSizeUpdateIerarhy();
+        }
+        return false;
+    });
+    function productSizeSubmitMenuFormUl(ul, form)
+    {
+        var index = 0;
+        $(ul).children('li').each(function (i, element)
+        {
+            if ($(element).children('input').length > 0)
+            {
+                var name = $(element).children('a').html();
+                var enabled = $(element).children('input.itemEnabled').val();
+                var localenames = '';
+                {% for locale in locales %}
+                var namelocale{{locale['shortName']}} = $(element).children('input.itemLocaleName{{locale['shortName']}}').val();
+                localenames = localenames + '<input type="hidden" name="sizes['+index+'][name][{{locale['shortName']}}]" value="'+namelocale{{locale['shortName']}}+'" />';
+                {% endfor %}
+                $(form).append('<input type="hidden" name="sizes['+index+'][enabled]" value="'+enabled+'" />'+
+                               '<input type="hidden" name="sizes['+index+'][name][default]" value="'+name+'" />'+localenames);
+                index++;
+            }
+        });
+    }
+    
+    $('#productSizeTree').closest('form').bind('submit', function () {productSizeSubmitMenuFormUl('#productSizeTree>ul', this);$('#productSizeTree>ul input').remove();});
+</script>

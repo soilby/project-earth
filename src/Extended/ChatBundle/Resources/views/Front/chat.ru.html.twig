@@ -1,0 +1,1030 @@
+<style>
+    #ec-chat-toggle {
+        background: #ff7 none repeat scroll 0 0;
+        box-shadow: 0 0 10px #000;
+        color: #000;
+        font-size: 12px;
+        height: 50px;
+        left: 50%;
+        line-height: 46px;
+        margin-left: -100px;
+        position: fixed;
+        text-align: center;
+        text-decoration: none;
+        top: 5px;
+        width: 200px;
+        z-index: 9998;
+        font-weight: bold;
+    }
+    
+    #ec-chat-main {
+        display: none;
+    }
+    
+    .ec-chat-popup {
+        background: #fff;
+        box-shadow: 0 0 10px #000;
+        height: 500px;
+        left: 100px;
+        position: fixed;
+        top: 100px;
+        width: 800px;
+        z-index: 9999;
+    }    
+
+    .ec-chat-popup h6{
+        background: #185359 none repeat scroll 0 0;
+        color: #fff;
+        margin: 1px;
+        padding: 6px;
+        text-align: center;
+        position: relative;
+        cursor: move;
+    }
+    
+    .ec-chat-popup a.ec-chat-popup-title-close {
+        color: #fff;
+        font-size: 25px;
+        position: absolute;
+        right: 3px;
+        text-decoration: none;
+        top: 0;
+    }
+    
+    .ec-chat-popup a.ec-chat-popup-title-close:hover {
+        text-shadow: 0 0 3px #fff;
+    }
+    
+    .ec-chat-popup-title-corner {
+        border-color: transparent #ccc #ccc transparent;
+        border-style: double;
+        border-width: 7px;
+        bottom: 0;
+        position: absolute;
+        right: 0;
+        cursor: nwse-resize;
+    }
+    
+    #ec-chat-hint-wrap {
+        display: none;
+        position: absolute;
+        z-index: 100000;
+        background: rgba(255,255,230,0.8);
+        font-size: 11px;
+        padding: 5px 10px;
+        border: 1px solid #333;
+        box-shadow: 0 0 5px #444;
+        color: #000;
+        opacity: 1;
+        line-height: 1.3;
+        text-align: left;
+        white-space: nowrap;
+    }
+    
+    .ec-chat-list {
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        bottom: 0;
+        margin: 5px;
+        position: absolute;
+        top: 30px;
+        width: 200px;
+        overflow-y: auto;
+    }
+    .ec-chat-list>ul {
+        list-style: none;
+    }
+    .ec-chat-list>ul>li {
+        display: block;
+        font-size: 14px;
+        padding: 5px;
+        cursor: pointer;
+    }
+    .ec-chat-list>ul>li:hover {
+        background: #ccc;
+        
+    }
+    .ec-chat-list>ul>li.active {
+        background: #185359;
+        color: #fff;
+    }
+    
+    .ec-chat-list-members {
+        list-style: none;
+        font-size: 0;
+        white-space: nowrap;
+        margin-top: 5px;
+        opacity: 0.4;
+    }
+    .ec-chat-list>ul>li:hover .ec-chat-list-members {
+        opacity: 1;
+    }
+    .ec-chat-list-members>li {
+        display: inline-block;
+        font-size: 11px;
+        padding-right: 5px;
+    }
+    .ec-chat-list-members>li>img {
+        width: 20px;
+        height: 20px;
+        max-width: 20px;
+        max-height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+        border-radius: 10px;
+    }
+    .ec-chat-list-create {
+        padding: 10px 0;
+        text-align: center;
+    }
+    
+    .ec-chat-messages {
+        border-radius: 3px;
+        bottom: 105px;
+        left: 206px;
+        margin: 5px;
+        position: absolute;
+        right: 0;
+        top: 30px;
+        overflow-y: auto;
+    }
+    
+    .ec-chat-messages ul {
+        list-style: none;
+    }
+    
+    .ec-chat-messages li {
+        display: block;
+        position: relative;
+    }
+    
+    .ec-chat-message {
+        background: #ddd none repeat scroll 0 0;
+        border-radius: 10px;
+        margin: 5px 0 5px 60px;
+        min-height: 40px;
+        padding: 5px 10px;
+        position: relative;
+    }
+    .ec-chat-message::before {
+        border-color: #ddd #ddd transparent transparent;
+        border-style: solid;
+        border-width: 6px;
+        content: " ";
+        display: block;
+        left: -12px;
+        position: absolute;
+        top: 10px;
+    }
+    
+    .ec-chat-message-author {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    
+    .ec-chat-message-author img {
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+    }
+    
+    .self .ec-chat-message {
+        background: #B3D7D7 none repeat scroll 0 0;
+        margin: 5px 60px 5px 0;
+    }
+    .self .ec-chat-message::before {
+        border-color: #B3D7D7 transparent transparent #B3D7D7;
+        right: -12px;
+        left: auto;
+    }
+    
+    .self .ec-chat-message-author {
+        right: 0;
+        left: auto;
+    }
+   
+    .ec-chat-form {
+        bottom: 0;
+        height: 100px;
+        left: 206px;
+        margin: 5px;
+        position: absolute;
+        right: 0;        
+    }
+    .ec-chat-form.unactive::after{
+        position: absolute;
+        z-index: 999;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: #fff;
+        background: rgba(255,255,255,0.7);
+        display: block;
+        content: " ";
+    }
+    .ec-chat-form textarea {
+        border-radius: 3px;
+        box-sizing: border-box;
+        height: 65px;
+        resize: none;
+        width: 100%;        
+    }
+    .ec-chat-form .ec-chat-tools {
+        bottom: 0;
+        left: 15px;
+        position: absolute;
+    }
+    .ec-chat-form .button {
+        bottom: 0;
+        position: absolute;
+        right: 15px;
+    }
+    .ec-chat-tools a{
+        background: #fff none repeat scroll 0 0;
+        border: 1px solid #fff;
+        display: inline-block;
+        font-size: 0;
+        height: 25px;
+        line-height: 25px;
+        text-align: center;
+        text-decoration: none;
+        vertical-align: top;
+        width: 27px;
+    }
+    .ec-chat-form .ec-chat-tools a:hover, .ec-chat-form .ec-chat-tools a.hover{
+	background: #ffffff;
+	background-image: -webkit-linear-gradient(top, #ffffff, #c4c4c4);
+	background-image: -moz-linear-gradient(top, #ffffff, #c4c4c4);
+	background-image: -ms-linear-gradient(top, #ffffff, #c4c4c4);
+	background-image: -o-linear-gradient(top, #ffffff, #c4c4c4);
+	background-image: linear-gradient(to bottom, #ffffff, #c4c4c4);
+	border: solid #e7e7e7 1px;
+    }
+    .ec-chat-tools a.active{
+	background: #edeaed;
+	background-image: -webkit-linear-gradient(top, #edeaed, #bfbfbf);
+	background-image: -moz-linear-gradient(top, #edeaed, #bfbfbf);
+	background-image: -ms-linear-gradient(top, #edeaed, #bfbfbf);
+	background-image: -o-linear-gradient(top, #edeaed, #bfbfbf);
+	background-image: linear-gradient(to bottom, #edeaed, #bfbfbf);
+	border: solid #c7c7c7 1px;
+    }
+    
+    .ec-chat-form-cfgtool::before {
+        content: " ";
+        display: inline-block;
+        width: 21px;
+        height: 21px;
+        vertical-align: middle;
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wwJCR0hK5DhHAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAADRklEQVQ4y91VQUhqWxRdR71Q5A0zlIJCuwYOooEQRFAUCEVBFNR/DYIKollQBAk2jKJRoxpEOahJ0HtFQQRRqTkMQiXDRCOScmAXbqXWNZT2Gzy6D+nzH7z3/+Tv4Tqw9jrrrL0P8L+vWCxGAHB9fU3/CuH4+Dg1NjaS1+uljo4O6u3tLSBW/Q5pRUUFRFHE6OgoYrEYKisr8UvSYDBIDQ0NZLPZ6OTkRFERj8fJ6XSS2+1Ga2srTk9PMTAwAL/fj+npabq8vKQC0kgkQiMjI7S7u0vhcBiSJOH5+RnBYBBer5eGh4fp/v4eW1tbiMfjaG5uRlFREdra2iCKInZ2dpBMJgEA7IO0r6+PAoEAGPsBEf20iTEGIoLFYsHKygpWV1fhdrvR1dUFn88Hs9kMp9OJ8vJyGAwGpijt7OxUyIgIVqsV9fX1UKlUSoP29nbwPA9JkiBJEkKhEO7u7pBMJqHX678ZDAYGABoAOD8/p3A4/MNklQrLy8uw2+0gIoRCIQwNDUGWZXAch9vbW/T398NkMsHhcMDlckGv18NoNH4peBiLxUKCIJAgCDQ4OEiSJCl3F0Xx68zMjHIuCAJdXFxQJpMhAEilUvT09PQ5UirVzxDkcjno9XrFa4PB8CWbzRaIeH9/h1arZQBQWlrKdDod+xShTCZDx8fHipK1tTWl897eHlmtVhIEgVwuFyUSCdrc3KSJiQkCgNnZWVpcXPysVKvVsmg0qoALCwtoamqilpYWmpqaQi6X+xhNcBwHn8+H/f192O12Wl9fh8fj+fvwBwIBAIBarYZarUYymUQikQAAcBwHAPD7/YhEIiguLobRaER3dzdqa2uh0+ng9Xo/74DHx0dyOBx0dnZGbrdbscLlclE0GqXJyUm6urpS8I2NDUqlUuTxeBTs6OiIlEgBQFlZGXt9fSVZliFJEsxmM4gIdXV10Ol03+bn5/8qKSlhS0tLdHh4iIODA5hMJmxvb6Oqqgo9PT2oqan556WRz+cpn8+TKIoF10qn0zQ3N1cQsbGxMUqn0/TLLaXRaJhGo2EfU/JRPM8zWZZRXV2Nm5sbZrPZ8Pb2Bp7n2R/t00wmQy8vL/Tw8PA1nU5TNpul//xX+A5rTqldbBMZZgAAAABJRU5ErkJggg==) no-repeat center center;
+    }
+    
+    .ec-chat-form-soundtool::before {
+        content: " ";
+        display: inline-block;
+        width: 21px;
+        height: 21px;
+        vertical-align: middle;
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wwJCSkFrLn2OgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAABtUlEQVQ4y+WVu4oiQRSG/9IWr21iLEIhtIEoGo2ZBl2IIBiZ6QuY7YtsLA0+gAaGghgpaOIFTEpMZx7ABrFtvJwNhlm2x9mheyZZ2JNV1eGrv/46pwr4b2IymdC3IVJKMgyDWq0WZTIZ4pzTYDBwgBU3oOVySbPZDNPpFPV6Hff73bFu2zY8QRuNBjWbzU9zGGOOse+z5NVqRdvt1rNFPi8K3kcikUAoFHqYV7yqSCaT0HUdQggUCgXouv41qKZpEEJACAFN03A+n19isVgSAMrlMnmCEr3mj0Yj1u/3+6qqNt2IUNx4KqUkVVWZW4tcHf/PulwsFjSfz3E4HJBKpdDr9b4G9fv9AADDMKjdbuN2u3lXKqWk6/WKy+XyWnc+3wsAbDabD4HxePzvOwyHQ6pUKsQ5J845FYtF4pzTfr9/fsvpdDq/e75UKlG32324fYf5uVyOjsfjw2bj8fhHOp3+CQCWZVEgEIBt2wgGg7Asa/C+KhwdVavVHoDVahVvQAAIh8NMURQWjUaZoijsozJzKD2dTrTb7bBer0FEyOfzyGaziEQi7NtvpmmaT6ZpPv1Tv8EvNnCm1AYeciIAAAAASUVORK5CYII=) no-repeat center center;
+    }
+    
+    .ec-chat-form-closetool::before {
+        content: " ";
+        display: inline-block;
+        width: 21px;
+        height: 21px;
+        vertical-align: middle;
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wwJCSs1uFakFAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAABV0lEQVQ4y+2Uv4qDQBDGP08rk1c4hMUuna9gmSewSRGRLILIvUFK8QGskpQp7ppA+qwgWKdLYbq7R1AhRTJXHIi53HpeuDIfLOyf2d/M7AwLPPTfUmQHh8OByrIEAKiqCsuylLu97Pd7Go/HxBi7GkVRvALAer2mMAzpT1DHcWgymUgvRVFEjDFyXVdq8/RDpPA8T+pUVVUAgBACMrD2feN0OuF8PgMA8jynJEmaNQBst9tmLoTAdDql1WqldEIBgOgrgKIokOd553OlaQrXdWm5XCrS9NtQTdN61UEIgSAIqBN6jwzDQC/oYDDoBeScYzabvUkNGGO02+2k7TKfz6/6N45jKsvyvbOldF1HVVW9ouecw/f9j+Fw+NxZfdu2kSQJNpsN6bre9KZt20q7iDKgVEEQ0Gg0alI0TZOOx+MLAGRZRovF4iblX1XXNV0uF2rr8ff21ifHiKp3pARBegAAAABJRU5ErkJggg==) no-repeat center center;
+    }
+
+    .ec-chat-form-smiletool::before {
+        content: " ";
+        display: inline-block;
+        width: 21px;
+        height: 21px;
+        vertical-align: middle;
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wwJCS4HDfYB0QAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAACb0lEQVQ4y+VUP0hqYRw99/VQEGoWyuWGeYfSIDBaFCUwSpSIqEB0amjsTS3RH4iWBt1KpEEiIqFCCATdG4wiQgpaBB0cRKubXLwa5y2vS/JemW9879vO951z+P2+73w/4L9eQjvC9fU1i8UiFEWB0WiEw+EQ/tr09PSU8XgcNzc36OnpgV6vR6VSQXd3N/x+P9bW1oSOyl9fX6ckSdzc3CQAvL6+stlsslar8ezsjC6Xi+Pj48xms/ySYTgcps1m4+XlJV9eXv4okmW5sLi4SLfb3d706uqKAwMDTKfTLJVK3NnZ4dHRUYtwa2uL6XSaT09Pyx6PhysrK58br66ucmFhgQCQSCQoiiLNZrMmikQiFEWRDoeDAJBKpTg0NPSb6bf3IJvNwuPxAABmZ2eF0dFRzM3NaedOpxM2mw3z8/MAgImJCUEQBCSTyY+rtVqtzGQyGqFer7NWq7UIVFXl8/Pz8Rv2er2MxWItnO/vQVdXF1RV1XA+ny9aLBbTe45Op2uJUqPRgE6n+7h9k8mEh4cHLfTT09N9t7e3LVVsbGwwFAppe4VCAb29vZ/HaXJyUhMEAgFOTU0xk8nw7u6Ou7u7tFgsPD8/JwDs7+/Tbre3j9Xg4CCj0ahGXFpaYn9/P0VR5MjICBOJBMvlMnO5HMfGxhiJRNqbJpNJSpLEg4MDAoCiKJRlmW+P9Pj4yFwuR6/Xy5mZma/9qGq1unx4eEhJkhgMBnlycqIJLy4uuL29zeHhYQYCAXY0UKrV6nKpVPqxt7fXl0qlWhIhSRKCwSB8Ph8MBoPQ8VxUFIWqqhIA7u/vj2VZ5q8rOP43Jv9PXdNKuoKp/DwAAAAASUVORK5CYII=) no-repeat center center;
+    }
+
+    .ec-chat-form-attachtool::before {
+        content: " ";
+        display: inline-block;
+        width: 21px;
+        height: 21px;
+        vertical-align: middle;
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wwJCTIsRz2lzAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAACBElEQVQ4y9XUvWoqURQF4OXFCSEPkOpWE3VS6ciYEK1ERAbSBazEQQsbRfzBOghaydgopAqoD2Bj5U+iaGOhaazs8waOiClk3SoSk0DUW2V3e8P52BzOWcBvKdPnwXw+Z71ex2QywWazgcPhgKZpUBTFdBQ6n88Zi8WwXq9xd3cHQRDQarWwWCyg6zr8fr/p4LWz2Syvrq4IAIZh3BiGcQMA4XCYdrud/X6fB6Mej4elUunbg5qm7Q3/+di8vb1BEIRtPxgMeHt7S5/Px0AgAFmWkU6n8RO8g9rtdvR6vW1fLBYhCAKcTifu7+/hdrshyzIymQyen5/3u4rpdEpJkhiPxwkALpeL5XKZq9WK1WqVoijy4eGB4XCYDoeDg8FgP7jdbtNmszEej7NSqdBqtbLRaNAwjG/h0Wj0BTZ/Hqiqaup0OkwmkzCbzQiFQigUCiCJSCQCANB1HblcDufn5zg5Odn/JXS7XdpsNqZSKebzeVosFtbr9Z2NHx8fD39ivV7vC1yr1XbgSqVyHCxJ0ha+vr5+/xysVqu8uLhgs9k8HO52u1v443yxWLxGIhEGg0EelTzvGycSiR2gXC7T5/Px6Eh7enqiJEmMRqN8eXnheDym1+tlNpvlf2XlcDikoigURZGiKFJVVf6Yp/vUcrl8nc1mf09PT3F5eYmzszMTfmX9A8RKI+4VNwP/AAAAAElFTkSuQmCC) no-repeat center center;
+    }
+    
+    #ec-chat-cfg {
+        display: none;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: #fff;
+        background: rgba(255,255,255, 0.7);
+        z-index: 10000;
+    }
+    
+    .ec-chat-cfg-popup {
+	position: relative;
+	top: 100px;
+	left: 50%;
+	width: 400px;
+	background: #fff;
+	box-shadow: 0 0 5px #000;
+	margin-left: -200px;
+	text-align: left;
+    }
+
+
+    .ec-chat-cfg-popup h4{
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: bold;
+    }
+
+    .ec-chat-cfg-popup p{
+	padding: 5px 20px;
+    }    
+    
+    .ec-chat-cfg-members {
+        border: 1px solid #ccc;
+        height: 200px;
+        margin: 0 20px;
+        overflow-y: auto;        
+    }
+    .ec-chat-cfg-members label {
+        display: block;
+    }
+    .ec-chat-preloader {
+        display: block;
+        height: 13px;
+        padding: 5px 0;
+        background:url(data:image/gif;base64,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) no-repeat center center;
+    }
+    .ec-message-attachment {
+        color: #900;
+        display: block;
+    }
+    .ec-message-attachment img {
+        border: 1px solid #777;
+        border-radius: 10px;
+        display: inline-block;
+        height: 100px;
+        max-height: 100px;
+        max-width: 100%;
+        min-height: 100px;
+    }
+    .ec-message-removed {
+        font-size: 11px;
+        color: #777;
+        font-style: italic;
+    }
+    #ec-chat-container a:focus {
+        outline: none;
+    }
+    #ec-chat-smiles {
+        display: none;
+        background: #fff none repeat scroll 0 0;
+        border: 1px solid #000;
+        bottom: 28px;
+        position: absolute;
+        right: -165px;
+        width: 192px;
+        font-size: 0;
+    }
+    #ec-chat-smiles a{
+        border: medium none;
+        display: inline-block;
+        height: 24px;
+        text-decoration: none;
+        vertical-align: top;
+        width: 24px;
+    }
+    #ec-chat-smiles a:hover{
+        background: #ddd;
+    }
+    .ec-chat-cite {
+        color: #555;
+        font-style: italic;
+    }
+    #ec-chat-form-preloader {
+        display: none;
+        position: absolute;
+        bottom: 7px;
+        right: 3px;
+        width: 14px;
+        height: 14px;
+        background:url(data:image/gif;base64,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) no-repeat center center;
+    }
+</style>
+<div id="ec-chat-container">
+    <a id="ec-chat-toggle">Новых сообщений: <span>0</span></a>
+    <div class="ec-chat-popup" id="ec-chat-main">
+        <h6>Чат<a href="#" class="ec-chat-popup-title-close">&#10006;</a></h6>
+        <span class="ec-chat-popup-title-corner"></span>
+        <div class="ec-chat-list">
+            <ul>
+                <li><div class="ec-chat-preloader"></div></li>
+            </ul>
+            {% if isMaster %}
+            <div class="ec-chat-list-create">
+                <button class="button" id="ec-chat-list-create">Создать чат</button>
+            </div>
+            {% endif %}
+        </div>
+        <div class="ec-chat-messages">
+            <div class="ec-chat-preloader" id="ec-chat-messages-preloader" style="display:none"></div>
+            <ul id="ec-chat-messages-container">
+            </ul>
+        </div>
+        <div class="ec-chat-form unactive">
+            <textarea id="ec-chat-form-message" autocomplete="off"></textarea>
+            <div class="ec-chat-tools" id="ec-chat-tools">
+                {% if isMaster %}
+                <a href="#" class="ec-chat-form-cfgtool ec-chat-hint" data-hint="Настройки чата">&nbsp;</a>
+                {% endif %}
+                <a href="#" class="ec-chat-form-soundtool ec-chat-hint" data-hint="Включить/выключить звук">&nbsp;</a>
+                <a href="#" class="ec-chat-form-closetool ec-chat-hint" data-hint="Выйти из чата">&nbsp;</a>
+                <a href="#" class="ec-chat-form-attachtool ec-chat-hint" data-hint="Послать файл" id="ec-chat-form-attachtool">&nbsp;</a>
+                <a href="#" class="ec-chat-form-smiletool ec-chat-hint" data-hint="Вставить смайл">&nbsp;</a>
+                <div id="ec-chat-smiles">
+                </div>
+            </div>
+            <div id="ec-chat-form-preloader"></div>
+            <a href="#" class="button" id="ec-chat-form-send">Отправить</a>
+        </div>
+    </div>
+    {% if isMaster %}
+    <div id="ec-chat-cfg">
+        <div class="ec-chat-cfg-popup">
+            <h4></h4>
+            <p>Название чата <input type="text" id="ec-chat-cfg-title" /></p>
+            <p>Участники чата:</p>
+            <div class="ec-chat-cfg-members">
+                {% for user in users %}
+                <label><input type="checkbox" data-userid="{{user['id']}}" class="ec-chat-cfg-users" />{{user['fullName']}}</label>
+                {% endfor %}
+            </div>
+            <p class="tac"><a href="#" id="ec-chat-cfg-submit" class="button">Сохранить</a><a href="#" id="ec-chat-cfg-cancel" class="button">Отмена</a></p>
+        </div>
+    </div>
+    {% endif %}
+    <div id="ec-chat-hint-wrap"></div>
+    <audio id="ec-chat-sound" src="data:audio/mpeg;base64,//M0xAALgI4cCHhMICMDKJOY5yOhJnkyZMmn4jexCDEC0/H7ICwt7y58h/rd4IfB9//6gAD74P/E75cJy2ygCoKODgVNW02K//M0xA0HgBJcvimGAEVOC7P1e1frT9u2Q7+r1+3oQpEFAF0Ay4lESicU7vZyNROCEU1F7RgOCKC3nSyCzrVKldGn6bMfb9Ot//M0xCoLYJ48AHpMBOggvqUIkGXSyYABIGZQcGBNCu5J9jZZFLXo6qLVWd37u7tv0NT/6xgA5JJgCmFD8DYOAKwJFujNku9B//M0xDcI+BJlHhhGANSxV7v9H9Or9Go3+ywg7zwwwAD98swvvuZzQWLOyEhpzrs8kXAcIBSgHmpsJIBzoacFOEkYk6J+NH/K//M0xE4HQBZgXUYQAOx0+aOpH3fRK45hAiCi49VJbb8MvizhAAbaBoookFLv/9noWM1H/6//5omeL5vdlnBJCgAGlJJJJJBI//M0xGwYQirdlY+YAAAABLDYAHx/As4P6LXEITB3eamYDKTItQt3BsyYmTidikieMWSos7SLlAnjQvujzVd0XLp80OIm/1oq//M0xEYYQebiX4uAA0V0qZxkDNT6te7IvZ0UHRTQsn/5rP8Y78qF2od/2rZlyM4SJLNCbBQCicSJXO/JRn0S51U8zPeZz1v7//M0xCAT8i38CcYwAX///3/+t8u+xj4/3+qepxH4jC38/mHTP86qKWpI/RmJHdQpRXunwkhajbA1rDwsJi5f+4/38q/////u//M0xAsOWkX0AAiNgFpwb7GareYdE2UgfUprtE+1kxMyROTAnpjj+cRPVd9KPKRegsjGCR4pI2E3VZ91/n5SNpcvL//v/5Xn//M0xAwPYi30AAgTCf+rjVLOqD821Mn259PUaNjUMmGTKTkoIMdCZVhpRcMkTnF09ScrJA/E4eAsmSJtBfWFn//P////f/M3//M0xAkMYj38AAgMtcP+zd2L18ef7QfnG4zofN+or0+i82iiRmoIIV1TIHMTa+uEcqypZOJF9f/y+HL/////z//Aw2Hf9WM3//M0xBIL6jn8AAjNobhyOc+KS9o3W4nbT4P3W0pTPvAi2lCH4pHYhE45Cv/y///5/////4+auggrhP7mSYUeDseh033TEC8P//M0xB0Mgj38AAjNoF2ldAhXLmRJrZLRafdp+WCQR2UUrcCG/5fPkS///5f/Pk+ssTbmspbihkKxt99luDUCU0+QUOOO4MRQ//M0xCYLYjoAAAgG7RBMCWV8cRMaCBQLQCUCujep3s1Ku5/kc/v/3/7/z775Vr84yUJB1zfvs8RM9SnZrQFPUDwhn4UCUE3G//M0xDMLqY4JkBBGvYQAAWW9rmEFWqdqqdL9v3DPrLqssbgb1U/vay6x1KqmpDYsLuuTVCnMmq9AAEACALHGuJCd46ZtOVej//M0xD8IiBYhmAjEAE5j0bUo3uVrW5TDNFK7HyEczE+gAgNHf6L4jOPfzrr8WSeBYGCY0cCYEBgMLc8pSrWjAlv/kOmiup/t//M0xFcKuGYgCEmEDMpkFf9lcHpoup3rXBEEcEZCbtmQIGQAGZPG7yFdkwMSDIDFggAw0AgMTNkDJABBsk3QwDhGfNzw+C+x//M0xGcLkF40CUwYAHvmBo+me/6mTQVUha3/QSQZa0lIkyir//dCOZdbU0Ez//5UWXnNSIfVcsjKtv3wwAFVSjAQEcZmYMzB//M0xHMYEhqcAZqoAJVVQESsBA0DQNREeKgrKjAaU8Sgr6wWBoGjxUGgafwa/9BUNKBoGQwADh5ZZNUuZ4Y4d4j+XXLq+tLY//M0xE0OQGbmX8MYAsj8rrtI31OeSNX3CvqeKpfg0wH62XqJTEjgAPjXMqz86tcom5MupsP7cVFp0ufOjM6CYsrRFYXPnhJc//M0xE8WoknoOBmZhHUyZeTGWXqIoS4i9QixyAIkGYTJgGqdgNsBolsccnz//FYGUUV44ze0ylLH4ySMuFTizUHh9I6kVZMH//M0xC8WmknkAApZhJIWSxYyudnJiWzxsRzBEJWNOmgMmXR4MkTbA6JyAJZGJD5fZ8zQj9BLsHRqSAMCGAJXln3orfymc+9///M0xA8QCkH6MAjNoD/+v6LxHx2xBnDsVAiBQFVIkMIMlSDcsIEKg4tNS1pFECtchGCEjrA3lIt4R6zEzZTVkmjiTkRAI3qe//M0xAkJuAIGWAhElDzt1an8Yezzqzv9T9eWfLPln/LPyoKu8qo8sFoK1gWhIz////kR87Lf7LLY6GrWS/2WAgaCxIEFDAwY//M0xB0JGcE4EgBHDCDoaCviwqK1TEFNRTMuOTkuNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"></audio>
+</div>
+<script>
+    var ecChat = {
+        updateTime: 15,
+        smiles: [
+            {symb: ":-)", file: "/img/smiles/happy.png", regexp: / :\) | :\-\) | =\) /g},
+            {symb: ":-D", file: "/img/smiles/excited.png", regexp: / :\-D | :\-d | :D | :d | =D | =d /g},
+            {symb: ":-(", file: "/img/smiles/sad.png", regexp: / :\( | :\-\( /g},
+            {symb: ";-(", file: "/img/smiles/wink.png", regexp: / ;\-\( | ;\( | ;\^\( /g},
+            {symb: ":-P", file: "/img/smiles/tongue.png", regexp: / :P | :p | :\-P | :\-p /g},
+            {symb: ":-O", file: "/img/smiles/shocked.png", regexp: / =\-O | =\-o | :\-O | :\-o | O_O /g},
+            {symb: ":-*", file: "/img/smiles/kiss.png", regexp: / :kiss: | :\-\* /g},
+            {symb: "B-)", file: "/img/smiles/glasses-cool.png", regexp: / 8\-\) | B\-\) /g},
+            {symb: ":-[", file: "/img/smiles/embarrassed.png", regexp: / :\-\[ /g},
+            {symb: ":'(", file: "/img/smiles/crying.png", regexp: / :'\-\( | :'\( /g},
+            {symb: ":-/", file: "/img/smiles/thinking.png", regexp: / :\-\/ | :\-\\\\ /g},
+            {symb: "O:-)", file: "/img/smiles/angel.png", regexp: / O:\-\) | o:\-\) /g},
+            {symb: ":-X", file: "/img/smiles/shut-mouth.png", regexp: / :\-X /g},
+            {symb: ":-$", file: "/img/smiles/moneymouth.png", regexp: / :\-\$ /g},
+            {symb: ":-!", file: "/img/smiles/foot-in-mouth.png", regexp: / :\-\! /g},
+            {symb: ">:o", file: "/img/smiles/shout.png", regexp: / &gt;:o | &gt;:O /g},
+            {symb: ">:-(", file: "/img/smiles/angry.png", regexp: / &gt;:\-\( | &gt;:\( | X\-\( | x\-\( /g},
+            {symb: ":-|", file: "/img/smiles/neutral.png", regexp: / :\-\| | :\| /g},
+            {symb: "\\m/", file: "/img/smiles/victory.png", regexp: / \\m\/ /g},
+            {symb: "C:-)", file: "/img/smiles/skywalker.png", regexp: / C:\-\) | c:\-\) | C:\) | c:\) /g},
+            {symb: ":-(|)", file: "/img/smiles/monkey.png", regexp: / :\-\(\|\) | :\(\|\) | 8\-\|\) /g},
+            {symb: "O-)", file: "/img/smiles/cyclops.png", regexp: / O\-\) | o\-\) /g},
+            {symb: "@->--", file: "/img/smiles/rose.png", regexp: / @\-&gt;\-\- | :rose: /g},
+            {symb: "<3", file: "/img/smiles/in_love.png", regexp: / :heart: | :love: |&lt;3/g},
+            {symb: ":yes:", file: "/img/smiles/good.png", regexp: / :yes: /g},
+            {symb: ":no:", file: "/img/smiles/bad.png", regexp: / :no: /g},
+            {symb: ":wait:", file: "/img/smiles/stop.png", regexp: / :wait: /g},
+            {symb: ":telephone:", file: "/img/smiles/phone.png", regexp: / :telephone: /g},
+            {symb: ":email:", file: "/img/smiles/mail.png", regexp: / :email: /g},
+            {symb: ":jabber:", file: "/img/smiles/lamp.png", regexp: / :jabber: /g},
+            {symb: ":cake:", file: "/img/smiles/cake.png", regexp: / :cake: /g},
+            {symb: ":brokenheart:", file: "/img/smiles/love-over.png", regexp: / :brokenheart: /g},
+            {symb: ":music:", file: "/img/smiles/musical-note.png", regexp: / :music: /g},
+            {symb: ":beer:", file: "/img/smiles/beer.png", regexp: / :beer: /g},
+            {symb: ":coffee:", file: "/img/smiles/coffee.png", regexp: / :coffee: /g},
+            {symb: ":money:", file: "/img/smiles/coins.png", regexp: / :money: /g},
+            {symb: ":moon:", file: "/img/smiles/moon.png", regexp: / :moon: /g},
+            {symb: ":sun:", file: "/img/smiles/sun.png", regexp: / :sun: /g},
+            {symb: ":star:", file: "/img/smiles/star.png", regexp: / :star: /g},
+            {symb: ":poop:", file: "/img/smiles/poop.png", regexp: / :poop: /g},
+        ],
+        
+        soundEnabled: true,
+        mainPopupVisible: false,
+        mainPopupPosition: {
+            left: 100,
+            top: 100,
+            width: 600,
+            height: 400
+        },
+        mainPopupDragMode: 0,
+        mainPopupDragPosition: {
+            left: 0, 
+            top: 0
+        },
+        chats: null,
+        activeChat: null,
+        requestTimeout: null,
+        newMessages: 0,
+        endLoaded: false,
+        minMessageId: -1,
+        editChatId: null,
+        
+        
+        soundChangeState: function () {
+            this.soundEnabled = !this.soundEnabled;
+            var date = new Date();
+            date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
+            var expires = "; expires=" + date.toGMTString();
+            var value = this.soundEnabled;
+            document.cookie = "ec-chat-sound=" + value + expires + "; path=/";
+            if (this.soundEnabled) {
+                $('#ec-chat-tools .ec-chat-form-soundtool').addClass('active');
+            } else {
+                $('#ec-chat-tools .ec-chat-form-soundtool').removeClass('active');
+            }
+        },
+        
+        soundLoadState: function () {
+            var nameEQ = "ec-chat-sound=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1, c.length);
+                }
+                if (c.indexOf(nameEQ) == 0) {
+                    c = c.substring(nameEQ.length, c.length);
+                    if (c == 'true') {
+                        this.soundEnabled = true;
+                    } else {
+                        this.soundEnabled = false;
+                    }
+                }
+            }
+            if (this.soundEnabled) {
+                $('#ec-chat-tools .ec-chat-form-soundtool').addClass('active');
+            } else {
+                $('#ec-chat-tools .ec-chat-form-soundtool').removeClass('active');
+            }
+        },
+        
+        mainPopupSavePosition: function () {
+            var date = new Date();
+            date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
+            var expires = "; expires=" + date.toGMTString();
+            var value = this.mainPopupPosition.left + ',' + this.mainPopupPosition.top + ',' + this.mainPopupPosition.width + ',' + this.mainPopupPosition.height;
+            document.cookie = "ec-chat-popup-position=" + value + expires + "; path=/";
+        },
+        
+        mainPopupUpdatePosition: function () {
+            $('#ec-chat-main').css({'left': this.mainPopupPosition.left + 'px', 'top': this.mainPopupPosition.top + 'px', 'width': this.mainPopupPosition.width + 'px', 'height': this.mainPopupPosition.height + 'px'});
+        },
+        
+        mainPopupRestorePosition: function () {
+            var nameEQ = "ec-chat-popup-position=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1, c.length);
+                }
+                if (c.indexOf(nameEQ) == 0) {
+                    c = c.substring(nameEQ.length, c.length);
+                    var p = c.split(',');
+                    if (p.length == 4) {
+                        this.mainPopupPosition.left = p[0];
+                        this.mainPopupPosition.top = p[1];
+                        this.mainPopupPosition.width = p[2];
+                        this.mainPopupPosition.height = p[3];
+                    }
+                }
+            }
+        },
+        
+        mainPopupHide: function () {
+            $('#ec-chat-main').hide();
+            this.mainPopupVisible = false;
+        },
+        
+        mainPopupShow: function () {
+            this.mainPopupUpdateChatList();
+            this.mainPopupRestorePosition();
+            this.mainPopupUpdatePosition();
+            $('#ec-chat-main').show();
+            this.mainPopupVisible = true;
+        },
+        
+        mainPopupUpdateChatList: function () {
+            if (this.chats === null) {
+                return;
+            }
+            $('#ec-chat-main .ec-chat-list>ul').html('');
+            for (var i in this.chats) {
+                var chat = this.chats[i];
+                var chatLi = '<li data-chatid="' + chat.id + '" ' + (chat.id == this.activeChat ? 'class="active"' : '') + '>';
+                chatLi += (chat.newMessages > 0 ? '<strong>' + chat.title + '(' + chat.newMessages + ')</strong>' : chat.title);
+                chatLi += '<ul class="ec-chat-list-members">';
+                var c = 0;
+                for (var j in chat.members) {
+                    if (c < 6) {
+                        chatLi += '<li class="ec-chat-hint" data-hint="'+chat.members[j].fullName+'"><img src="'+(chat.members[j].avatar != '' ? '/helper/imageresize.php?width=50&height=50&scale=n&url='+chat.members[j].avatar : '/img/noava.png')+'" /></li>';
+                    } else {
+                        chatLi += '<li>...</li>';
+                        break;
+                    }
+                    c++;
+                }
+                chatLi += '</ul></li>';
+                $('#ec-chat-main .ec-chat-list>ul').append(chatLi);
+            }
+        },
+        
+        notifyNewMessages: function () {
+            var messages = 0;
+            for (var i in this.chats) {
+                messages += parseInt(this.chats[i].newMessages);
+            }
+            $('#ec-chat-toggle>span').text(messages);
+            if (this.newMessages < messages) {
+                if (this.soundEnabled) {
+                    $('#ec-chat-sound')[0].play();
+                }
+                for (var x = 1; x <= 5; x++) {
+                    $('#ec-chat-toggle').animate({'margin-left': -120}, 30).animate({'margin-left': -80}, 60).animate({'margin-left': -100}, 30);
+                }
+            }
+            this.newMessages = messages;
+        },
+        
+        bindResponse: function (data) {
+            if (data.chats) {
+                this.chats = data.chats;
+                this.notifyNewMessages();
+                if (this.mainPopupVisible) {
+                    this.mainPopupUpdateChatList();
+                }
+            }
+            if ((typeof data.activemessages == 'object') && (data.activemessages.length > 0)) {
+                this.addMessages(data.activemessages, false);
+                this.scrollChatToBottom(0);
+            }
+            if (data.action == 'object.chat.load') {
+                if (data.position != 'bottom') {
+                    var pos = this.scrollChatToBottom();
+                } else {
+                    var pos = 0;
+                }
+                this.addMessages(data.messages, true);
+                this.scrollChatToBottom(pos);
+                if (data.loaded == 'end') {
+                    this.endLoaded = true;
+                } else {
+                    this.endLoaded = false;
+                }
+            }
+            if (data.action == 'object.chat.delete') {
+                if (data.deleteMessage) {
+                    $('#ec-chat-message-'+data.deleteMessage+' .ec-chat-message').html('<span class="ec-message-removed">Сообщение удалено</span>');
+                }
+            }
+        },
+        
+        request: function (operation, data) {
+            if (this.requestTimeout !== null) {
+                clearTimeout(this.requestTimeout);
+            }
+            this.requestTimeout = setTimeout(function () {ecChat.request("info", {});}, this.updateTime * 1000);
+            $('#ec-chat-form-preloader').show();
+            $.ajax({
+                type: "POST",
+                url: '?actionobject=chat&action=' + operation + '&ajax=result' + (this.activeChat != null ? '&actionactivechat=' + this.activeChat : ''),
+                data: data,
+                dataType: 'json',
+                global: false,
+                complete: function () {
+                    $('#ec-chat-form-preloader').hide();
+                },
+                error: function () {
+                },
+                success: function (data) {
+                    ecChat.bindResponse(data);
+                }
+            });	      
+        },
+        
+        addMessages: function (messages, prepend) {
+            $('#ec-chat-messages-preloader').hide();
+            for (var i in messages) {
+                var message = messages[i];
+                var text = $("<div>").text(message.message).html();
+                text = text.replace(/^&gt;&gt; (.*)$/mg, '<span class="ec-chat-cite">$1</span>');
+                text = text.replace(/\r?\n\r?/g, '<br />');
+                if (message.attachment != '') {
+                    if ((message.attachmentMimetype == 'image/gif') || (message.attachmentMimetype == 'image/jpeg') || (message.attachmentMimetype == 'image/pjpeg') || (message.attachmentMimetype == 'image/png')) {
+                        text += '<a target="_blank" class="ec-message-attachment" href="{{path('extended_chat_download_attachment')}}?id='+message.id+'"><img src="{{path('extended_chat_download_attachment')}}?id='+message.id+'" /></a>';
+                    } else {
+                        text += '<a target="_blank" class="ec-message-attachment" href="{{path('extended_chat_download_attachment')}}?id='+message.id+'">'+$('<div>').text(message.attachmentFilename).html()+'</a>';
+                    }
+                } else if (message.message == '') {
+                    text += '<span class="ec-message-removed">Сообщение удалено</span>';
+                }
+                for (var s in this.smiles) {
+                    text = text.replace(this.smiles[s].regexp, '<img src="'+this.smiles[s].file+'" height="24" width="24" />');
+                }
+                if ((this.minMessageId == -1) || (message.id < this.minMessageId)) {
+                    this.minMessageId = message.id;
+                }
+                var menu = '<menu type="context" id="ec-chat-message-menu-'+message.id+'">'+
+                               '<menuitem onclick="ecChat.citeMessage('+message.id+');" label="Цитировать сообщение"></menuitem>'+
+                               (parseInt(message.createrId) == {{userId}} ? '<menuitem onclick="ecChat.deleteMessage('+message.id+');" label="Удалить сообщение"></menuitem>' : '')+
+                           '</menu>';
+                var messageLi = '<li id="ec-chat-message-'+message.id+'" ' + (parseInt(message.createrId) == {{userId}} ? 'class="self"' : '') + '>';
+                messageLi += '<div class="ec-chat-message-author ec-chat-hint" data-hint="' + message.fullName + '"><img src="' + (message.avatar != '' ? '/helper/imageresize.php?width=50&height=50&scale=n&url='+message.avatar : '/img/noava.png') + '" /></div>';
+                messageLi += '<div class="ec-chat-message" contextmenu="ec-chat-message-menu-'+message.id+'">' + text + '</div>'+menu+'</li>';
+                if (prepend == true) {
+                    $('#ec-chat-messages-container').prepend(messageLi);
+                } else {
+                    $('#ec-chat-messages-container').append(messageLi);
+                }
+            }
+        },
+        
+        activateChat: function(id) {
+            this.activeChat = id;
+            this.endLoaded = false;
+            this.minMessageId = -1;
+            ecChat.mainPopupUpdateChatList();
+            $('#ec-chat-messages-container').html('');
+            if (id != null) {
+                $('#ec-chat-messages-preloader').show();
+                ecChat.request('load', {actionid: id});
+                $('#ec-chat-main .ec-chat-form').removeClass('unactive');
+            } else {
+                $('#ec-chat-main .ec-chat-form').addClass('unactive');
+            }
+        },
+        
+        scrollChatToBottom: function (value) {
+            var height = $('#ec-chat-messages-preloader').height() + $('#ec-chat-messages-container').height();
+            var containerHeight = $('#ec-chat-main .ec-chat-messages').height();
+            if (value !== undefined) {
+                if (height - value - containerHeight > 0) {
+                    $('#ec-chat-main .ec-chat-messages').scrollTop(height - value - containerHeight);
+                } else {
+                    $('#ec-chat-main .ec-chat-messages').scrollTop(0);
+                }
+            }
+            var pos = height - $('#ec-chat-main .ec-chat-messages').scrollTop() - containerHeight;
+            if (pos < 0) {
+                pos = 0;
+            }
+            
+            return pos;
+        },
+            
+        insertText: function (text) {
+            if (!text) {
+                return;
+            }
+            var el = $('#ec-chat-form-message')[0];
+            var val = el.value, endIndex, range, doc = el.ownerDocument;
+            if ((typeof el.selectionStart == "number") && (typeof el.selectionEnd == "number")) {
+                endIndex = el.selectionEnd;
+                el.value = val.slice(0, endIndex) + text + val.slice(endIndex);
+                el.selectionStart = el.selectionEnd = endIndex + text.length;
+            } else if ((doc.selection != "undefined") && (doc.selection.createRange)) {
+                el.focus();
+                range = doc.selection.createRange();
+                range.collapse(false);
+                range.text = text;
+                range.select();
+            }
+        },
+            
+        insertSmile: function (smile) {
+            this.insertText(' '+this.smiles[smile].symb+' ');
+        },
+        
+        citeMessage: function (id) {
+            var text = '&gt;&gt; ' + $('#ec-chat-message-'+id+' .ec-chat-message').html()+"\r\n";
+            text = text.replace(/<[bB][rR][^>]*>/g, "\r\n&gt;&gt; ");
+            text = text.replace(/<[^>]*>/g, " ");
+            text = $('<div>').html(text).text();
+            this.insertText(text);
+        },
+        
+        deleteMessage: function (id) {
+            if (confirm("Удалить сообщение?")) {
+                ecChat.request('delete', {actionid: id});
+            }
+        },
+        
+        
+        {% if isMaster %}
+        initCfgPopup: function () {
+            $('#ec-chat-cfg-cancel').click(function () {
+                $('#ec-chat-cfg').hide();
+                return false;
+            });
+            $('#ec-chat-cfg-submit').click(function () {
+                var title = $('#ec-chat-cfg-title').val();
+                var users = [];
+                $('.ec-chat-cfg-users').each(function () {
+                    if ($(this).is(':checked')) {
+                        users.push($(this).data('userid'));
+                    }
+                });
+                ecChat.request('editroom', {actionid: ecChat.editChatId, actionfields: {title: title, users: users}});
+                $('#ec-chat-cfg').hide();
+                return false;
+            });
+            $('#ec-chat-list-create').click(function () {
+                ecChat.editChatId = 'new';
+                $('#ec-chat-cfg h4').text('Создание нового чата');
+                $('#ec-chat-cfg-title').val('');
+                $('.ec-chat-cfg-users').prop('checked', false);
+                $('#ec-chat-cfg').show();
+                return false;
+            });
+            $('#ec-chat-tools .ec-chat-form-cfgtool').click(function () {
+                for (var i in ecChat.chats) {
+                    console.log(ecChat.chats[i].id);
+                    if (ecChat.chats[i].id == ecChat.activeChat) {
+                        ecChat.editChatId = ecChat.activeChat;
+                        $('#ec-chat-cfg h4').text('Настройки чата');
+                        $('#ec-chat-cfg-title').val(ecChat.chats[i].title);
+                        $('.ec-chat-cfg-users').prop('checked', false).each(function () {
+                            for (var j in ecChat.chats[i].members) {
+                                var member = ecChat.chats[i].members[j].id;
+                                if (member == $(this).data('userid')) {
+                                    $(this).prop('checked', true);
+                                }
+                            }
+                        });
+                        $('#ec-chat-cfg').show();
+                        break;
+                    }
+                }
+                return false;
+            });
+        },
+        {% endif %}
+        
+        
+        
+        
+        init: function () {
+            $('#ec-chat-toggle').click(function () {
+                if (ecChat.mainPopupVisible) {
+                    ecChat.mainPopupHide();
+                } else {
+                    ecChat.mainPopupShow();
+                }
+                return false;
+            });
+            $('#ec-chat-main .ec-chat-popup-title-close').click(function () {
+                ecChat.mainPopupHide();
+                return false;
+            });
+            $('#ec-chat-main>h6').on('mousedown', function (e) {
+                if ((e.target.tagName == 'H6') && (e.which == 1)) {
+                    ecChat.mainPopupDragMode = 1;
+                    ecChat.mainPopupDragPosition.left = e.pageX - ecChat.mainPopupPosition.left;
+                    ecChat.mainPopupDragPosition.top = e.pageY - ecChat.mainPopupPosition.top;
+                    return false;
+                }
+            });
+            $('#ec-chat-main>.ec-chat-popup-title-corner').on('mousedown', function (e) {
+                if ((e.target.tagName == 'SPAN') && (e.which == 1)) {
+                    ecChat.mainPopupDragMode = 2;
+                    ecChat.mainPopupDragPosition.left = e.pageX - ecChat.mainPopupPosition.width;
+                    ecChat.mainPopupDragPosition.top = e.pageY - ecChat.mainPopupPosition.height;
+                    return false;
+                }
+            });
+            $('body').on('mousemove', function (e) {
+                if (ecChat.mainPopupDragMode == 1) {
+                    ecChat.mainPopupPosition.left = e.pageX - ecChat.mainPopupDragPosition.left;
+                    ecChat.mainPopupPosition.top = e.pageY - ecChat.mainPopupDragPosition.top;
+                    ecChat.mainPopupUpdatePosition();
+                    return false;
+                }
+                if (ecChat.mainPopupDragMode == 2) {
+                    ecChat.mainPopupPosition.width = e.pageX - ecChat.mainPopupDragPosition.left;
+                    ecChat.mainPopupPosition.height = e.pageY - ecChat.mainPopupDragPosition.top;
+                    if (ecChat.mainPopupPosition.width < 500) {
+                        ecChat.mainPopupPosition.width = 500;
+                    }
+                    if (ecChat.mainPopupPosition.height < 300) {
+                        ecChat.mainPopupPosition.height = 300;
+                    }
+                    ecChat.mainPopupUpdatePosition();
+                    return false;
+                }
+            });
+            $('body').on('mouseup', function (e) {
+                if (ecChat.mainPopupDragMode != 0) {
+                    ecChat.mainPopupSavePosition();
+                }
+                ecChat.mainPopupDragMode = 0;
+            });
+            $('#ec-chat-main .ec-chat-list>ul').delegate('li', 'click', function () {
+                ecChat.activateChat($(this).data('chatid'));
+            });
+            $('#ec-chat-form-send').click(function () {
+                var message = $('#ec-chat-form-message').val();
+                if (message == '') {
+                    return false;
+                }
+                $('#ec-chat-form-message').val('');
+                ecChat.request('post', {actionid: ecChat.activeChat, actionmessage: message});
+                return false;
+            });
+            $('#ec-chat-main .ec-chat-messages').scroll(function () {
+                if (($(this).scrollTop() < 10) && (ecChat.endLoaded == false)) {
+                    ecChat.endLoaded = true;
+                    ecChat.request('load', {actionid: ecChat.activeChat, actionprev: ecChat.minMessageId});
+                }
+            });
+            this.soundLoadState();
+            $('#ec-chat-tools .ec-chat-form-soundtool').click(function () {
+                ecChat.soundChangeState();
+                return false;
+            });
+            $('#ec-chat-tools .ec-chat-form-closetool').click(function () {
+                ecChat.request('leave', {actionid: ecChat.activeChat});
+                ecChat.activateChat(null);
+            });
+            new AjaxUpload('#ec-chat-form-attachtool', 
+            {
+                action: '?actionobject=chat&action=post&ajax=result',
+                name: 'actionattachment',
+                data: {
+                    actionid: '',
+                    actionmessage: '',
+                    actionactivechat: ''
+                },
+                responseType: "json",
+                onSubmit: function(file, extension)
+                {
+                    $('#ec-chat-form-preloader').show();
+                    this._settings.data.actionid = ecChat.activeChat;
+                    this._settings.data.actionactivechat = ecChat.activeChat;
+                },
+                onComplete: function(file, response)
+                {
+                    ecChat.bindResponse(response);
+                    $('#ec-chat-form-preloader').hide();
+                }
+            });
+            for (var s in this.smiles) {
+                $('#ec-chat-smiles').append('<a href="#" data-smile="'+s+'"><img src="'+this.smiles[s].file+'" /></a>');
+            }
+            $('#ec-chat-tools .ec-chat-form-smiletool').click(function () {
+                $('#ec-chat-smiles').toggle();
+                return false;
+            });
+            $('body').click(function () {
+                $('#ec-chat-smiles').hide();
+            });
+            $('#ec-chat-smiles').delegate('a', 'click', function () {
+                ecChat.insertSmile($(this).data('smile'));
+                $('#ec-chat-smiles').hide();
+                return false;
+            });
+            $('#ec-chat-container').delegate('.ec-chat-hint', 'mouseover', function () {
+                $('#ec-chat-hint-wrap').css('top', $(this).offset().top + $(this).height()).css('left', $(this).offset().left).text($(this).data('hint')).show();
+            });
+            $('#ec-chat-container').delegate('.ec-chat-hint', 'mouseout', function () {
+                $('#ec-chat-hint-wrap').hide();
+            });
+            {% if isMaster %}
+            this.initCfgPopup();
+            {% endif %}
+            
+            this.request('info', {});
+            
+        }
+        
+        
+        
+    };
+    $(function () {
+        ecChat.init();
+    });
+</script>

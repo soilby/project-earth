@@ -1,0 +1,1519 @@
+body {
+        position:relative;
+        padding-top:20px;
+        min-width:1200px;
+}
+.mainHeader {
+	width:90%;
+	margin:0px auto 20px auto;
+	padding:0;
+	border:none;
+	border-radius:10px;
+	-webkit-border-radius:10px;
+	-moz-border-radius:10px;
+	box-shadow:0 0 10px #000;
+	-webkit-box-shadow:0 0 10px #000;
+	-moz-box-shadow:0 0 10px #000;
+	background:#dbeff9;
+	z-index:2;
+	/*height: 80px;*/
+	display:block;
+	behavior: url(/admincss/PIE.htc);
+}
+.mainHeader div.logo  {
+	height: 90px;
+	/*width:100%;*/
+	padding:20px 20px 0 20px;
+	border-bottom: 1px #999 solid;
+}
+.mainHeader div.logo img {
+	float:left;
+}
+.mainHeader div.logo div {
+	text-align:right;
+	font-size:120%;
+	line-height:40px;
+	color:#000;
+}
+.mainHeader div.logo div a {
+	text-decoration:underline;
+	color:#000;
+}
+.mainHeader div.logo div a:hover {
+	text-decoration:none;
+}
+.mainHeader nav {
+	border-top: 1px #fff solid;
+	height: 30px;
+	padding:0 50px;
+}
+.mainHeader nav ul {
+	border-left:1px #999 solid;
+	border-right:1px #fff solid;
+	float:left;
+}
+.mainHeader nav ul li {
+	line-height:30px;
+	font-size:120%;
+	list-style: none;
+	float: left;
+    position:relative;
+	/*display:inline-block;*/
+	padding:0;
+	border-left:1px #fff solid;
+	border-right:1px #999 solid;
+
+}
+.mainHeader nav ul li a {
+	display:block;
+	color:#000;
+	padding:0 10px;
+}
+.mainHeader nav ul li a:hover {
+	color:#000;
+	background:#a9cee7;
+}
+.mainHeader nav ul li p {
+	color:#999;
+	display:block;
+	padding:0 10px;
+}
+.mainHeader nav ul.secondStage {
+	display:none;
+	position:absolute;
+	width:auto;
+	left:0px;
+	/*top:38px;*/
+	float:none;
+	outline:0px dashed red;
+	z-index:2;
+	border:none;
+	border-radius:0 10px 10px 10px;
+	-webkit-border-radius:0 10px 10px 10px;
+	-moz-border-radius:0 10px 10px 10px;
+	box-shadow:0 0 10px #000;
+	-webkit-box-shadow:0 0 10px #000;
+	-moz-box-shadow:0 0 10px #000;
+	background:#dbeff9;
+	border:none;
+	behavior: url(/admincss/PIE.htc);
+}
+.mainHeader nav ul.secondStage li {
+	display:block;
+	float:none;
+	line-height:20px;
+	list-style: none;
+	/*display:inline-block;*/
+	padding:5px 10px;
+	font-size:100%;
+	width:auto;
+	border:none;
+	white-space: nowrap;
+}
+.mainContent {
+	width:90%;
+	margin:20px auto;
+}
+.mainFooter {
+	width:90%;
+	margin:20px auto;
+	border:none;
+	border-radius:10px;
+	-webkit-border-radius:10px;
+	-moz-border-radius:10px;
+	box-shadow:0 0 10px #000;
+	-webkit-box-shadow:0 0 10px #000;
+	-moz-box-shadow:0 0 10px #000;
+	background:#dbeff9;
+	z-index:2;
+	display:block;
+	behavior: url(/admincss/PIE.htc);
+	font-size:90%;
+	font-weight: bold;
+	text-align:center;
+	padding: 10px;
+}
+#formLogin {
+	position:relative;
+        top:80px;
+        width:400px;
+	margin:0px auto;
+	border:none;
+	border-radius:10px;
+	-webkit-border-radius:10px;
+	-moz-border-radius:10px;
+	box-shadow:0 0 10px #000;
+	-webkit-box-shadow:0 0 10px #000;
+	-moz-box-shadow:0 0 10px #000;
+	background:#fff;
+	z-index:2;
+	display:block;
+	behavior: url(/admincss/PIE.htc);
+	font-size:100%;
+	padding: 10px;
+        text-align: center;
+}
+#formLogin p {
+    margin:20px;
+}
+#formLogin p span.widthed{
+    display:inline-block;
+    width:12ex;
+    text-align:left;
+}
+#formLogin p.error {
+    color:#f00;
+}
+
+.indexBlock {
+    text-align:left;
+}
+.indexBlock div.indexBlockItem {
+    border:1px solid #000;
+    display: inline-block;
+    margin: 20px;
+    padding: 10px;
+    vertical-align: top;
+    width: 450px;
+    text-align:left;
+    min-height: 100px;
+    background-position: 97% 5px;
+    background-repeat: no-repeat;
+}
+.indexBlock div.indexBlockItem > h3 {
+    color: #000;
+    font-size: 130%;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.indexBlock div.indexBlockItem > h3 > a {
+    color: #006;
+    text-decoration: none;
+}
+
+.indexBlock div.indexBlockItem > h3 > a:hover {
+    text-decoration: underline;
+}
+
+.indexBlock div.indexBlockItem > ul > li {
+    color: #000;
+    font-size: 120%;
+    list-style: none;
+    margin-bottom: 5px;
+}
+
+.indexBlock div.indexBlockItem > ul > li > a {
+    color: #000;
+    text-decoration: none;
+}
+
+.indexBlock div.indexBlockItem > ul > li > a:hover {
+    text-decoration: underline;
+}
+
+.indexBlock div.indexBlockCol {
+    float:left;
+    width: 514px;
+}
+
+
+#tabsButtons {
+    float: left;
+    padding-top:20px;
+}
+
+#tabsButtons>a {
+    display:block;
+    padding: 10px 20px 10px 10px;
+    margin: 10px 0px 10px 10px;
+    width: 160px;
+    border:1px solid #777;
+    background: #ddd;
+    color:#000;
+    cursor: pointer;
+}
+
+#tabsContent {
+    margin-left:201px;
+}
+
+#tabsContent>div {
+    display:none;
+}
+
+#tabsButtons>a.active {
+    color: black;
+    cursor: default;
+    font-weight: bold;
+    text-decoration: none;
+    padding:20px;
+    margin:0px;
+    background: #fff;
+    border-right:solid 1px #fff;
+}
+#tabsContent>div.active {
+    display:block;
+    width:auto;
+    min-height: 100%;
+    border:1px solid #777;
+    padding:20px;
+}
+
+table.tableContent {
+    width:100%;
+    border-collapse: collapse;
+    table-layout: auto;
+    margin:10px 0;
+}
+
+table.tableContent th{
+    border-collapse: separate;
+    background: #ddd;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    border:1px solid #777;
+    padding:10px 5px;
+}
+table.tableContent td{
+    border-collapse: separate;
+    background: #fff;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    border:1px solid #777;
+    padding:5px;
+}
+
+.goToRight {
+    float:right;
+}
+
+table.tableContent a{
+    color: #000;
+    text-decoration: underline;
+}
+table.tableContent a:hover{
+    text-decoration: none;
+}
+
+div.saveButtons {
+    float:right;
+}
+table.cfgTable {
+    width: auto;
+}
+
+table.cfgTable td {
+    padding: 5px 20px 5px 0;
+    vertical-align: middle;
+}
+table.cfgTable td.cfgError {
+    color:#F00;
+    font-style: italic;
+    font-size: 90%;
+}
+
+table.cfgTable td.cfgValue {
+    color:#003;
+    font-weight: bold;
+}
+
+.globalError {
+    color:#F00;
+    font-style: italic;
+    font-size: 90%;
+}
+
+table.cfgTable input[type="text"], table.cfgTable input[type="password"] {
+    width:40ex;
+}
+table.cfgTable select {
+    width:36ex;
+}
+#systemMessage {
+    border: 1px solid #000000;
+    margin: 10% auto 0;
+    padding: 20px;
+    text-align: center;
+    width: 60%;
+}
+#systemMessage p {
+    color: #000000;
+    font-weight: bold;
+    margin-bottom: 20px;    
+}
+table.tableContent p.error {
+    color: #CC0000;
+    font-size: 11px;
+    font-style: italic;    
+}
+.aboutInfo {
+    text-align: center;
+}
+.aboutInfo h1 {
+    font-size:20pt;
+    font-weight: bold;
+}
+.aboutInfo a{
+    color: #009;
+    text-decoration: none;
+}
+.aboutInfo a:hover{
+    text-decoration: underline;
+}
+
+.aboutLicense {
+    margin: 0px auto; 
+    width: 500px; 
+    text-align: justify; 
+    line-height: 150%; 
+    text-indent: 6ex;
+}
+
+.aboutLicense a{
+    color: #009;
+    text-decoration: none;
+}
+
+.aboutLicense a:hover{
+    text-decoration: underline;
+}
+
+#preloader {
+    background: url(/adminimg/opacity.png) repeat;
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    display: none;
+    z-index:1000;
+}
+#preloader>div {
+    background: url(/adminimg/preloader.gif) no-repeat 50% 50%;
+    width:100%;
+    height:100%;
+}
+
+.categoryTree ul {
+    padding-left:20px;
+}
+
+.categoryTree ul li {
+    list-style: none;
+    line-height: 21px;
+}
+
+.categoryTree .moveButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsmove.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.categoryTree .moveButton.unactive {
+    background: url(/adminimg/arrowsmove.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.categoryTree .moveButton.active {
+    background: url(/adminimg/arrowsmove.png) no-repeat -20px top;
+}
+
+.categoryTree .ierarhLeftButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsierarh.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 0px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.categoryTree .ierarhLeftButton.active {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -20px top;
+}
+
+.categoryTree .ierarhLeftButton.unactive {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -80px top;
+    cursor:default;
+}
+
+.categoryTree .ierarhRightButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsierarh.png) no-repeat -40px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.categoryTree .ierarhRightButton.active {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -60px top;
+}
+
+.categoryTree .ierarhRightButton.unactive {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -80px top;
+    cursor:default;
+}
+
+.categoryTree .deleteButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsdelete.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 5px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.categoryTree .deleteButton.active {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -20px top;
+}
+
+.categoryTree .deleteButton.unactive {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.categoryTree a {
+    color: #009;
+    text-decoration: none;
+}
+
+.categoryTree a:hover {
+    text-decoration: underline;
+}
+
+.categoryTree a.disabled {
+    color:#669;
+}
+
+.categoryTree a.disabled:after {
+    content:" (выключено)";
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+.categoryTree span.disabled {
+    color:#999;
+}
+
+.categoryTree span.disabled:after {
+    content:" (выключено)";
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+table.taxonomyFilterTable {
+    width:100%;
+    border-collapse: collapse;
+    table-layout: auto;
+    margin:10px 0;
+}
+
+table.taxonomyFilterTable th{
+    border-collapse: separate;
+    background: #ddd;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    border:1px solid #777;
+    padding:10px 5px;
+}
+table.taxonomyFilterTable td{
+    border-collapse: separate;
+    background: #fff;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    border:1px solid #777;
+    padding:5px;
+}
+
+.menuTree ul {
+    padding-left:20px;
+}
+
+.menuTree ul li {
+    list-style: none;
+    line-height: 21px;
+}
+
+.menuTree .moveButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsmove.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.menuTree .moveButton.unactive {
+    background: url(/adminimg/arrowsmove.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.menuTree .moveButton.active {
+    background: url(/adminimg/arrowsmove.png) no-repeat -20px top;
+}
+
+.menuTree .ierarhLeftButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsierarh.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 0px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.menuTree .ierarhLeftButton.active {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -20px top;
+}
+
+.menuTree .ierarhLeftButton.unactive {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -80px top;
+    cursor:default;
+}
+
+.menuTree .ierarhRightButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsierarh.png) no-repeat -40px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.menuTree .ierarhRightButton.active {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -60px top;
+}
+
+.menuTree .ierarhRightButton.unactive {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -80px top;
+    cursor:default;
+}
+
+.menuTree .deleteButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsdelete.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 5px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.menuTree .deleteButton.active {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -20px top;
+}
+
+.menuTree .deleteButton.unactive {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.menuTree a {
+    color: #009;
+    text-decoration: none;
+}
+
+.menuTree a:hover {
+    text-decoration: underline;
+}
+
+.menuTree a.disabled {
+    color:#669;
+}
+
+.menuTree a.disabled:after {
+    content:" (выключено)";
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+.menuTree span.disabled {
+    color:#999;
+}
+
+.menuTree span.disabled:after {
+    content:" (выключено)";
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+.popupCfgWindow{
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    display: none;
+    z-index:2;
+}
+
+.popupCfgWindow>div{
+    position:absolute;
+    top:250px;
+    left:20%;
+    width:60%;
+    margin:0px auto;
+    border:none;
+    border-radius:10px;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    box-shadow:0 0 10px #000;
+    -webkit-box-shadow:0 0 10px #000;
+    -moz-box-shadow:0 0 10px #000;
+    background:#fff;
+    z-index:3;
+    display:block;
+    behavior: url(/admincss/PIE.htc);
+    font-size:100%;
+    padding: 20px;
+}
+
+.pageSelector {
+    border: 1px solid #000;
+}
+
+.pageSelector a {
+    display: block;
+    padding: 2px;
+    color: #000;
+    text-decoration: none;
+    background: #fff;
+}
+
+.pageSelector a:nth-child(even) {
+    background: #eee;
+}
+
+.pageSelector a:hover {
+    background: #ddd !important;
+}
+
+.pageSelectorPaginator {
+    margin-top:10px;
+}
+
+.pageSelectorPaginator .pagePrevButton {
+    display: inline-block;
+    background: url(/adminimg/arrowspagesel.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 0px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.pageSelectorPaginator .pagePrevButton:active {
+    background: url(/adminimg/arrowspagesel.png) no-repeat -20px top;
+}
+
+.pageSelectorPaginator a.pagePrevButton.unactive {
+    background: url(/adminimg/arrowspagesel.png) no-repeat -80px top;
+    cursor:default;
+}
+
+.pageSelectorPaginator .pageNextButton {
+    display: inline-block;
+    background: url(/adminimg/arrowspagesel.png) no-repeat -40px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.pageSelectorPaginator .pageNextButton:active {
+    background: url(/adminimg/arrowspagesel.png) no-repeat -60px top;
+}
+
+.pageSelectorPaginator a.pageNextButton.unactive {
+    background: url(/adminimg/arrowspagesel.png) no-repeat -80px top;
+    cursor:default;
+}
+
+#imageCfgTable div.imageItem {
+    display: inline-block;
+    width: 150px;
+    border: solid 1px #999;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+
+#imageCfgTable div.imageWrap {
+    display: inline-block;
+    width: 140px;
+    height: 140px;
+    margin: 0 0 5px 0;
+    text-align: center;
+    line-height: 140px;
+}
+
+#imageCfgTable div.imageWrap img {
+    max-height: 140px;
+    max-width: 140px;
+    vertical-align: middle;
+}
+
+#referenceCfgTable div.referItem {
+    display: inline-block;
+    width: 150px;
+    border: solid 1px #999;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+
+#referenceCfgTable div.referItem p {
+    white-space: nowrap;
+    overflow: hidden;
+    color: #000;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+#referenceCfgTable div.referWrap {
+    display: inline-block;
+    width: 140px;
+    height: 140px;
+    margin: 0 0 5px 0;
+    text-align: center;
+    line-height: 140px;
+}
+
+#referenceCfgTable div.referWrap img {
+    max-height: 140px;
+    max-width: 140px;
+    vertical-align: middle;
+}
+
+#giftsCfgTable div.giftItem {
+    display: inline-block;
+    width: 150px;
+    border: solid 1px #999;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+
+#giftsCfgTable div.giftItem p {
+    white-space: nowrap;
+    overflow: hidden;
+    color: #000;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+#giftsCfgTable div.giftWrap {
+    display: inline-block;
+    width: 140px;
+    height: 140px;
+    margin: 0 0 5px 0;
+    text-align: center;
+    line-height: 140px;
+}
+
+#giftsCfgTable div.giftWrap img {
+    max-height: 140px;
+    max-width: 140px;
+    vertical-align: middle;
+}
+
+#attachmentCfgTable div.attachmentItem {
+    display: inline-block;
+    width: 150px;
+    border: solid 1px #999;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+
+#attachmentCfgTable div.attachmentItem p {
+    white-space: nowrap;
+    overflow: hidden;
+    color: #000;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+#attachmentCfgTable div.attachmentWrap {
+    display: inline-block;
+    width: 140px;
+    height: 140px;
+    margin: 0 0 5px 0;
+    text-align: center;
+    line-height: 140px;
+}
+
+#attachmentCfgTable div.attachmentWrap img {
+    max-height: 140px;
+    max-width: 140px;
+    vertical-align: middle;
+}
+
+.formFieldTree ul {
+    padding-left:20px;
+}
+
+.formFieldTree ul li {
+    list-style: none;
+    line-height: 21px;
+}
+
+.formFieldTree .moveButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsmove.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.formFieldTree .moveButton.unactive {
+    background: url(/adminimg/arrowsmove.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.formFieldTree .moveButton.active {
+    background: url(/adminimg/arrowsmove.png) no-repeat -20px top;
+}
+
+.formFieldTree .deleteButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsdelete.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 5px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.formFieldTree .deleteButton.active {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -20px top;
+}
+
+.formFieldTree .deleteButton.unactive {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.formFieldTree a {
+    color: #009;
+    text-decoration: none;
+}
+
+.formFieldTree a:hover {
+    text-decoration: underline;
+}
+
+.formFieldTree a.disabled {
+    color:#669;
+}
+
+.formFieldTree a.disabled:after {
+    content:" (выключено)";
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+.formFieldTree span.disabled {
+    color:#999;
+}
+
+.formFieldTree span.disabled:after {
+    content:" (выключено)";
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+.formFieldTree .ierarhLeftButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsierarh.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 0px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.formFieldTree .ierarhLeftButton.active {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -20px top;
+}
+
+.formFieldTree .ierarhLeftButton.unactive {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -80px top;
+    cursor:default;
+}
+
+.formFieldTree .ierarhRightButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsierarh.png) no-repeat -40px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.formFieldTree .ierarhRightButton.active {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -60px top;
+}
+
+.formFieldTree .ierarhRightButton.unactive {
+    background: url(/adminimg/arrowsierarh.png) no-repeat -80px top;
+    cursor:default;
+}
+
+.siteMapTree ul {
+    padding-left:20px;
+}
+
+.siteMapTree ul li {
+    list-style: none;
+    line-height: 21px;
+}
+
+.siteMapTree .moveButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsmove.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.siteMapTree .moveButton.unactive {
+    background: url(/adminimg/arrowsmove.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.siteMapTree .moveButton.active {
+    background: url(/adminimg/arrowsmove.png) no-repeat -20px top;
+}
+
+.siteMapTree .deleteButton {
+    display: inline-block;
+    background: url(/adminimg/arrowsdelete.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 5px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.siteMapTree .deleteButton.active {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -20px top;
+}
+
+.siteMapTree .deleteButton.unactive {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.siteMapTree a {
+    color: #009;
+    text-decoration: none;
+}
+
+.siteMapTree a:hover {
+    text-decoration: underline;
+}
+
+.siteMapTree a.disabled {
+    color:#669;
+}
+
+.siteMapTree a.disabled:after {
+    content:" (выключено)";
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+.siteMapTree span.disabled {
+    color:#999;
+}
+
+.siteMapTree span.disabled:after {
+    content:" (выключено)";
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+div.progressBar {
+    margin: 20px;
+    padding: 0;
+    width: 200px;
+    height: 30px;
+    background: #fff;
+    border: solid 1px #000;
+}
+
+div.progressBar p{
+    background: #29f;
+    height: 30px;
+}
+
+.modulePageSelector {
+    border: 1px solid #000;
+    clear: both;
+}
+
+.modulePageSelector label {
+    display: block;
+    padding: 2px;
+    color: #000;
+    text-decoration: none;
+    background: #fff;
+}
+
+.modulePageSelector label:nth-child(even) {
+    background: #eee;
+}
+
+.modulePageSelector label:hover {
+    background: #ddd !important;
+}
+
+.modulePageSelectorPaginator {
+    margin-top:10px;
+}
+
+.modulePageSelectorPaginator .pagePrevButton {
+    display: inline-block;
+    background: url(/adminimg/arrowspagesel.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 0px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.modulePageSelectorPaginator .pagePrevButton:active {
+    background: url(/adminimg/arrowspagesel.png) no-repeat -20px top;
+}
+
+.modulePageSelectorPaginator a.pagePrevButton.unactive {
+    background: url(/adminimg/arrowspagesel.png) no-repeat -80px top;
+    cursor:default;
+}
+
+.modulePageSelectorPaginator .pageNextButton {
+    display: inline-block;
+    background: url(/adminimg/arrowspagesel.png) no-repeat -40px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 10px 0 0;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.modulePageSelectorPaginator .pageNextButton:active {
+    background: url(/adminimg/arrowspagesel.png) no-repeat -60px top;
+}
+
+.modulePageSelectorPaginator a.pageNextButton.unactive {
+    background: url(/adminimg/arrowspagesel.png) no-repeat -80px top;
+    cursor:default;
+}
+
+a.miniLinkButton {
+    font-size:90%;
+    color: #999;
+    text-decoration: underline;
+    font-style: italic;
+}
+a.miniLinkButton:hover {
+    text-decoration: none;
+}
+
+.hintLabel {
+    position:relative;
+    text-decoration: underline;
+}
+
+.hintLabel .hintWrap{
+    display:none;
+    position:absolute;
+    background: #FFC;
+    border: 1px solid #000;
+    border-radius: 3px;
+    box-shadow: 0 0 10px #888;
+    padding: 4px;
+    z-index: 999; 
+    font-size: 100%;
+}
+
+.hintLabel:hover .hintWrap{
+    display:block;
+}
+
+.cfgTable textarea.metaTextArea {
+    width: 65ex;
+}
+
+#bannerCfgTable div.bannerItem {
+    display: inline-block;
+    width: 150px;
+    border: solid 1px #999;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+
+#bannerCfgTable div.bannerItem p {
+    white-space: nowrap;
+    overflow: hidden;
+    color: #000;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+#bannerCfgTable div.bannerItem p a {
+    text-decoration:underline;
+    color:#000;
+}
+
+#bannerCfgTable div.bannerItem p a:hover {
+    text-decoration: none;
+}
+
+#bannerCfgTable div.bannerWrap {
+    display: inline-block;
+    width: 140px;
+    height: 140px;
+    margin: 0 0 5px 0;
+    text-align: center;
+    line-height: 140px;
+}
+
+#bannerCfgTable div.bannerWrap img {
+    max-height: 140px;
+    max-width: 140px;
+    vertical-align: middle;
+}
+
+div.breadcrumbs {
+    font-size: 90%;
+    font-style: italic;
+    margin-left: 210px;
+    margin-bottom: 5px;
+}
+
+div.breadcrumbs a {
+    color: #000;
+}
+
+div.breadcrumbs a:after {
+    display: inline-block;
+    content: ">";
+    padding: 0 5px 0 10px;
+}
+
+div.breadcrumbs a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+div.breadcrumbs a.main {
+    background: url(/adminimg/homecrumbs.gif) no-repeat left top;
+    padding-left: 13px;
+}
+
+.miniNote {
+    font-size: 90%;
+    font-style: italic;
+    color:#999;
+}
+
+.statisticBar {
+    width: 50px;
+    background: url(/adminimg/statistic/bluebk.png) no-repeat top center #00f;
+    background: url(/adminimg/statistic/bluetop.png) no-repeat top center, url(/adminimg/statistic/bluebk.png) no-repeat bottom center;
+    display:inline-block;
+    padding-top:10px;
+}
+
+.statisticBar:hover {
+    background: url(/adminimg/statistic/bluebkl.png) no-repeat top center #00f;
+    background: url(/adminimg/statistic/bluetopl.png) no-repeat top center, url(/adminimg/statistic/bluebkl.png) no-repeat bottom center;
+}
+
+.statisticBar.red{
+    background: url(/adminimg/statistic/redbk.png) no-repeat top center #f00;
+    background: url(/adminimg/statistic/redtop.png) no-repeat top center, url(/adminimg/statistic/redbk.png) no-repeat bottom center;
+}
+
+.statisticBar.red:hover{
+    background: url(/adminimg/statistic/redbkl.png) no-repeat top center #f00;
+    background: url(/adminimg/statistic/redtopl.png) no-repeat top center, url(/adminimg/statistic/redbkl.png) no-repeat bottom center;
+}
+
+.statisticBar.orange{
+    background: url(/adminimg/statistic/orangebk.png) no-repeat top center #fe0;
+    background: url(/adminimg/statistic/orangetop.png) no-repeat top center, url(/adminimg/statistic/orangebk.png) no-repeat bottom center;
+}
+
+.statisticBar.orange:hover{
+    background: url(/adminimg/statistic/orangebkl.png) no-repeat top center #fe0;
+    background: url(/adminimg/statistic/orangetopl.png) no-repeat top center, url(/adminimg/statistic/orangebkl.png) no-repeat bottom center;
+}
+
+.statisticBar.green{
+    background: url(/adminimg/statistic/greenbk.png) no-repeat top center #0f0;
+    background: url(/adminimg/statistic/greentop.png) no-repeat top center, url(/adminimg/statistic/greenbk.png) no-repeat bottom center;
+}
+
+.statisticBar.green:hover{
+    background: url(/adminimg/statistic/greenbkl.png) no-repeat top center #0f0;
+    background: url(/adminimg/statistic/greentopl.png) no-repeat top center, url(/adminimg/statistic/greenbkl.png) no-repeat bottom center;
+}
+
+.statisticWrap {
+    margin: 10px 0;
+}
+
+.statisticWrap td {
+    vertical-align: bottom;
+    text-align: center;
+}
+
+ul.cfgSimpleList {
+    padding-bottom: 5px;
+}
+
+ul.cfgSimpleList li {
+    list-style: disc inside;
+    padding: 5px;
+}
+
+ul.cfgSimpleList li a{
+    color: #999;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+ul.cfgSimpleList li a:hover{
+    text-decoration: none;
+}
+
+.moderatorWrapInTable {
+    border: 1px solid #999999;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 2px 5px;
+    padding: 2px 5px;
+}
+
+
+.moderatorWrapInTable .deleleModerator {
+    display: inline-block;
+    background: url(/adminimg/arrowsdelete.png) no-repeat 0px top;
+    width:20px;
+    height:20px;
+    paddin: 0;
+    margin: 0 0 0 5px;
+    overflow: hidden;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+.moderatorWrapInTable .deleleModerator:active {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -20px top;
+}
+
+.moderatorWrapInTable .deleleModerator.unactive {
+    background: url(/adminimg/arrowsdelete.png) no-repeat -40px top;
+    cursor:default;
+}
+
+.cfgImageList {
+    list-style: none;
+}
+
+.cfgImageList li{
+    display:inline-block;
+    width: 120px;
+    height: 140px;
+    margin: 5px;
+    border: #ccc solid 1px;
+    border-radius: 5px;
+    vertical-align: top;
+}
+
+.cfgImageList li img{
+    display: block;
+    max-width: 100px;
+    max-height: 100px;
+    margin: 10px auto;
+}
+
+.cfgImageList li a{
+    display: block;
+    text-align:center;
+    color: #000;
+    text-decoration: underline;
+}
+.cfgImageList li a:hover{
+    text-decoration: none;
+}
+
+.helpInfo {
+line-height: 200%;
+}
+
+.helpInfo p a{
+    color: #000;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+.helpInfo p a:hover{
+    text-decoration: underline;
+}
+
+.helpInfo p a.active{
+    font-weight: bold;
+}
+
+.helpContainerButton {
+    color: #999999;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 11px;
+    padding-left: 5px;
+    vertical-align: top;
+}
+
+#helpContainer {
+    display: none;
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    z-index:2;
+}
+
+#helpContainer>div {
+    display: none;
+}
+
+.helpContainerAdd, .helpContainerAdd>div {
+    display: none;
+}
+
+#helpContainer>div.helpContainerWindow {
+    position:absolute;
+    top:250px;
+    margin-left: -250px;
+    left: 50%;
+    width:500px;
+    border:none;
+    border-radius:10px;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    box-shadow:0 0 10px #000;
+    -webkit-box-shadow:0 0 10px #000;
+    -moz-box-shadow:0 0 10px #000;
+    background:#fff;
+    z-index:3;
+    display:block;
+    behavior: url(/admincss/PIE.htc);
+    font-size:100%;
+    padding: 20px;
+    display: block;
+    line-height: 200%;
+}
+
+.helpContent {
+    line-height: 200%;
+    text-indent: 5ex;
+}
+
+.statisticLogWrap {
+    table-layout: fixed;
+}
+
+.statisticLogWrapDate {
+    width: 20ex;
+}
+
+.statisticLogWrapText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.statisticLogWrapText a{
+    white-space: nowrap;
+    color: #000;
+    text-decoration: none;
+}
+.statisticLogWrapText a:hover{
+    text-decoration: underline;
+}
+.statisticLogWrapText.viewed a{
+    color: #777;
+}
+
+select.quickSearch {
+    width: 300px;    
+}

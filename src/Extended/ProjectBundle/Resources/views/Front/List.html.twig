@@ -1,0 +1,290 @@
+<style>
+    #projectfiles-list {
+        padding-left: 0;
+    }
+    #projectfiles-list, #projectfiles-list li {
+        list-style: none;
+    }
+    #projectfiles-list .projectfiles-list-item {
+        background: rgba(130, 130, 130, 0.2) none repeat scroll 0 0;
+        border-radius: 4px;
+        margin: 0 0 5px;
+        padding: 5px;       
+        display: inline-block;
+    }
+    
+    #projectfiles-list .projectfiles-list-item p {
+        
+    }
+    
+    
+</style>
+
+<div>
+{#<p class="pt20">Список файлов к проекту (новая тестовая версия):</p>#}
+<ul id="projectfiles-list">
+    {% if (files|length) > 0 %}
+        {% for i in 0..(files|length - 1) %}
+            {% if files[i]['isCollection'] %}
+            <li>
+                <div>
+                <div style="border: 1px solid rgba(170, 170, 68, 0.7); padding: 10px; margin-top: 30px; background: rgba(255, 255, 204, 0.4) none repeat scroll 0% 0%; display: inline-block; min-width: 400px; position: relative; border-radius: 2px;">
+                    <div style="position: absolute; left: 10px; border: 1px solid rgba(170, 170, 68, 0.7); bottom: 100%; background: rgba(255, 255, 204, 0.4) none repeat scroll 0% 0%; border-radius: 2px 20px 0px 0px; padding: 2px 20px 2px 10px;"><a href="?file={{files[i]['id']}}">{{files[i]['titleRu']}} / {{files[i]['title']}}</a>&nbsp;</div>
+            {% else %}
+            <li>
+                <div>
+                <div class="projectfiles-list-item">
+                    {% if mimeHelper.getTypeNameByMime(files[i]['mimeType']) != '' %}
+                        <p>{{mimeHelper.getTypeNameByMime(files[i]['mimeType'])}}</p>
+                    {% endif %}
+                {% if 'ru' in files[i]['findLocales'] %}
+                    <p><a href="{% if files[i]['mimeType'] == 'text/html' %}?view=true&file={{files[i]['id']}}&locale=ru{% else %}{{path('extended_project_front_view', {'id': files[i]['id'], 'locale': 'ru'})}}{% endif %}">
+                        {{files[i]['titleRu']}}
+                        (версия от {{files[i]['versions']['ru'][0]['createDate'] | date('d.m.Y H:i')}} {{files[i]['versions']['ru'][0]['createrFullName']}})
+                        </a>{% if removePermission %} (<a href="#" class="projectfiles-remove-btn" data-version-id="{{files[i]['versions']['ru'][0]['id']}}">удалить</a>){% endif %}</p>
+                {% endif %}
+                {% if 'en' in files[i]['findLocales'] %}
+                    <p><a href="{% if files[i]['mimeType'] == 'text/html' %}?view=true&file={{files[i]['id']}}&locale=en{% else %}{{path('extended_project_front_view', {'id': files[i]['id'], 'locale': 'en'})}}{% endif %}">
+                        {{files[i]['title']}}
+                        (version dated {{files[i]['versions']['en'][0]['createDate'] | date('d.m.Y H:i')}} {{files[i]['versions']['en'][0]['createrFullName']}})
+                        </a>{% if removePermission %} (<a href="#" class="projectfiles-remove-btn" data-version-id="{{files[i]['versions']['en'][0]['id']}}">удалить</a>){% endif %}</p>
+                {% endif %}
+                
+                <div id="projectfiles-list-file-{{files[i]['id']}}" style="display:none">
+                {% if 'ru' in files[i]['findLocales'] %}
+                    {% for version in files[i]['versions']['ru'] %}
+                        {% if not loop.first %}
+                        <p><a href="{% if files[i]['mimeType'] == 'text/html' %}?view=true&file={{files[i]['id']}}&locale=ru&version={{version['id']}}{% else %}{{path('extended_project_front_view', {'id': files[i]['id'], 'locale': 'ru', 'version': version['id']})}}{% endif %}">
+                            {{files[i]['titleRu']}}
+                            (версия от {{version['createDate'] | date('d.m.Y H:i')}} {{version['createrFullName']}})
+                            </a>{% if removePermission %} (<a href="#" class="projectfiles-remove-btn" data-version-id="{{version['id']}}">удалить</a>){% endif %}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if 'en' in files[i]['findLocales'] %}
+                    {% for version in files[i]['versions']['en'] %}
+                        {% if not loop.first %}
+                        <p><a href="{% if files[i]['mimeType'] == 'text/html' %}?view=true&file={{files[i]['id']}}&locale=en&version={{version['id']}}{% else %}{{path('extended_project_front_view', {'id': files[i]['id'], 'locale': 'en', 'version': version['id']})}}{% endif %}">
+                            {{files[i]['title']}}
+                            (version dated {{version['createDate'] | date('d.m.Y H:i')}} {{version['createrFullName']}})
+                            </a>{% if removePermission %} (<a href="#" class="projectfiles-remove-btn" data-version-id="{{version['id']}}">удалить</a>){% endif %}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                </div>
+                {% if configPermission %}
+                <p>
+                    <a href="#" onclick="$('#projectfiles-list-file-{{files[i]['id']}}').toggle();$(this).find('span').toggle();return false;"><span>[+]</span><span style="display:none">[-]</span></a>
+                    (<a href="?file={{files[i]['id']}}">редактировать</a>)
+                </p>
+                {#{% if configPermission %}#}
+                    <p>
+                        Настройки <a href="#" onclick="$(this).find('span').toggle().closest('p').next('p').toggle();return false;"><span>[+]</span><span style="display:none">[-]</span></a>
+                    </p>
+                    <p style="display:none;" class="form-inline">
+                        Виден 
+                        <select autocomplete="off" class="projectfiles-access-control-select form-control" data-id="{{files[i]['id']}}">
+                            <option value="0" {% if files[i]['accessControl'] == 0 %}selected="selected"{% endif %}>всем</option>
+                            <option value="1" {% if files[i]['accessControl'] == 1 %}selected="selected"{% endif %}>зарегистрированным</option>
+                            <option value="2" {% if files[i]['accessControl'] == 2 %}selected="selected"{% endif %}>участникам мастерской</option>
+                            <option value="3" {% if files[i]['accessControl'] == 3 %}selected="selected"{% endif %}>мастерам мастерской</option>
+                        </select>
+                    </p>
+                {% endif %}
+            {% endif %}
+            {%if ((i < files|length-1) and (files[i+1]['nesting'] > files[i]['nesting']))%}
+                <ul>
+            {%else%}
+                </div></div></li>
+            {%endif%}
+            {%if ((i < files|length-1) and (files[i+1]['nesting'] < files[i]['nesting']))%}
+                {% for j in 0..(files[i]['nesting'] - files[i+1]['nesting'] - 1) %}
+                    </ul>
+                </div>
+                </div>
+                </li>
+                {% endfor %}
+            {%endif%}
+        {% endfor %}
+        {%if (files[files|length-1]['nesting'] > 0)%}
+            {% for j in 0..(files[files|length-1]['nesting'] - 1) %}
+                    </ul>
+                </div>
+                </div>
+                </li>
+            {% endfor %}
+        {%endif%}
+    {% endif %}
+</ul>
+{% if createPermission %}
+<div>
+    <p class="form-inline">
+        В папку <select id="projectfiles-upload-folder" class="form-control">
+                    <option value="">[корневую]</option>
+            {% for file in files %}
+                {% if file['isCollection'] %}
+                    <option value="{{file['id']}}">{% if file['nesting'] > 0 %}{% for i in 0..file['nesting'] %} - {% endfor %}{% endif %}{{file['titleRu'] != '' ? file['titleRu'] : file['title']}}</option>
+                {% endif %}
+            {% endfor %}
+        </select> 
+        локаль <select id="projectfiles-upload-locale" class="form-control">
+            <option value="ru" {% if currentLocale != 'en' %}selected{% endif %}>русская</option>
+            <option value="en" {% if currentLocale == 'en' %}selected{% endif %}>английская</option>
+        </select>
+        <a href="#" class="btn btn-default" data-toggle="modal" data-target="#projectfiles-add-file-popup">добавить файл</a> <a href="#" id="projectfiles-folder" class="btn btn-default">создать папку</a> <span class="progress"></span>
+    </p>
+</div>
+{% endif %}
+<div id="projectfiles-add-file-popup" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Добавление файла</h4>
+            </div>
+            <div class="modal-body">
+                <p>Тип файла</p>
+                {% for mimeType,mimeTypeTitle in mimeHelper.getTypes() %}
+                    <p class="radio"><label><input onclick="if ($(this).val() == 'internal') {$('.projectfiles-for-type-internal').show();$('.projectfiles-for-type-file').hide();} else {$('.projectfiles-for-type-internal').hide();$('.projectfiles-for-type-file').show();}" autocomplete="off" type="radio" name="projectfiles-type" value="{{mimeType}}" />{{mimeTypeTitle}}</label></p>
+                {% endfor %}
+            </div>
+            <div class="modal-footer" id="projectfiles-add-file-controls">
+                <button class="projectfiles-for-type-internal btn btn-primary" type="submit" id="projectfiles-create-internal" style="display:none">Создать</button>
+                <button class="projectfiles-for-type-file btn btn-primary" type="submit" id="projectfiles-upload" style="display:none">Выбрать файл</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                <p id="progress"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/js/ajaxupload.partial.js"></script>    
+<script>
+    $(function () {
+        var alaxuploader =  new AjaxUploadPartial('#projectfiles-upload', {
+            url: '{{path('extended_project_front_upload')}}?project={{projectId}}',
+            addHeaders: {'x-ajaxupload-partial-folder': '', 'x-ajaxupload-partial-locale': '{{currentLocale == 'en' ? 'en' : 'ru'}}'},
+            progressElement: "#progress",
+            onSubmit: function(file, extension)
+            {
+                $('#progress').html('0%');
+                $('#projectfiles-add-file-controls').hide();
+            },
+            onComplete: function(file, response)
+            {
+                var answer = $.parseJSON(response);
+                if (answer.result != "OK") alert(answer.message);
+                $('#progress').html('');
+                $('#projectfiles-add-file-controls').show();
+                location.reload();
+            }
+        });        
+        $('#projectfiles-upload-folder').change(function () {
+            alaxuploader.setData({'folder': $(this).val()});
+        });
+        $('#projectfiles-upload-locale').change(function () {
+            alaxuploader.setData({'locale': $(this).val()});
+        });
+        $('#projectfiles-folder').click(function () {
+            var title = prompt('Введите название папки на английском');
+            if (!title) {
+                return false;
+            }
+            var titleRu = prompt('Введите название папки на русском');
+            if (!titleRu) {
+                return false;
+            }
+            $.ajax({
+                'method': 'POST',
+                'url': '{{path('extended_project_front_createfolder')}}',
+                'data' : {
+                    title: title,
+                    titleRu: titleRu,
+                    folder: $('#projectfiles-upload-folder').val(),
+                    locale: '{{currentLocale}}',
+                    project: '{{projectId}}'
+                },
+                'success': function (data) {
+                    location.reload();
+                },
+                'error': function () {
+                    alert('Ошибка создания папки');
+                }
+            });
+            return false;
+        });
+        $('#projectfiles-create-internal').click(function () {
+            var title = prompt('Введите название документа на английском');
+            if (!title) {
+                return false;
+            }
+            var titleRu = prompt('Введите название документа на русском');
+            if (!titleRu) {
+                return false;
+            }
+            $.ajax({
+                'method': 'POST',
+                'url': '{{path('extended_project_front_createdocument')}}',
+                'data' : {
+                    title: title,
+                    titleRu: titleRu,
+                    folder: $('#projectfiles-upload-folder').val(),
+                    locale: $('#projectfiles-upload-locale').val(),
+                    project: '{{projectId}}'
+                },
+                'success': function (data) {
+                    location.reload();
+                },
+                'error': function () {
+                    alert('Ошибка создания документа');
+                }
+            });
+            return false;
+        });
+        $('.projectfiles-remove-btn').click(function () {
+            var timeout = 10;
+            var id = $(this).data('version-id'), version = $(this).prev('a').text();
+            if (!id) {
+                return false;
+            }
+            var $popup = $('<div id="projectfiles-remove-file-popup" class="popupContainer" style="display:block"><div class="popupWindowModeration"><h4>Удаление файла</h4><p>Вы уверены что хотите удалить версию файла?</p><p>'+version+'</p><p class="tac"><button class="button" id="projectfiles-remove-btn-main" style="color:#777 !important;cursor:not-allowed;">Да (ждите '+timeout+' сек)</button><button class="button" onclick="$(\'#projectfiles-remove-file-popup\').remove();return false;">Отмена</button></p></div></div>');
+            $popup.appendTo('body');
+            var interval = setInterval(function () {
+                timeout--;
+                if (timeout == 0) {
+                    $popup.find('#projectfiles-remove-btn-main').text('Да').prop('style', false);
+                    $popup.find('#projectfiles-remove-btn-main').click(function () {
+                        $.ajax({
+                            'method': 'POST',
+                            'url': '{{path('extended_project_front_removeversion')}}',
+                            'data' : {id: id},
+                            'success': function (data) {
+                                location.reload();
+                            },
+                            'error': function () {
+                                alert('Ошибка удаления');
+                            }
+                        });
+        
+                    });
+                    clearInterval(interval);
+                } else {
+                    $popup.find('#projectfiles-remove-btn-main').text('Да (ждите '+timeout+' сек)');
+                }
+            }, 1000);
+            return false;
+        });
+        $('.projectfiles-access-control-select').change(function () {
+            var id = $(this).data('id'), access = $(this).val();
+            $.ajax({
+                'method': 'POST',
+                'url': '{{path('extended_project_front_changeaccess')}}',
+                'data' : {id: id, access: access},
+                'error': function () {
+                    alert('Ошибка настройки');
+                }
+            });
+        });
+    });
+</script>
+

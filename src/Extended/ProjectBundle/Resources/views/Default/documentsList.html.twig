@@ -1,0 +1,23 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Просмотр документов мастерской{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('extended_project_list')}}">Мастерские</a>
+    <span>Просмотр документов мастерской &laquo;{{project.title}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" id="tab1" class="active">Документы мастерской</a>
+</div>
+<div id="tabsContent">
+    <div id="con_tab1" class="active">
+        {% include "ExtendedProjectBundle:Default:documentsListTab1.html.twig" %}
+    </div>
+</div>​
+{% endblock %}       
+
+
+

@@ -1,0 +1,14 @@
+<table class="cfgTable">
+    <tr>
+        <td>Форма для вывода</td>
+        <td>
+            <select name="parameters[formId]">
+                {% for form in formlist %}
+                    <option value="{{form['id']}}" {% if (parameters['formId'] == form['id']) %}selected="selected"{% endif %}>{{form['title']}} {% if (form['enabled'] == 0) %}(выключена){% endif %}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="cfgError">{{parameterserror['formId']}}</td>
+    </tr>
+</table>
+

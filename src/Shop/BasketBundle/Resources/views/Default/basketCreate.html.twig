@@ -1,0 +1,200 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание страницы корзины{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('shop_basket_list')}}">Настройки корзины</a>
+    <span>Создание страницы корзины</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+</div>
+<form action="{{path('shop_basket_create')}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('basket_configedit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('basket_configview') == 1) %}<a class="button" href="{{path('shop_basket_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="basket[enabled]" value="1" {% if (basket['enabled'] != 0) %}checked="checked"{% endif %} />Включена</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{basketerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="basket[sendEmail]" value="1" {% if (basket['sendEmail'] != 0) %}checked="checked"{% endif %} />Отправлять письмо по E-Mail</label><span class="helpContainerButton" data-id="sendEmail">?</span></td>
+                    <td class="cfgError">{{basketerror['sendEmail']}}</td>
+                </tr>
+                <tr>
+                    <td>E-Mail<span class="helpContainerButton" data-id="email">?</span></td>
+                    <td><input type="text" name="basket[email]" value="{{basket['email']}}" /></td>
+                    <td class="cfgError">{{basketerror['email']}}</td>
+                </tr>
+                <tr>
+                    <td>Количество шагов оформления заказа<span class="helpContainerButton" data-id="steps">?</span></td>
+                    <td>
+                        <select name="basket[stepCount]" id="basketStepCount" onchange="changeBasketStepCount(this);">
+                            <option value="1" {% if (basket['stepCount'] == 1) %}selected="selected"{% endif %}>Один шаг</option>
+                            <option value="2" {% if (basket['stepCount'] == 2) %}selected="selected"{% endif %}>Два шага</option>
+                            <option value="3" {% if (basket['stepCount'] == 3) %}selected="selected"{% endif %}>Три шага</option>
+                            <option value="4" {% if (basket['stepCount'] == 4) %}selected="selected"{% endif %}>Четыре шага</option>
+                            <option value="5" {% if (basket['stepCount'] == 5) %}selected="selected"{% endif %}>Пять шагов</option>
+                            <option value="6" {% if (basket['stepCount'] == 6) %}selected="selected"{% endif %}>Шесть шагов</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{basketerror['stepCount']}}</td>
+                </tr>
+                {% for i in 0..5 %}
+                    <tr class="basketStep{{i}}">
+                        <td>Заголовок шага {{i+1}}<span class="helpContainerButton" data-id="title">?</span></td>
+                        <td><input type="text" name="basket[names][{{i}}][default]" value="{{basket['names'][i]['default']}}" /></td>
+                        <td class="cfgError">{{basketerror['names'][i]['default']}}</td>
+                    </tr>
+                    {% for locale in locales %}
+                    <tr class="basketStep{{i}}">
+                        <td>Заголовок шага {{i+1}} ({{locale['fullName']}})</td>
+                        <td><input type="text" name="basket[names][{{i}}][{{locale['shortName']}}]" value="{{basket['names'][i][locale['shortName']]}}" /></td>
+                        <td class="cfgError">{{basketerror['names'][i][locale['shortName']]}}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="basketStep{{i}}">
+                        <td>Шаблон шага {{i+1}}<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                        <td>
+                            <select name="basket[templates][{{i}}]">
+                                <option value="" {% if (basket['templates'][i] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                                {% for templatekey,template in templates %}
+                                    <option value="{{templatekey}}" {% if (basket['templates'][i] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="cfgError">{{basketerror['templates'][i]}}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td>Заголовок шага проверки<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="basket[names][check][default]" value="{{basket['names']['check']['default']}}" /></td>
+                    <td class="cfgError">{{basketerror['names']['check']['default']}}</td>
+                </tr>
+                {% for locale in locales %}
+                <tr>
+                    <td>Заголовок шага проверки ({{locale['fullName']}})</td>
+                    <td><input type="text" name="basket[names][check][{{locale['shortName']}}]" value="{{basket['names']['check'][locale['shortName']]}}" /></td>
+                    <td class="cfgError">{{basketerror['names']['check'][locale['shortName']]}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td>Шаблон шага проверки<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="basket[templates][check]">
+                            <option value="" {% if (basket['templates']['check'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in checktemplates %}
+                                <option value="{{templatekey}}" {% if (basket['templates']['check'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{basketerror['templates']['check']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('basket_configedit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('basket_configview') == 1) %}<a class="button" href="{{path('shop_basket_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+</div>​
+</form>
+<script>
+function changeBasketStepCount(that)
+{
+    $('tr.basketStep0').show();
+    if (parseInt($(that).val()) < 2) $('tr.basketStep1').hide(); else $('tr.basketStep1').show();
+    if (parseInt($(that).val()) < 3) $('tr.basketStep2').hide(); else $('tr.basketStep2').show();
+    if (parseInt($(that).val()) < 4) $('tr.basketStep3').hide(); else $('tr.basketStep3').show();
+    if (parseInt($(that).val()) < 5) $('tr.basketStep4').hide(); else $('tr.basketStep4').show();
+    if (parseInt($(that).val()) < 6) $('tr.basketStep5').hide(); else $('tr.basketStep5').show();
+}
+$(function () {changeBasketStepCount('#basketStepCount');});    
+</script>    
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить страницу корзины.</div>
+    <div id="helpContainer-title">Задаёт название страницы корзины на шаге.</div>
+    <div id="helpContainer-sendEmail">Если данная опция включена, то при приёме заказа через данную страницу на E-mail, указанный в следующем поле будет отправлено письмо о заказе.</div>
+    <div id="helpContainer-email">Если включена предыдущая опция, то на введенный E-mail при приёме заказа через данную страницу будет отправлено письмо о заказе.</div>
+    <div id="helpContainer-steps">Количество шагов оформления заказа. Данное количество определяется на основании дизайна сайта.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+</div>
+{% endblock %}       
+
+
+

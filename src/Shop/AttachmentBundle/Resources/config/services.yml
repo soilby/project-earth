@@ -1,0 +1,4 @@
+services:
+    addone.product.attachment:
+        class: Shop\AttachmentBundle\AttachmentManager
+        arguments: ['@service_container']

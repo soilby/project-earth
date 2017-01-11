@@ -1,0 +1,119 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание нового сообщения форума{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('forum_forum_topic_list')}}">Форум</a>
+    <a href="{{path('forum_forum_messages_list')}}?id={{forum.id}}">Просмотр сообщений форума &laquo;{{forum.title}}&raquo;</a>
+    <span>Создание нового сообщения</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+</div>
+<form action="{{path('forum_forum_messages_create')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_edit') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if (app.user.checkAccess('forum_edit') == 1) %}<a class="button" href="{{path('forum_forum_messages_list')}}?id={{forum.id}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="message[isVisible]" value="1" {% if (message['isVisible'] != 0) %}checked="checked"{% endif %} />Отображать сообщение</label><span class="helpContainerButton" data-id="isVisible">?</span></td>
+                    <td class="cfgError">{{messageerror['isVisible']}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Текст сообщения:<span class="helpContainerButton" data-id="content">?</span></p>
+            <p class="globalError">{{messageerror['content']}}</p>
+            <br />
+            <textarea name="message[content]" id="messageContent">{{message['content']}}</textarea>
+            </div>
+            <script>
+            tinymce.init({
+                selector: "textarea#messageContent",
+                language : 'ru',
+                height: 400,
+                convert_urls: false,
+                verify_html : false,
+                plugins: [
+                    "advlist autolink lists image charmap print preview anchor",
+                    "searchreplace visualblocks code fullscreen",
+                    "media table contextmenu paste textcolor",
+                    "jbimages link"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | jbimages"
+            });
+            </script>
+            <div class="mb20">
+                <p>Вложения:<span class="helpContainerButton" data-id="attachments">?</span></p>
+                <ul class="cfgSimpleList" id="forumMessageAttachments">
+                    {% for attach in message['attachments'] %}
+                    <li>{{attach.filename}} ({{(attach.filesize / 1024) | number_format(0,',',' ')}} Кб, <a href="#" onclick="$(this).parent('li').remove();return false;">удалить</a>)<input type="hidden" name="attachments[]" value="{{attach.id}}" />{% if attach.error != '' %}<p class="globalError">{{attach.error}}</p>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+                <button id="forumMessageAddFile">Добавить файлы</button>
+            </div>
+            {% if message['moderatorMessagePrev'] != '' %}
+            <div class="mb20">
+                <p>Предыдущее сообщение модератора {{message['moderatorNamePrev']}}:</p>
+                <div style="border: 1px #999 solid; padding: 5px; margin: 5px;">{{message['moderatorMessagePrev']}}</div>
+            </div>
+            {% endif %}
+            <table class="cfgTable">
+                <tr>
+                    <td>Новое сообщение модератора<span class="helpContainerButton" data-id="moderatorMessage">?</span></td>
+                    <td><textarea name="message[moderatorMessage]" class="metaTextArea">{{message['moderatorMessage']}}</textarea></td>
+                    <td class="cfgError">{{messageerror['moderatorMessage']}}</td>
+                </tr>
+            </table>
+        </div>
+</div>​
+</form>
+<script>
+$(function () 
+{
+    new AjaxUpload('#forumMessageAddFile', 
+    {
+        action: '{{path('forum_forum_topic_ajaxattachment')}}',
+        name: 'files',
+        multiply: true,
+        onSubmit: function(file, extension)
+        {
+            $('#preloader').show();
+        },
+        onComplete: function(file, response)
+        {
+            $('#preloader').hide();
+            if (!response) response = "[{id:'', filename:'', filesize:'', error:'Ошибка загрузки файла'}]";
+            var answers = $.parseJSON(response);
+            var key;
+            for (key in answers)
+            {
+                var answer = answers[key];
+                if(answer.id)
+                {
+                        $('#forumMessageAttachments').append('<li>'+answer.filename+' ('+answer.filesize+' Кб, <a href="#" onclick="$(this).parent(\'li\').remove();return false;">удалить</a>)<input type="hidden" name="attachments[]" value="'+answer.id+'" /></li>');
+                } else
+                {
+                        $('#forumMessageAttachments').append('<li>'+answer.filename+'<p class="globalError">'+answer.error+'</p></li>');
+                }
+            }
+        }
+    });
+});
+
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-isVisible">Позволяет разрешить или запретить отображение сообщения. Если отображение сообщения запрещено, то оно будет видимо только модераторам данного форума.</div>
+    <div id="helpContainer-content">Задаёт текст сообщения.</div>
+    <div id="helpContainer-attachments">Задаёт вложения к сообщению.</div>
+    <div id="helpContainer-moderatorMessage">Задаёт комментарий модератора к сообщению. Оставьте поле пустым, если изменять сообщение модератора не требуется.</div>
+</div>
+{% endblock %}       
+
+
+

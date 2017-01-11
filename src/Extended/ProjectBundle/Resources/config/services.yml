@@ -1,0 +1,5 @@
+services:
+    object.project:
+        class: Extended\ProjectBundle\ProjectManager
+        arguments: ['@service_container']
+        

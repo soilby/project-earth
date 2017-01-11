@@ -1,0 +1,159 @@
+<style>
+    {% if image %}
+    #mirclubBackground {
+        /*background: url({{image}}) center no-repeat fixed #000;
+        background-size: cover;
+        -o-background-size: cover;
+        -moz-background-size: cover;
+        -webkit-background-size: cover;*/
+		z-index: -2;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		min-height: 100%;
+    }
+	#mirclubBackground img {
+		min-width: 100%;
+		min-height: 100%;
+	}
+	
+    #mirclubBackground:after {
+        content: " ";
+        display: block;
+        position: fixed;
+        background: #fff;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.5;
+        -o-opacity: 0.5;
+        filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+        -moz-opacity: 0.5;
+        -khtml-opacity: 0.5;
+    }
+	header.no-background {
+		background: none;
+	}
+    {% endif %}
+</style>
+<script>
+	var mirclubBackground = {
+		currentForce : 0,
+		currentSpeed : 0,
+		currentTop : 0,
+		topRange : null,
+		$element : null,
+                interval : null,
+		
+		timerHandler : function () {
+			if (this.topRange === null) {
+				this.topRange = this.$element.height() - $(window).height();
+				if (this.topRange < 0) this.topRange = 0;
+			}
+			this.currentTop += this.currentSpeed / 10;
+			if (this.currentForce == +2) {
+				this.currentSpeed += 8;
+				if (this.currentSpeed >= 100) {this.currentSpeed = 100; this.currentForce = -1;}
+			}
+			if (this.currentForce == -2) {
+				this.currentSpeed -= 8;
+				if (this.currentSpeed <= -100) {this.currentSpeed = -100; this.currentForce = +1;}
+			}
+			if (this.currentForce == +1) {
+				this.currentSpeed += 2;
+				if (this.currentSpeed >= -10) {this.currentSpeed = -10; this.currentForce = 0;}
+			}
+			if (this.currentForce == -1) {
+				this.currentSpeed -= 2;
+				if (this.currentSpeed <= 10) {this.currentSpeed = 10; this.currentForce = 0;}
+			}
+			
+			if (this.currentTop > this.topRange) {this.currentTop = this.topRange; this.currentSpeed = 0;}
+			if (this.currentTop < 0) {this.currentTop = 0; this.currentSpeed = 0;}
+			this.$element.css('top', '-' + this.currentTop + 'px');
+		},
+		
+                on : function () {
+                        $.removeCookie("mirclub-background");
+                        this.load();
+                },
+                
+                off : function () {
+                        $.cookie("mirclub-background", 1, {
+                                expires : 365,
+                                path    : '/',
+                        });
+                        clearInterval(this.interval);
+                        $(this.$element).remove();
+                        $('header').removeClass('no-background');
+                },
+                
+                check : function () {
+                        return (!$.cookie("mirclub-background"));
+                },
+                
+                load : function () {
+                        var tmpImg = new Image() ;
+			tmpImg.src = "{{image}}";
+			tmpImg.onload = function () {
+				$('body').prepend('<div id="mirclubBackground"><img src="{{image}}" /></div>');
+				$('body').bind('mousewheel DOMMouseScroll', function(event) {
+					if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+						mirclubBackground.currentForce = -2;
+					} else {
+						mirclubBackground.currentForce = +2;
+					}
+				});
+				$(window).resize(function () {
+					$('#mirclubBackground img').css('min-height', $(window).height() + 'px');
+					mirclubBackground.topRange = null;
+				});
+				$('#mirclubBackground img').css('min-height', $(window).height() + 'px');
+				mirclubBackground.$element = $('#mirclubBackground');
+				mirclubBackground.interval = setInterval('mirclubBackground.timerHandler()', 50);
+                                $('header').addClass('no-background');
+			};
+                },
+                
+		init : function () {
+			$(function () {
+                            if ($(window).width() < 1024) {
+                                $('#mirclubBackgroundButton a').hide();
+                                return false;
+                            }
+                            if (mirclubBackground.check()) {
+                                $('#mirclubBackgroundButton a').find('.off').hide();
+                                $('#mirclubBackgroundButton a').find('.on').show();
+                            } else {
+                                $('#mirclubBackgroundButton a').find('.on').hide();
+                                $('#mirclubBackgroundButton a').find('.off').show();
+                            }
+                            $('#mirclubBackgroundButton a').click(function () {
+                                if (mirclubBackground.check()) {
+                                    mirclubBackground.off();
+                                    $(this).find('.on').hide();
+                                    $(this).find('.off').show();
+                                } else {
+                                    mirclubBackground.on();
+                                    $(this).find('.off').hide();
+                                    $(this).find('.on').show();
+                                }
+                                return false;
+                            });
+                            setTimeout(function () {
+                                if (mirclubBackground.check()) {
+                                    mirclubBackground.load();
+                                    $('#mirclubBackgroundButton a').find('.off').hide();
+                                    $('#mirclubBackgroundButton a').find('.on').show();
+                                } else {
+                                    $('#mirclubBackgroundButton a').find('.on').hide();
+                                    $('#mirclubBackgroundButton a').find('.off').show();
+                                }
+                            }, 3000)
+			});
+		},
+	}
+	mirclubBackground.init();
+</script>

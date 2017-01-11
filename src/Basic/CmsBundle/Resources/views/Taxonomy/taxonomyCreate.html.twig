@@ -1,0 +1,208 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Создание новой группы категорий{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('basic_cms_taxonomy_list')}}">Категории</a>
+    <span>Создание новой группы категорий</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Дерево категорий</a>
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+3}}" {% if (activetab == loop.index0+3) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="{{path('basic_cms_taxonomy_create')}}" method="post" onsubmit="submitCategoryForm(this);return true;">
+    <div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Заголовок<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="tax[title]" value="{{tax['title']}}" onchange="$('#mainCategoryName').text($(this).val());" /></td>
+                    <td class="cfgError">{{taxerror['title']}}</td>
+                </tr>
+                <tr>
+                    <td>Тип объектов для категории<span class="helpContainerButton" data-id="object">?</span></td>
+                    <td>
+                        <select name="tax[object]">
+                        {% for objectkey,objectname in taxonomyobjects %}
+                            <option value="{{objectkey}}" {% if (objectkey == tax['object']) %}selected="selected"{% endif %}>{{objectname}}</option>
+                        {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{taxerror['object']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            <div class="categoryTree">
+                <p><span class="moveButton unactive">&nbsp</span><span class="ierarhLeftButton unactive">&nbsp</span><span class="ierarhRightButton unactive">&nbsp</span><span class="deleteButton unactive">&nbsp</span><a href="#" id="mainCategoryName">{{tax['title']}}</a></p>
+                <ul>
+                    {% if (categories|length) > 0 %}
+                        {% for i in 0..(categories|length - 1) %}
+                            <li class="noselect"><span class="moveButton">&nbsp</span><span class="ierarhLeftButton">&nbsp</span><span class="ierarhRightButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#">{{categories[i]['name']}}</a>
+                                {% if (categories[i]['error'] != '') %}<span class="ml20 globalError">{{categories[i]['error']}}</span>{% endif %}
+                            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] > categories[i]['nesting']))%}
+                            <ul>
+                            {%else%}
+                            </li>
+                            {%endif%}
+                            {%if ((i < categories|length-1) and (categories[i+1]['nesting'] < categories[i]['nesting']))%}
+                                {% for j in 0..(categories[i]['nesting'] - categories[i+1]['nesting'] - 1) %}
+                                </ul></li>
+                                {% endfor %}
+                            {%endif%}
+                        {% endfor %}
+                        {%if (categories[categories|length-1]['nesting'] > 0)%}
+                            {% for j in 0..(categories[categories|length-1]['nesting'] - 1) %}
+                            </ul></li>
+                            {% endfor %}
+                        {%endif%}
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="mt20"><input type="text" name="categoryName" id="categoryName" onkeypress="if (event.keyCode == 13) {$('#categoryNameAdd').click();return false;} else return true;" /><button type="button" id="categoryNameAdd" onclick="return false">Добавить категорию</button><p class="globalError" id="categoryNameError"></p></div>    
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+3}}" {% if (activetab == loop.index0+3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('taxonomy_new') == 1) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('taxonomy_list') == 1) or (app.user.checkAccess('taxonomy_listshow') == 1)) %}<a class="button" href="{{path('basic_cms_taxonomy_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>​
+</form>
+<script>
+    window.moveelement = null;
+    function updateIerarhy()
+    {
+        $('.categoryTree li>a').unbind('click').click(function () {alert('Для редактирования категорий необходимо сохранить иерархию классификации');});
+        $('.categoryTree span.ierarhLeftButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.categoryTree span.ierarhRightButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.categoryTree span.deleteButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.categoryTree li ul li').children('span.ierarhLeftButton').removeClass('unactive');
+        $('.categoryTree li+li').children('span.ierarhRightButton').removeClass('unactive');
+        $('.categoryTree ul>li>span.deleteButton').removeClass('unactive');
+        $('.categoryTree span.moveButton').unbind('mousedown').unbind('mouseenter').removeClass('active');
+        
+        $('.categoryTree span.ierarhLeftButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                                  mouseleave(function () {$(this).removeClass('active');}).
+                                                                  click(function () 
+        {
+            var element = $(this).closest('li').parent().closest('li');
+            var length = $(this).closest('li').parent().children('li').length;
+            var parent = $(this).closest('li').parent();
+            if (element.length != 0)
+            {
+                var savetr = $(this).closest('li').detach();
+                if (length == 1) parent.remove();
+                element.after(savetr);
+            }
+            updateIerarhy();
+        });
+        $('.categoryTree span.ierarhRightButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                                   mouseleave(function () {$(this).removeClass('active');}).
+                                                                   click(function () 
+        {
+            var element = $(this).closest('li').prev();
+            if (element.length != 0)
+            {
+                var savetr = $(this).closest('li').detach();
+                if (element.children('ul').length == 0) $('<ul></ul>').appendTo(element);
+                element.children('ul').append(savetr);
+            }
+            updateIerarhy();
+        });
+        $('.categoryTree span.deleteButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                              mouseleave(function () {$(this).removeClass('active');}).
+                                                              click(function () 
+        {
+            if (confirm('Вы действительно хотите удалить категорию?')) 
+            {
+                var length = $(this).closest('li').parent().children('li').length;
+                var parent = $(this).closest('li').parent();
+                $(this).closest('li').remove();
+                if ((length == 1) && (parent.get(0) != $('.categoryTree > ul').get(0))) parent.remove();
+            }
+            updateIerarhy();
+        });
+        $('.categoryTree span.moveButton').not('.unactive').mousedown(function()
+        {
+            $(this).addClass('active');
+            $(this).closest('li').find('ul').hide();
+            window.moveelement = $(this).closest('li');
+            $(window.moveelement).parent().children().children('span.moveButton').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().children();
+                    var indexnew = elements.index($(this).closest('li'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+        });
+    }
+    updateIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateIerarhy(); $('.categoryTree ul').show();});
+    $('#categoryNameAdd').click(function ()
+    {
+        var name = $('#categoryName').val();
+        var regname = /^.{3,250}$/i;
+        if (!regname.test(name)) $('#categoryNameError').html('Заголовок должен содержать от 3 до 250 символов'); else 
+        {
+            $('#categoryNameError').html('');
+            $('#categoryName').val('');
+            $('<li class="noselect"><span class="moveButton">&nbsp</span><span class="ierarhLeftButton">&nbsp</span><span class="ierarhRightButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#">'+name+'</a></li>').appendTo('.categoryTree > ul');
+            updateIerarhy();
+        }
+        return false;
+    });
+    function submitCategoryFormUl(ul, nesting, form, index)
+    {
+        $(ul).children('li').each(function (i, element)
+        {
+            var name = $(element).children('a').html();
+            $(form).append('<input type="hidden" name="categories['+index+'][nesting]" value="'+nesting+'" /><input type="hidden" name="categories['+index+'][name]" value="'+name+'" />');
+            index++;
+            if ($(element).children('ul').length != 0) index = submitCategoryFormUl($(element).children('ul'), nesting + 1, form, index);
+        });
+        return index;
+    }
+    
+    function submitCategoryForm(form)
+    {
+        submitCategoryFormUl('.categoryTree>ul', 0, form, 0);
+    }
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-title">Название группы категорий. Это же название будет присвоено корневой категории.</div>
+    <div id="helpContainer-object">Объект категорий, с которым будут оперировать создаваемые категории.</div>
+</div>
+{% endblock %}       
+
+
+

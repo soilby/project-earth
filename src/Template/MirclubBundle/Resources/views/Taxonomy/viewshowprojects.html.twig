@@ -1,0 +1,72 @@
+                        <h1>{{title}}</h1>
+						<div class="tinymceContent">{{description | raw}}</div>
+                {% if items | length > 0 %}
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                Сортировать по 
+                                {% if sortField == 'createDate' %}
+                                    дате добавления
+                                {% elseif sortField == 'title' %}
+                                    названию
+                                {% else %}
+                                    умолчанию
+                                {% endif %}
+                                <span class="caret"></span>
+                            </button>
+                                <ul class="dropdown-menu">
+                                  <li><a href="?sort=createDate">Дате добавления</a></li>
+                                  <li><a href="?sort=title">Названию</a></li>
+                                </ul>
+                        </div>
+                                <p></p>
+                        
+                        
+                        
+			<div class="row">
+                            {% for item in items %}
+                                <div class="col-xs-12">
+				<div class="earth-projectlist-item" onclick="location.href='{{item['url'] | default('')}}';" onmouseover="$(this).addClass('hover');" onmouseout="$(this).removeClass('hover');">
+                                                <p class="title"><a href="{{item['url'] | default('')}}">{{item['title'] | default('')}}</a></p>
+						<div class="description">{{(item['description'] | default('')) | raw}}</div>
+				</div>
+                                </div>
+                            {% endfor %}
+			</div>
+                {% endif %}
+                {% if ((items | length) + (categories | length) == 0) %}
+                        <p>Нет проектов</p>
+                {% endif %}
+		{% if pageCount > 1 %}
+                        <ul class="pagination">
+                        {% if (pageCount > 1) %}
+                            {% set to = page + 1 %}
+                            {% set from = page - 1 %}
+                            {% if (to >= pageCount) %}
+                                {% set to = pageCount - 1 %}
+                            {% endif %}
+                            {% if (from < 0) %}
+                                {% set from = 0 %}
+                            {% endif %}
+                            {% if (from > 0) %}
+                                <li><a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page=0">1</a></li>
+                            {% endif %}
+                            {% if (from > 1) %}
+                                <li><a class="disabled">...</a></li>
+                            {% endif %}
+                            {% for i in from..to %}
+                                {% if i == page %}
+                                <li class="active"><a href="#">{{i+1}}</a></li>
+                                {% else %}
+                                <li><a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page={{i}}">{{i+1}}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if (to < (pageCount - 2)) %}
+                                <li><a class="disabled">...</a></li>
+                            {% endif %}
+                            {% if (to < (pageCount - 1)) %}
+                                <li><a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page={{pageCount - 1}}">{{pageCount}}</a></li>
+                            {% endif %}
+                        {% endif %}
+                        </ul>
+                {% endif %}
+

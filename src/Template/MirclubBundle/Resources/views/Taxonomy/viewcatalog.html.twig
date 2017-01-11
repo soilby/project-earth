@@ -1,0 +1,69 @@
+			<h1>{{title}}</h1>
+                        {% if categories | length > 0 %}
+			<div class="catalogCategories">
+                            {% for category in categories  %}
+                                {% if category['nesting'] == 0 %}
+				<div>
+					<a href="{{category['url'] | default('')}}">
+						<img src="{{ (category['avatar'] is defined) and (category['avatar'] != '') ? '/helper/imageresize.php?url='~category['avatar']~'&height=200&width=200&scale=x' : '/img/category.png' }}" />
+						<p>{{category['title'] | default('')}}</p>
+					</a>
+				</div>
+                                {% endif %}
+                            {% endfor %}
+			</div>
+                        {% endif %}
+                 {% if items | length > 0 %}       
+			<div class="sortWrap">
+				Сортировать по
+				<a href="?sort=priceWithDiscount" {% if sortField == 'priceWithDiscount' %}class="active"{% endif %}>Цене</a>
+				<a href="?sort=createDate" {% if sortField == 'createDate' %}class="active"{% endif %}>Дате добавления</a>
+				<a href="?sort=title" {% if sortField == 'title' %}class="active"{% endif %}>Названию</a>
+			</div>
+			<div class="catalogProducts">
+                            {% for item in items %}
+				<div>
+					<a href="{{item['url'] | default('')}}">
+						<p>{{item['title'] | default('')}}</p>
+						<img src="{{ (item['avatar'] is defined) and (item['avatar'] != '') ? '/helper/imageresize.php?url='~item['avatar']~'&height=200&width=200&scale=x' : '/img/product.png' }}" />
+						<p class="price">Цена: {% if (item['formatPriceWithDiscount'][0] | default('0')) != 0 %}{{item['formatPriceWithDiscount'][0]}}{% else %}уточняйте{% endif %}</p>
+					</a>
+				</div>
+                            {% endfor %}
+			</div>
+                {% endif %}
+                {% if (categories | length == 0) and (items | length == 0) %}
+                        <p>Категория пуста</p>
+                {% endif %}
+		{% if pageCount > 1 %}
+			<div class="paginatorWrap">
+        		Страницы
+                        {% set to = page + 1 %}
+                        {% set from = page - 1 %}
+                        {% if (to >= pageCount) %}
+                            {% set to = pageCount - 1 %}
+                        {% endif %}
+                        {% if (from < 0) %}
+                            {% set from = 0 %}
+                        {% endif %}
+                        {% if (from > 0) %}
+                            <a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page=0">1</a>
+                        {% endif %}
+                        {% if (from > 1) %}
+                            ...
+                        {% endif %}
+                        {% for i in from..to %}
+                            {% if i == page %}
+                            <a href="#" class="active">{{i+1}}</a>
+                            {% else %}
+                            <a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page={{i}}">{{i+1}}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if (to < (pageCount - 2)) %}
+                        ...
+                        {% endif %}
+                        {% if (to < (pageCount - 1)) %}
+                            <a href="?sort={{sortField}}%20{{(sortDirection != 0 ? 'desc' : 'asc')}}&page={{pageCount - 1}}">{{pageCount}}</a>
+                        {% endif %}
+			</div>
+                {% endif %}

@@ -1,0 +1,102 @@
+
+extended_knowledge:
+    resource: "@ExtendedKnowledgeBundle/Resources/config/routing.yml"
+    prefix:   /
+
+extended_chat:
+    resource: "@ExtendedChatBundle/Resources/config/routing.yml"
+    prefix:   /
+
+extended_alert:
+    resource: "@ExtendedAlertBundle/Resources/config/routing.yml"
+    prefix:   /
+
+addone_backup:
+    resource: "@AddoneBackupBundle/Resources/config/routing.yml"
+    prefix:   /
+
+extended_project:
+    resource: "@ExtendedProjectBundle/Resources/config/routing.yml"
+    prefix:   /
+
+template_mirclub:
+    resource: "@TemplateMirclubBundle/Resources/config/routing.yml"
+    prefix:   /
+
+forum_forum:
+    resource: "@ForumForumBundle/Resources/config/routing.yml"
+    prefix:   /
+
+files_files:
+    resource: "@FilesFilesBundle/Resources/config/routing.yml"
+    prefix:   /
+
+#gallery_gallery:
+#    resource: "@GalleryGalleryBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+#shop_attachment:
+#    resource: "@ShopAttachmentBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+#shop_gift:
+#    resource: "@ShopGiftBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+#extended_shop_export:
+#    resource: "@ExtendedShopExportBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+#extended_shop_import:
+#    resource: "@ExtendedShopImportBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+shop_basket:
+    resource: "@ShopBasketBundle/Resources/config/routing.yml"
+    prefix:   /
+
+form_form:
+    resource: "@FormFormBundle/Resources/config/routing.yml"
+    prefix:   /
+
+#shop_parameter:
+#    resource: "@ShopParameterBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+#shop_reference:
+#    resource: "@ShopReferenceBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+#shop_gallery:
+#    resource: "@ShopGalleryBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+shop_product:
+    resource: "@ShopProductBundle/Resources/config/routing.yml"
+    prefix:   /
+
+#template_test:
+#    resource: "@TemplateTestBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+addone_profile:
+    resource: "@AddoneProfileBundle/Resources/config/routing.yml"
+    prefix:   /
+
+basic_cms:
+    resource: "@BasicCmsBundle/Resources/config/routing.yml"
+    prefix:   /
+
+basic_front:
+    resource: "@BasicFrontBundle/Resources/config/routing.yml"
+    prefix:   /
+
+
+# Internal routing configuration to handle ESI
+# ****** WARNING ******
+# This route should be enabled with caution as it can open a security vulnerability
+# see http://symfony.com/blog/security-release-symfony-2-0-20-and-2-1-5-released for more information
+# ****** WARNING ******
+#_internal:
+#    resource: "@FrameworkBundle/Resources/config/routing/internal.xml"
+#    prefix:   /_internal

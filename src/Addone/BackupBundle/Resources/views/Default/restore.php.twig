@@ -1,0 +1,257 @@
+<?php
+
+set_time_limit(0);
+
+$loader = require_once __DIR__.'/vendor/autoload.php';
+
+$parameters = \Symfony\Component\Yaml\Yaml::parse('app/config/parameters.yml');
+$parametersChange = false;
+
+if (isset($_POST['host'])) {$parameters['parameters']['database_host'] = $_POST['host']; $parametersChange = true;}
+if (isset($_POST['dbname'])) {$parameters['parameters']['database_name'] = $_POST['dbname']; $parametersChange = true;}
+if (isset($_POST['user'])) {$parameters['parameters']['database_user'] = $_POST['user']; $parametersChange = true;}
+if (isset($_POST['password'])) {$parameters['parameters']['database_password'] = $_POST['password']; $parametersChange = true;}
+
+$config = new \Doctrine\DBAL\Configuration();
+$connectionParams = array(
+    'dbname' => $parameters['parameters']['database_name'],
+    'user' => $parameters['parameters']['database_user'],
+    'password' => $parameters['parameters']['database_password'],
+    'host' => $parameters['parameters']['database_host'],
+    'driver' => $parameters['parameters']['database_driver'],
+);
+$conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+try {
+    $conn->query('SHOW TABLES');
+} catch (Exception $ex) {
+?>    
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admincss/base.css" />
+	<link rel="stylesheet" href="/admincss/main.css?update=1" />
+	<link rel="stylesheet" href="/admincss/uniform.default.min.css" />
+	<link rel="stylesheet" href="/admincss/lightbox.css" />
+	<link rel="stylesheet" href="/admincss/chosen.min.css" />
+	<script src="/adminjs/jquery-1.8.1.min.js"></script>
+	<script src="/adminjs/jquery.uniform.min.js"></script>
+        <script src="/adminjs/ajaxupload.3.5.js"></script>
+        <script src="/adminjs/lightbox.js"></script>
+        <script type="text/javascript" src="/adminjs/tinymce/tinymce.min.js"></script>
+	<script src="/adminjs/chosen.jquery.min.js"></script>
+	<script src="/adminjs/main.js?update=1"></script>
+	<script></script>
+	<title>Восстановление БД</title>
+</head>
+<body>
+<div class="mainHeader">
+	<div class="logo">
+	<img src="/adminimg/logo.gif">
+	</div>
+	<nav>
+	</nav>
+</div>
+<div class="mainContent">
+    <div id="formLogin">    
+        <form action="/restore.php" method="POST">
+            <p class="error">База данных не найдена</p>
+            <p><span class="widthed">Хост БД</span><input type="text" name="host" value="<?php echo $connectionParams['host'] ?>" /></p>
+            <p><span class="widthed">Имя БД</span><input type="text" name="dbname" value="<?php echo $connectionParams['dbname'] ?>" /></p>
+            <p><span class="widthed">Логин</span><input type="text" name="user" value="<?php echo $connectionParams['user'] ?>" /></p>
+            <p><span class="widthed">Пароль</span><input type="text" name="password" value="<?php echo $connectionParams['password'] ?>" /></p>
+            <p><input type="submit" id="submit" value="Применить" /></p>
+        </form>
+    </div>
+</div>
+<div class="mainFooter">
+Copyright &copy; 2014 by SergSXM
+</div>
+</body>
+</html>
+<?php    
+    die;
+}
+if ($parametersChange)
+{
+    $yaml = \Symfony\Component\Yaml\Yaml::dump($parameters, 2);
+    file_put_contents('app/config/parameters.yml', $yaml);
+}
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admincss/base.css" />
+	<link rel="stylesheet" href="/admincss/main.css?update=1" />
+	<link rel="stylesheet" href="/admincss/uniform.default.min.css" />
+	<link rel="stylesheet" href="/admincss/lightbox.css" />
+	<link rel="stylesheet" href="/admincss/chosen.min.css" />
+	<script src="/adminjs/jquery-1.8.1.min.js"></script>
+	<script src="/adminjs/jquery.uniform.min.js"></script>
+        <script src="/adminjs/ajaxupload.3.5.js"></script>
+        <script src="/adminjs/lightbox.js"></script>
+        <script type="text/javascript" src="/adminjs/tinymce/tinymce.min.js"></script>
+	<script src="/adminjs/chosen.jquery.min.js"></script>
+	<script src="/adminjs/main.js?update=1"></script>
+	<script></script>
+	<title>Восстановление БД</title>
+</head>
+<body>
+<div class="mainHeader">
+	<div class="logo">
+	<img src="/adminimg/logo.gif">
+	</div>
+	<nav>
+	</nav>
+</div>
+<div class="mainContent">
+    <div id="formLogin">    
+        <p>Идёт восстановление базы данных</p>
+        <style>
+            #restoreLog {
+                border: 1px solid #ccc;
+                font-style: italic;
+                height: 160px;
+                overflow-y: scroll;
+                padding: 5px;
+                text-align: left;
+            }
+            #restoreLog p{
+                margin: 0;
+                line-height: 150%;
+            }
+        </style>
+        <div id="restoreLog">
+        </div>
+    </div>
+</div>
+<div class="mainFooter">
+Copyright &copy; 2014 by SergSXM
+</div>
+<script>
+    $('.mainContent').css('min-height',($(window).height() - 20 - $('.mainHeader').outerHeight(true) - $('.mainFooter').outerHeight(true))+'px');
+    function restoreLogWrite(log) {
+        var $logel = $('#restoreLog');
+        $logel.append(log);
+        $logel.scrollTop($logel.prop('scrollHeight'));        
+    }
+</script>
+<?php
+flush();
+
+
+$file = fopen('secured/backup.sql', 'r');
+$buffer = '';
+
+function getSymb()
+{
+    global $buffer, $file;
+    if (strlen($buffer) < 1) 
+    {
+        $buffer .= fread($file, 1024);
+    }
+    $char = $buffer{0};
+    $buffer = substr($buffer, 1);
+    return $char;
+}
+function viewSymb($index)
+{
+    global $buffer, $file;
+    if (strlen($buffer) < $index + 1) 
+    {
+        $buffer .= fread($file, 1024);
+    }
+    $char = $buffer{$index};
+    return $char;
+}
+function checkEof()
+{
+    global $buffer, $file;
+    if (strlen($buffer) == 0) 
+    {
+        $buffer .= fread($file, 1024);
+    }
+    return (strlen($buffer) == 0);
+}
+function getQueryFromFile()
+{
+    $query = '';
+    while (!checkEof())
+    {
+        $char  = getSymb();
+        switch ($char)
+        {
+            case '-':
+                if ((viewSymb(0) != '-') || (viewSymb(1) != ' '))
+                {
+                    $query .= $char;
+                    break;
+                }
+            case '#':
+                while (($char !== "\r") && ($char !== "\n") && (!checkEof()))
+                    $char = getSymb();
+                break;
+            case '`':
+            case '\'':
+            case '"':
+                $quote  = $char;
+                $query .= $quote;
+                while (!checkEof())
+                {
+                    $char = getSymb();
+                    if ($char === '\\')
+                    {
+                        $query .= $char;
+                        if (!checkEof())
+                        {
+                            $char = getSymb();
+                            $query .= $char;
+                            if (!checkEof()) $char = getSymb();
+                        } else 
+                        {
+                            break;
+                        }
+                    }
+                    if ( $char === $quote ) break;
+                    $query .= $char;
+                }
+                $query .= $quote;
+                break;
+            case ';':
+                $query = trim($query);
+                return $query;
+            default:
+                $query .= $char;
+                break;
+        }
+    }
+    $query = trim($query);
+    return $query;
+}
+
+while ($query = getQueryFromFile())
+{
+    $conn->executeQuery($query);
+    if (preg_match('/drop\s+table\s+(if\s+exists\s+)?([^;]+)/ui', strtolower($query), $matches))
+    {
+        if (isset($matches[2]))
+        {
+            echo "<script>restoreLogWrite('<p>Восстановление таблицы <b>".$matches[2]."</b></p>');</script>";
+            flush();
+        }
+    }
+}
+fclose($file);
+@unlink('secured/backup.sql');
+@unlink('restore.php');
+
+?>
+<script>
+    restoreLogWrite('<p style="border-top:1px dashed #ccc;padding:5px 0;margin:5px 0;"><b>База данных восстановлена</b></p>');
+    restoreLogWrite('<p style="border-top:1px dashed #ccc;padding:5px 0;margin:5px 0;">Сейчас Вы будете перенаправлены на сайт...</p>');
+    setTimeout(function () {location.href = '/';}, 2000);
+</script>
+</body>
+</html>

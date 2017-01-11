@@ -1,0 +1,333 @@
+<div class="earth-comments">
+    {{preContent | raw}}
+                        <table class="earth-messages-table table table-striped">
+                            {% for message in messages %}    
+				<tr id="commentMessage{{message['id']}}">
+					<td class="earth-messages-table_info">
+						<p>{{(message['createrId'] != null ? '<span class="mirclubTransliteration">'~message['createrFullName']~'</span>' : 'Guest') | raw}}</p>
+                                                <p><img src="{{(message['createrAvatar'] != '' ? message['createrAvatar'] : '/img/noava.png')}}" /></p>
+                                                {% if permissions['moderator'] != 0 %}   
+                                                    <a class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#popupCommentModeration{{message['id']}}">Moderation</a>
+                                                    <div class="modal fade" id="popupCommentModeration{{message['id']}}">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <form action="?" method="post" enctype="multipart/form-data">
+                                                                    <div class="modal-header">
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                                        <h4 class="modal-title">Message moderation</h4>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <input type="hidden" name="actionobject" value="forum" />
+                                                                        <input type="hidden" name="action" value="moderatecomment" />
+                                                                        <input type="hidden" name="actionid" value="{{seoPageId}}" />
+                                                                        <input type="hidden" name="actionmessageid" value="{{message['id']}}" />
+                                                                        <div class="form-group">
+                                                                            <label>The reason for moderation</label>
+                                                                            <textarea class="form-control" placeholder="The reason for moderation" name="actionfields[text]">{{message['moderateTextValue']}}</textarea>
+                                                                            {% if message['moderateTextError'] != '' %}<p class="form-error">The field is not valid</p>{% endif %}
+                                                                        </div>
+                                                                        <div class="checkbox"><label><input type="checkbox" name="actionfields[hide]" value="1" {% if message['moderateHideValue'] != 0 %}checked="checked"{% endif %} />Hide the message</label></div>
+                                                                        <div class="checkbox"><label><input type="checkbox" name="actionfields[ban]" value="1" {% if message['moderateBanValue'] != 0 %}checked="checked"{% endif %} />Ban author</label></div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button class="btn btn-primary" type="submit">Apply</button>
+                                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div><!-- /.modal-content -->
+                                                        </div><!-- /.modal-dialog -->
+                                                    </div><!-- /.modal -->
+                                                    {% if (message['moderateStatus'] != '') and (message['moderateStatus'] != 'OK') %}
+                                                        <script>
+                                                            $(function () {$('#popupCommentModeration{{message['id']}}').modal('show');});
+                                                        </script>
+                                                    {% endif %}
+                                                    {% if message['moderateStatus'] == 'OK' %}
+                                                        <div class="modal fade" id="popupCommentModeration{{message['id']}}Success">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                                        <h4 class="modal-title">Message moderation</h4>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <p>The message is sended</p>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <script>
+                                                            $(function () {$('#popupCommentModeration{{message['id']}}Success').modal('show');});
+                                                        </script>
+                                                    {% endif %}
+                                                {% endif %}    
+                                                {% if message['permissions']['edit'] != 0 %}
+                                                    <a class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#popupCommentEdit{{message['id']}}">Edit</a>
+                                                    <div class="modal fade" id="popupCommentEdit{{message['id']}}">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <form action="?" method="post" enctype="multipart/form-data">
+                                                                    <div class="modal-header">
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                                        <h4 class="modal-title">Edit message</h4>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <input type="hidden" name="actionobject" value="forum" />
+                                                                        <input type="hidden" name="action" value="editcomment" />
+                                                                        <input type="hidden" name="actionid" value="{{seoPageId}}" />
+                                                                        <input type="hidden" name="actionmessageid" value="{{message['id']}}" />
+                                                                        <div class="form-group">
+                                                                            <label>Message text</label>
+                                                                            <textarea class="addTinyMce" name="actionfields[text]">{{message['editMessageValue']}}</textarea>
+                                                                            {% if message['editMessageError'] != '' %}<p class="form-error">The field is not valid</p>{% endif %}
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Attachments:</label>
+                                                                            <div id="fileCommentAttachments{{message['id']}}">
+                                                                                {% for attach in message['editAttachments'] %}
+                                                                                    <p>
+                                                                                        <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                                                                                        {{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} kb, <a href="#" onclick="$(this).parent('p').remove();return false;">remove</a>)
+                                                                                    </p>
+                                                                                {% endfor %}
+                                                                            </div>
+                                                                            {% if message['editAttachmentsError'] != '' %}<p class="form-error">File upload error</p>{% endif %}
+                                                                            <p><button class="btn btn-default" id="fileCommentAttachmentsAdd{{message['id']}}" onclick="return false;">Add files</button></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button class="btn btn-primary" type="submit">Send</button>
+                                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% if (message['editStatus'] != '') and (message['editStatus'] != 'OK') %}
+                                                        <script>
+                                                            $(function () {$('#popupCommentEdit{{message['id']}}').modal('show');});
+                                                        </script>
+                                                    {% endif %}
+                                                    {% if message['editStatus'] == 'OK' %}
+                                                        <div class="modal fade" id="popupCommentEdit{{message['id']}}Success">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                                        <h4 class="modal-title">Edit message</h4>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <p>The message is sended</p>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <script>
+                                                            $(function () {$('#popupCommentEdit{{message['id']}}Success').modal('show');});
+                                                        </script>
+                                                    {% endif %}
+                                                    <script>
+                                                        $(function () 
+                                                        {
+                                                            new AjaxUpload('#fileCommentAttachmentsAdd{{message['id']}}', 
+                                                            {
+                                                                action: '{{path('forum_forum_front_commentattachmentsupload')}}',
+                                                                name: 'files',
+                                                                multiply: true,
+                                                                onSubmit: function(file, extension)
+                                                                {
+                                                                    $('#preloader').show();
+                                                                },
+                                                                onComplete: function(file, response)
+                                                                {
+                                                                    $('#preloader').hide();
+                                                                    if (!response) response = "[{id:'', error:'File upload error'}]";
+                                                                    var answers = $.parseJSON(response);
+                                                                    var key;
+                                                                    for (key in answers)
+                                                                    {
+                                                                        var answer = answers[key];
+                                                                        if(answer.id)
+                                                                        {
+                                                                                $('#fileCommentAttachments{{message['id']}}').append(
+                                                                                    '<p>'+
+                                                                                    '    <input type="hidden" name="actionfields[attachments][]" value="'+answer.id+'" />'+
+                                                                                    '    '+answer.filename+' ('+answer.filesizeformat+' kb, <a href="#" onclick="$(this).parent(\'p\').remove();return false;">remove</a>)'+
+                                                                                    '</p>');
+                                                                        } else
+                                                                        {
+                                                                                alert(answer.error);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            });
+                                                        });
+                                                    </script>
+                                                {% endif %}
+                                        </td>
+					<td class="earth-messages-table_message">
+                                            <p><small>{{message['createDate'] | date('d.m.Y H:i')}}{% if message['modifyDate'] != message['createDate'] %}, changed {{message['modifyDate'] | date('d.m.Y H:i')}} {% endif %} <a href="?page={{page}}#commentMessage{{message['id']}}">#{{message['id']}}</a> <a href="#" onclick="citeMessageToEditor('Message {{(message['createrId'] != null ? message['createrFullName'] : 'Guest')}} от {{message['createDate'] | date('d.m.Y H:i')}}:',this);return false;">Cite</a></small></p>
+                                                {% if message['isVisible'] == 0 %}[hidden message]<br />{% endif %}
+                                                {{message['content'] | raw}}
+                                                {% if message['attachments']|length > 0 %}
+                                                <p><br />Attachments: </p>
+						<ul>
+                                                    {% for attach in message['attachments'] %}
+                                                    {% if attach['permissions']['download'] != 0 %}
+                                                        <li><a href="{{path('forum_forum_front_commentattachmentsdownload')}}?id={{attach['id']}}">{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} kb)</a></li>
+                                                    {% else %}
+                                                        <li>{{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} kb) [you don`t have permissions to download this file]</li>
+                                                    {% endif %}
+                                                    {% endfor %}
+						</ul>
+                                                {% endif %}
+                                                {% if message['moderatorId'] != null %}
+                                                    <p style="color:#f00">{{message['moderatorMessage']}}<br />Moderator: <span class="mirclubTransliteration">{{message['moderatorFullName']}}</span></p>
+                                                {% endif %}
+					</td>
+				</tr>
+                            {% endfor %}    
+			</table>
+                        <ul class="pagination">
+                        {% if (pageCount > 1) %}
+                            {% set to = page + 1 %}
+                            {% set from = page - 1 %}
+                            {% if (to >= pageCount) %}
+                                {% set to = pageCount - 1 %}
+                            {% endif %}
+                            {% if (from < 0) %}
+                                {% set from = 0 %}
+                            {% endif %}
+                            {% if (from > 0) %}
+                                <li><a href="?commentspage=0">1</a></li>
+                            {% endif %}
+                            {% if (from > 1) %}
+                                <li><a class="disabled">...</a></li>
+                            {% endif %}
+                            {% for i in from..to %}
+                                {% if i == page %}
+                                <li class="active"><a href="#">{{i+1}}</a></li>
+                                {% else %}
+                                <li><a href="?commentspage={{i}}">{{i+1}}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if (to < (pageCount - 2)) %}
+                                <li><a class="disabled">...</a></li>
+                            {% endif %}
+                            {% if (to < (pageCount - 1)) %}
+                                <li><a href="?commentspage={{pageCount - 1}}">{{pageCount}}</a></li>
+                            {% endif %}
+                        {% endif %}
+                        </ul>
+                        
+                    {% if permissions['post'] != 0 %}
+                        <p class="text-center" {% if status == 'OK' %}style="display:none"{% endif %}><a href="#" class="btn btn-default" onclick="$('#mirclubCommentsAdd').slideDown(300);$(this).closest('p').hide();return false;">Add message</a></p>
+			<div {% if status != 'OK' %}style="display:none"{% endif %} id="mirclubCommentsAdd">
+                                {% if status == 'OK' %}
+                                <p class="alert alert-success">The message is sended</p>
+                                {% endif %}
+                                <div class="row">
+                        <form action="?" method="post" enctype="multipart/form-data" class="col-md-6 col-md-offset-3 col-sm-12">
+                            <input type="hidden" name="actionobject" value="forum" />
+                            <input type="hidden" name="action" value="postcomment" />
+                            <input type="hidden" name="actionid" value="{{seoPageId}}" />
+                                <div class="form-group">
+                                    <label for="addMessageEditor">Message text</label>
+                                    <textarea class="form-control addTinyMce" id="addMessageEditor" placeholder="Message text" autocomplete="off" name="actionfields[text]">{{postMessageValue}}</textarea>
+                                    {% if postMessageError != '' %}<p class="form-error">The field is not valid</p>{% endif %}
+                                </div>
+                                <div class="form-group">
+                                    <label>Attachments:</label>
+                                    <div id="fileCommentAttachmentsNew">
+                                        {% for attach in postAttachments %}
+                                        <p>
+                                            <input type="hidden" name="actionfields[attachments][]" value="{{attach['id']}}" />
+                                            {{attach['fileName']}} ({{(attach['fileSize'] / 1024) | number_format(0,',',' ')}} kb, <a href="#" onclick="$(this).parent('p').remove();return false;">remove</a>)
+                                        </p>
+                                        {% endfor %}
+                                    </div>
+                                    {% if postAttachmentsError != '' %}<p class="form-error">File upload error</p>{% endif %}
+                                    <p><button class="btn btn-default" id="fileCommentAttachmentsAddNew" onclick="return false;">Add files</button></p>
+				</div>
+				
+                                <script>
+                                    $(function () 
+                                    {
+                                        new AjaxUpload('#fileCommentAttachmentsAddNew', 
+                                        {
+                                            action: '{{path('forum_forum_front_commentattachmentsupload')}}',
+                                            name: 'files',
+                                            multiply: true,
+                                            onSubmit: function(file, extension)
+                                            {
+                                                $('#preloader').show();
+                                            },
+                                            onComplete: function(file, response)
+                                            {
+                                                $('#preloader').hide();
+                                                if (!response) response = "[{id:'', error:'File upload error'}]";
+                                                var answers = $.parseJSON(response);
+                                                var key;
+                                                for (key in answers)
+                                                {
+                                                    var answer = answers[key];
+                                                    if(answer.id)
+                                                    {
+                                                            $('#fileCommentAttachmentsNew').append(
+                                                                '<p>'+
+                                                                '    <input type="hidden" name="actionfields[attachments][]" value="'+answer.id+'" />'+
+                                                                '    '+answer.filename+' ('+answer.filesizeformat+' kb, <a href="#" onclick="$(this).parent(\'p\').remove();return false;">remove</a>)'+
+                                                                '</p>');
+                                                    } else
+                                                    {
+                                                            alert(answer.error);
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    });
+                                </script>
+                                    {% if captchaEnabled != 0 %}
+                                    <div class="form-group">
+                                        <label for="addMessageEditorCaptcha">Enter text from image<br /><img src="{{captchaPath}}&rand={{random()}}" onclick="this.setAttribute('src', '{{captchaPath}}&rand='+Math.floor(Math.random() * 2000000000));" /></label>
+                                        <input type="text" class="form-control" id="addMessageEditorCaptcha" name="actionfields[captcha]" value="">
+                                        {% if captchaError != '' %}<p class="form-error">The field is not valid</p>{% endif %}
+                                    </div>
+                                    {% endif %}
+				<p class="text-center"><button class="btn btn-default" type="submit">Send</button></p>
+				<script>
+					tinymce.init({
+						selector: "textarea.addTinyMce",
+						language : 'en',
+						height: 100,
+						menubar: false,
+						convert_urls: false,
+						verify_html : true,
+						plugins: ["link"],
+						toolbar: "undo redo | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link"
+					});
+				</script>
+                        </form></div>
+                        </div>
+                    {% else %}
+                        <p class="text-center"><a href="#" class="btn btn-default" onclick="$('#mirclubCommentsAdd').show();return false;">Add message</a></p>
+                        <p id="mirclubCommentsAdd" class="form-error text-center" style="display:none">To add messages you need to register on the site.</p>
+                    {% endif %}
+
+                        <script>
+                            function citeMessageToEditor(preamb, that)
+                            {
+                                var text = $(that).closest('.forumColMessage').clone();
+                                text.find('div').remove();
+                                text.find('blockquote').remove();
+                                tinymce.get('addMessageEditor').execCommand('mceInsertContent', false, '<blockquote>'+preamb+'<br />'+text.html()+'</blockquote><p></p>');
+                            }
+                        </script>
+    {{postContent | raw}}                        
+</div>

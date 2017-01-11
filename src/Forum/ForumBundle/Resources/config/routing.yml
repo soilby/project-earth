@@ -1,0 +1,83 @@
+forum_forum_topic_list:
+    path:  /admin/forums/
+    defaults: { _controller: ForumForumBundle:Default:forumsTopicList }
+
+forum_forum_topic_create:
+    path:  /admin/forums/create
+    defaults: { _controller: ForumForumBundle:Default:forumsTopicCreate }
+
+forum_forum_topic_edit:
+    path:  /admin/forums/edit
+    defaults: { _controller: ForumForumBundle:Default:forumsTopicEdit }
+
+forum_forum_topic_ajax:
+    path:  /admin/forums/ajax
+    defaults: { _controller: ForumForumBundle:Default:forumsTopicAjax }
+
+forum_forum_createpage_create:
+    path:  /admin/forums/createpage/create
+    defaults: { _controller: ForumForumBundle:Default:forumsCreatepageCreate }
+
+forum_forum_createpage_edit:
+    path:  /admin/forums/createpage/edit
+    defaults: { _controller: ForumForumBundle:Default:forumsCreatepageEdit }
+
+
+forum_forum_topic_ajaxavatar:
+    path:  /admin/forums/ajaxavatar
+    defaults: { _controller: ForumForumBundle:Default:forumsTopicAjaxAvatar }
+
+forum_forum_topic_ajaxattachment:
+    path:  /admin/forums/ajaxattachment
+    defaults: { _controller: ForumForumBundle:Default:forumsTopicAjaxAttachment }
+
+forum_forum_topic_ajaxloadusers:
+    path:  /admin/forums/ajaxloadusers
+    defaults: { _controller: ForumForumBundle:Default:forumsTopicAjaxLoadUsers }
+
+forum_forum_messages_list:
+    path:  /admin/forums/messages
+    defaults: { _controller: ForumForumBundle:Default:forumsMessageList }
+
+forum_forum_messages_create:
+    path:  /admin/forums/messages/create
+    defaults: { _controller: ForumForumBundle:Default:forumsMessageCreate }
+
+forum_forum_messages_edit:
+    path:  /admin/forums/messages/edit
+    defaults: { _controller: ForumForumBundle:Default:forumsMessageEdit }
+    
+forum_forum_messages_ajax:
+    path:  /admin/forums/messages/ajax
+    defaults: { _controller: ForumForumBundle:Default:forumsMessageAjax }
+
+
+forum_forum_front_attachmentsupload:
+    path:  /system/upload/forumattachments
+    defaults: { _controller: ForumForumBundle:Default:forumsFrontAjaxAttachment }
+
+forum_forum_front_avatarupload:
+    path:  /system/upload/forumavatar
+    defaults: { _controller: ForumForumBundle:Default:forumsFrontAjaxAvatar }
+
+
+forum_forum_front_attachmentsdownload:
+    path:  /system/download/forumattachments
+    defaults: { _controller: ForumForumBundle:Default:forumsFrontDownloadAttachment }
+
+
+forum_forum_comments_ajaxattachment:
+    path:  /admin/forums/comments/ajaxattachment
+    defaults: { _controller: ForumForumBundle:Default:forumsCommentAjaxAttachment }
+    
+forum_forum_comments_edit:
+    path:  /admin/forums/comments/edit
+    defaults: { _controller: ForumForumBundle:Default:forumsCommentEdit }
+
+forum_forum_front_commentattachmentsdownload:
+    path:  /system/download/commentattachments
+    defaults: { _controller: ForumForumBundle:Default:forumsFrontDownloadCommentAttachment }
+
+forum_forum_front_commentattachmentsupload:
+    path:  /system/upload/commentattachments
+    defaults: { _controller: ForumForumBundle:Default:forumsFrontAjaxCommentAttachment }

@@ -1,0 +1,78 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование сообщения форума{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('forum_forum_topic_list')}}">Форум</a>
+    <a href="{{path('forum_private_private_list')}}">Личные сообщения</a>
+    <span>Просмотр личного сообщения № {{id}}</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+</div>
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('forum_private') == 1) %}<a class="button" href="{{path('forum_private_private_list')}}">Назад</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Дата создания (изменения) сообщения<span class="helpContainerButton" data-id="createDate">?</span></td>
+                    <td class="cfgValue">{{private.createDate | date('d.m.Y G:i')}}{% if private.createDate != private.modifyDate %} ({{private.modifyDate | date('d.m.Y G:i')}}){% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Дата просмотра сообщения<span class="helpContainerButton" data-id="viewDate">?</span></td>
+                    <td class="cfgValue">{% if private.viewed == 0 %}Сообщение не просматривалось{% else %}{{private.viewDate | date('d.m.Y G:i')}}{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Удалено у автора</td>
+                    <td class="cfgValue">{{ (private.removedCreater != 0 ? 'Да' : 'Нет') }}</td>
+                </tr>
+                <tr>
+                    <td>Удалено у адресата</td>
+                    <td class="cfgValue">{{ (private.removedTarget != 0 ? 'Да' : 'Нет') }}</td>
+                </tr>
+                <tr>
+                    <td>Автор<span class="helpContainerButton" data-id="creater">?</span></td>
+                    <td class="cfgValue"><a href="{{path('basic_cms_user_edit')}}?id={{private.createrId}}">{{creater.fullName}}</a></td>
+                </tr>
+                <tr>
+                    <td>Адресат<span class="helpContainerButton" data-id="target">?</span></td>
+                    <td class="cfgValue"><a href="{{path('basic_cms_user_edit')}}?id={{private.targetId}}">{{target.fullName}}</a></td>
+                </tr>
+                <tr>
+                    <td>Тема сообщения<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td class="cfgValue">{{private.title}}</td>
+                </tr>
+            </table>
+            <div class="mb20">
+            <p>Текст сообщения:<span class="helpContainerButton" data-id="content">?</span></p>
+            <br />
+                <div style="border: 1px #999 solid; padding: 5px; margin: 5px;">{{private.content | raw}}</div>
+            </div>
+            <div class="mb20">
+                <p>Вложения:<span class="helpContainerButton" data-id="attachments">?</span></p>
+                <ul class="cfgSimpleList" id="forumMessageAttachments">
+                    {% for attach in attachments %}
+                    <li>{{attach.filename}} ({{(attach.filesize / 1024) | number_format(0,',',' ')}} Кб)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+</div>​
+<div id="helpContainer">
+    <div id="helpContainer-createDate">Дата создания личного сообщения. В скобках указывается дата последнего изменения сообщения, если изменения производились.</div>
+    <div id="helpContainer-viewDate">Дата просмотра сообщения адресатом.</div>
+    <div id="helpContainer-creater">Пользователь, создавший данное личное сообщение.</div>
+    <div id="helpContainer-target">Пользователь, которому адресовано данное личное сообщение.</div>
+    <div id="helpContainer-title">Тема личного сообщения.</div>
+    <div id="helpContainer-content">Текст личного сообщения.</div>
+    <div id="helpContainer-attachments">Вложения к личному сообщению.</div>
+</div>
+{% endblock %}       
+
+
+

@@ -1,0 +1,543 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Редактирование формы{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('form_form_list')}}">Формы</a>
+    <span>Редактирование формы &laquo;{{form['title']['default']}}&raquo;</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Страница</a>
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Поля формы</a>
+    {% for tab in tabs %}
+    {% if (tab.content != null) %}
+    <a href="#" onclick="return false;" id="tab{{loop.index0+4}}" {% if (activetab == loop.index0+4) %}class="active"{% endif %}>{{tab.name}}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+<form action="{{path('form_form_edit')}}?id={{id}}" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('form_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('form_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('form_list') == 1) or (app.user.checkAccess('form_letterlist') == 1)) %}<a class="button" href="{{path('form_form_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="form[enabled]" value="1" {% if (form['enabled'] != 0) %}checked="checked"{% endif %} />Включена</label><span class="helpContainerButton" data-id="enabled">?</span></td>
+                    <td class="cfgError">{{formerror['enabled']}}</td>
+                </tr>
+                <tr>
+                    <td>Заголовок<span class="helpContainerButton" data-id="title">?</span></td>
+                    <td><input type="text" name="form[title][default]" value="{{form['title']['default']}}" /></td>
+                    <td class="cfgError">{{formerror['title']['default']}}</td>
+                </tr>
+                {% for locale in locales %}
+                <tr>
+                    <td>Заголовок ({{locale['fullName']}})</td>
+                    <td><input type="text" name="form[title][{{locale['shortName']}}]" value="{{form['title'][locale['shortName']]}}" /></td>
+                    <td class="cfgError">{{formerror['title'][locale['shortName']]}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="form[sendEmail]" value="1" {% if (form['sendEmail'] != 0) %}checked="checked"{% endif %} />Отправлять письмо по E-Mail</label><span class="helpContainerButton" data-id="sendEmail">?</span></td>
+                    <td class="cfgError">{{formerror['sendEmail']}}</td>
+                </tr>
+                <tr>
+                    <td>E-Mail<span class="helpContainerButton" data-id="email">?</span></td>
+                    <td><input type="text" name="form[email]" value="{{form['email']}}" /></td>
+                    <td class="cfgError">{{formerror['email']}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="form[captchaEnabled]" value="1" {% if (form['captchaEnabled'] != 0) %}checked="checked"{% endif %} />Защитить форму с помощью капчи</label><span class="helpContainerButton" data-id="captchaEnabled">?</span></td>
+                    <td class="cfgError">{{formerror['captchaEnabled']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('form_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('form_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('form_list') == 1) or (app.user.checkAccess('form_letterlist') == 1)) %}<a class="button" href="{{path('form_form_list')}}">Отмена</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td colspan="2"><label><input type="checkbox" name="page[enable]" value="1" {% if (page['enable'] != 0) %}checked="checked"{% endif %} />Включить страницу просмотра</label><span class="helpContainerButton" data-id="seopageEnabled">?</span></td>
+                    <td class="cfgError">{{pageerror['enable']}}</td>
+                </tr>
+                <tr>
+                    <td>URL страницы<span class="helpContainerButton" data-id="seopageUrl">?</span></td>
+                    <td><input type="text" name="page[url]" value="{{page['url']}}" /></td>
+                    <td class="cfgError">{{pageerror['url']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль страницы<span class="helpContainerButton" data-id="seopageLocale">?</span></td>
+                    <td>
+                        <select name="page[locale]">
+                            <option value="" {% if (page['locale'] == '') %}selected="selected"{% endif %}>Для всех</option>
+                            {% for locale in locales %}
+                                <option value="{{locale['shortName']}}" {% if (page['locale'] == locale['shortName']) %}selected="selected"{% endif %}>{{locale['fullName']}} ({{locale['shortName']}})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Основной шаблон<span class="helpContainerButton" data-id="seopageLayout">?</span></td>
+                    <td>
+                        <select name="page[layout]">
+                            <option value="" {% if (page['layout'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for layoutkey,layout in layouts %}
+                                <option value="{{layoutkey}}" {% if (page['layout'] == layoutkey) %}selected="selected"{% endif %}>{{layout}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['layout']}}</td>
+                </tr>
+                <tr>
+                    <td>Шаблон контента<span class="helpContainerButton" data-id="seopageTemplate">?</span></td>
+                    <td>
+                        <select name="page[template]">
+                            <option value="" {% if (page['template'] == '') %}selected="selected"{% endif %}>По умолчанию</option>
+                            {% for templatekey,template in templates %}
+                                <option value="{{templatekey}}" {% if (page['template'] == templatekey) %}selected="selected"{% endif %}>{{template}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['template']}}</td>
+                </tr>
+            {% if (modules|length > 0) %}
+                <tr>
+                    <td>Включенные модули<span class="helpContainerButton" data-id="seopageModules">?</span></td>
+                    <td>
+                      {% for module in modules %}
+                        <label><input type="checkbox" name="page[modules][]" value="{{module['id']}}" {% if (module['id'] in page['modules']) %}checked="checked"{% endif %} />{{module['name']}}</label><br />
+                      {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['modules']}}</td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td>Ограничение доступа к странице<span class="helpContainerButton" data-id="seopageAccess">?</span></td>
+                    <td>
+                        <select name="page[accessOn]" onchange="if ($(this).val() == 0) $('#accessRoleWrap').hide(); else $('#accessRoleWrap').show();">
+                            <option value="0" {% if (page['accessOn'] == 0) %}selected="selected"{% endif %}>Доступна всем пользователям</option>
+                            <option value="1" {% if (page['accessOn'] != 0) %}selected="selected"{% endif %}>Доступна следующим ролям</option>
+                        </select>
+                    </td>
+                    <td class="cfgError">{{pageerror['accessOn']}}</td>
+                </tr>
+                <tr id="accessRoleWrap" {% if (page['accessOn'] == 0) %}style="display:none;"{% endif %}>
+                    <td></td>
+                    <td>
+                        {% for role in roles %}
+                            <label><input type="checkbox" name="page[access][]" value="{{role['id']}}" {% if (role['id'] in page['access']) %}checked="checked"{% endif %} />{{role['name']}}</label><br />
+                        {% endfor %}
+                    </td>
+                    <td class="cfgError">{{pageerror['access']}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('form_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('form_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('form_list') == 1) or (app.user.checkAccess('form_letterlist') == 1)) %}<a class="button" href="{{path('form_form_list')}}">Отмена</a>{% endif %}
+            </div>
+            <div class="formFieldTree">
+                <ul>
+                    {% if (formfields|length) > 0 %}
+                        {% for i in 0..(formfields|length - 1) %}
+                            <li class="noselect"><span class="moveButton">&nbsp</span><span class="ierarhLeftButton">&nbsp</span><span class="ierarhRightButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#" {% if (formfields[i]['enabled'] == 0) %}class="disabled"{% endif %}>{{formfields[i]['name']['default']}}</a>
+                                <input type="hidden" name="formfields[{{i}}][enabled]" class="itemEnabled" value="{{formfields[i]['enabled']}}" />
+                                <input type="hidden" name="formfields[{{i}}][required]" class="itemRequired" value="{{formfields[i]['required']}}" />
+                                <input type="hidden" name="formfields[{{i}}][type]" class="itemType" value="{{formfields[i]['type']}}" />
+                                <input type="hidden" name="formfields[{{i}}][ordering]" class="itemOrdering" value="{{formfields[i]['ordering']}}" />
+                                <input type="hidden" name="formfields[{{i}}][nesting]" class="itemNesting" value="{{formfields[i]['nesting']}}" />
+                                <input type="hidden" name="formfields[{{i}}][name][default]" class="itemNameDefault" value="{{formfields[i]['name']['default']}}" />
+                                <input type="hidden" name="formfields[{{i}}][parameter][default]" class="itemParameterDefault" value="{{formfields[i]['parameter']['default']}}" />
+                                {% for locale in locales %}
+                                <input type="hidden" name="formfields[{{i}}][name][{{locale['shortName']}}]" class="itemName{{locale['shortName']}}" value="{{formfields[i]['name'][locale['shortName']]}}" />
+                                <input type="hidden" name="formfields[{{i}}][parameter][{{locale['shortName']}}]" class="itemParameter{{locale['shortName']}}" value="{{formfields[i]['parameter'][locale['shortName']]}}" />
+                                {% endfor %}
+                                {% if (formfields[i]['id'] is defined) %}
+                                <input type="hidden" name="formfields[{{i}}][id]" value="{{formfields[i]['id']}}" />
+                                {% endif %}
+                                {% if (formfields[i]['error'] is defined) %}<span class="ml20 globalError">{{formfields[i]['error']}}</span>{% endif %}
+                            {%if ((i < formfields|length-1) and (formfields[i+1]['nesting'] > formfields[i]['nesting']))%}
+                            <ul>
+                            {%else%}
+                            </li>
+                            {%endif%}
+                            {%if ((i < formfields|length-1) and (formfields[i+1]['nesting'] < formfields[i]['nesting']))%}
+                                {% for j in 0..(formfields[i]['nesting'] - formfields[i+1]['nesting'] - 1) %}
+                                </ul></li>
+                                {% endfor %}
+                            {%endif%}
+                        {% endfor %}
+                        {%if (formfields[formfields|length-1]['nesting'] > 0)%}
+                            {% for j in 0..(formfields[formfields|length-1]['nesting'] - 1) %}
+                            </ul></li>
+                            {% endfor %}
+                        {%endif%}
+                    {% endif %}
+                </ul>
+{#                
+                
+                
+                
+                
+                <ul>
+                    {% if (formfields|length) > 0 %}
+                        {% for key,field in formfields %}
+                            <li class="noselect"><span class="moveButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#" {% if (field['enabled'] == 0) %}class="disabled"{% endif %}>{{field['name']['default']}}</a>
+                                <input type="hidden" name="formfields[{{key}}][enabled]" class="itemEnabled" value="{{field['enabled']}}" />
+                                <input type="hidden" name="formfields[{{key}}][type]" class="itemType" value="{{field['type']}}" />
+                                <input type="hidden" name="formfields[{{key}}][ordering]" class="itemOrdering" value="{{field['ordering']}}" />
+                                <input type="hidden" name="formfields[{{key}}][name][default]" class="itemNameDefault" value="{{field['name']['default']}}" />
+                                <input type="hidden" name="formfields[{{key}}][parameter][default]" class="itemParameterDefault" value="{{field['parameter']['default']}}" />
+                                {% for locale in locales %}
+                                <input type="hidden" name="formfields[{{key}}][name][{{locale['shortName']}}]" class="itemName{{locale['shortName']}}" value="{{field['name'][locale['shortName']]}}" />
+                                <input type="hidden" name="formfields[{{key}}][parameter][{{locale['shortName']}}]" class="itemParameter{{locale['shortName']}}" value="{{field['parameter'][locale['shortName']]}}" />
+                                {% endfor %}
+                                {% if (field['id'] is defined) %}
+                                <input type="hidden" name="formfields[{{key}}][id]" value="{{field['id']}}" />
+                                {% endif %}
+                                {% if (field['error'] is defined) %}<span class="ml20 globalError">{{field['error']}}</span>{% endif %}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>#}
+            </div>
+            <div class="mt20"><button type="button" id="fieldAdd" onclick="return false;">Добавить поле формы</button></div>
+            <div class="popupCfgWindow" id="formPopupCfgWindow">
+                <div>
+                    <table class="cfgTable">
+                        <tr>
+                            <td colspan="2"><label><input class="fieldEnabled" type="checkbox" name="temp" value="1" />Опубликовано</label></td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        <tr>
+                            <td>Название</td>
+                            <td><input class="fieldNameDefault" type="text" name="temp" value="" /></td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        {% for locale in locales %}
+                        <tr>
+                            <td>Название ({{locale['fullName']}})</td>
+                            <td><input class="fieldName{{locale['shortName']}}" type="text" name="temp" value="" /></td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="2"><label><input class="fieldRequired" type="checkbox" name="temp" value="1" />Обязательное поле</label></td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        <tr>
+                            <td>Тип поля</td>
+                            <td>
+                                <select class="fieldType" name="temp" onchange="changeFormPopupVisible(this);">
+                                    <option value="text">Текстовое поле</option>
+                                    <option value="textarea">Многострочный текст</option>
+                                    <option value="checkbox">Флажок</option>
+                                    <option value="radio">Группа радиокнопок</option>
+                                    <option value="select">Выпадающий список</option>
+                                    <option value="group">Группа параметров</option>
+                                </select>
+                            </td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        <tr class="formPopupRegExp">
+                            <td>Регулярное выражение<span class="helpContainerButton" data-id="regularExp">?</span></td>
+                            <td><input class="fieldRegExpDefault" type="text" name="temp" value="" /></td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        {% for locale in locales %}
+                        <tr class="formPopupRegExp">
+                            <td>Регулярное выражение ({{locale['fullName']}})</td>
+                            <td><input class="fieldRegExp{{locale['shortName']}}" type="text" name="temp" value="" /></td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="formPopupItems">
+                            <td>Пункты разделённые переносом строк</td>
+                            <td><textarea class="fieldItemsDefault" name="temp"></textarea></td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        {% for locale in locales %}
+                        <tr class="formPopupItems">
+                            <td>Пункты ({{locale['fullName']}})</td>
+                            <td><textarea class="fieldItems{{locale['shortName']}}" name="temp"></textarea></td>
+                            <td class="cfgError"></td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="3"><button id="saveFormFieldPopupButton" onclick="return false;">Сохранить</button><button onclick="$('#formPopupCfgWindow').hide();return false;">Отмена</button></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% for tab in tabs %}
+        {% if (tab.content != null) %}
+        <div id="con_tab{{loop.index0+4}}" {% if (activetab == loop.index0+4) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if ((app.user.checkAccess('form_editall') == 1) and (createrId != app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('form_editown') == 1) and (createrId == app.user.id)) %}<button type="submit">Сохранить</button>{% endif %}
+                {% if ((app.user.checkAccess('form_list') == 1) or (app.user.checkAccess('form_letterlist') == 1)) %}<a class="button" href="{{path('form_form_list')}}">Отмена</a>{% endif %}
+            </div>
+            {{tab.content | raw}}
+        </div>
+        {% endif %}
+        {% endfor %}
+</div>​
+</form>
+<script>
+window.moveelement = null;
+window.editedfield = null;
+window.indexoffields = {{formfields|length}};
+function changeFormPopupVisible(that)
+{
+    $('.formPopupRegExp').hide();
+    $('.formPopupItems').hide();
+    if (($(that).val() == 'text') || ($(that).val() == 'textarea')) $('.formPopupRegExp').show();
+    if (($(that).val() == 'select') || ($(that).val() == 'radio')) $('.formPopupItems').show();
+}
+
+$('#fieldAdd').click(function () {
+    window.editedfield = null;
+    $('#formPopupCfgWindow .fieldEnabled').attr('checked','checked');
+    $('#formPopupCfgWindow .fieldRequired').removeAttr('checked');
+    $.uniform.update("#formPopupCfgWindow .fieldEnabled, #formPopupCfgWindow .fieldRequired");
+    $('#formPopupCfgWindow .fieldType').val('text');
+    $.uniform.update("#formPopupCfgWindow .fieldType");
+    changeFormPopupVisible('#formPopupCfgWindow .fieldType');
+    $('#formPopupCfgWindow .fieldNameDefault').val('');
+    $('#formPopupCfgWindow .fieldRegExpDefault').val('');
+    $('#formPopupCfgWindow .fieldItemsDefault').val('');
+    {% for locale in locales %}
+    $('#formPopupCfgWindow .fieldName{{locale['shortName']}}').val('');
+    $('#formPopupCfgWindow .fieldRegExp{{locale['shortName']}}').val('');
+    $('#formPopupCfgWindow .fieldItems{{locale['shortName']}}').val('');
+    {% endfor %}
+    $('#formPopupCfgWindow').show();
+});
+    
+$('#saveFormFieldPopupButton').click(function ()
+{
+    var regname = /^[-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{3,250}$/i;
+    var regnamelocale = /^([-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,\\\/]{3,250})?$/i;
+    var regregexp = /^.*$/i;
+    var regregexplocale = /^.*$/i;
+    var regitems = /^([- _A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,]{3,250}([\r\n]+)?)+$/i;
+    var regitemslocale = /^([- _A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\,]{3,250}([\r\n]+)?)*$/i;
+    var errors = false;
+    $('#formPopupCfgWindow td.cfgError').html('');
+    var enabled = ($('#formPopupCfgWindow .fieldEnabled').is(':checked') == true ? 1 : 0);
+    var required = ($('#formPopupCfgWindow .fieldRequired').is(':checked') == true ? 1 : 0);
+    var type = $('#formPopupCfgWindow .fieldType').val();
+    var namedefault = $('#formPopupCfgWindow .fieldNameDefault').val();
+    if (!regname.test(namedefault)) {$('#formPopupCfgWindow .fieldNameDefault').closest('td').next('td.cfgError').html('Поле должно содержать от 3 до 999 разрешённых символов');errors = true;}
+    {% for locale in locales %}
+    var name{{locale['shortName']}} = $('#formPopupCfgWindow .fieldName{{locale['shortName']}}').val();
+    if (!regnamelocale.test(name{{locale['shortName']}})) {$('#formPopupCfgWindow .fieldName{{locale['shortName']}}').closest('td').next('td.cfgError').html('Поле должно содержать от 3 до 999 разрешённых символов');errors = true;}
+    {% endfor %}
+    if ((type == 'text') || (type == 'textarea'))
+    {
+        var paramdefault = $('#formPopupCfgWindow .fieldRegExpDefault').val();
+        if (!regregexp.test(paramdefault)) {$('#formPopupCfgWindow .fieldRegExpDefault').closest('td').next('td.cfgError').html('Поле заполнено неверно');errors = true;}
+        {% for locale in locales %}
+        var param{{locale['shortName']}} = $('#formPopupCfgWindow .fieldRegExp{{locale['shortName']}}').val();
+        if (!regregexplocale.test(param{{locale['shortName']}})) {$('#formPopupCfgWindow .fieldRegExp{{locale['shortName']}}').closest('td').next('td.cfgError').html('Поле заполнено неверно');errors = true;}
+        {% endfor %}
+    } else
+    if ((type == 'select') || (type == 'radio'))
+    {
+        var paramdefault = $('#formPopupCfgWindow .fieldItemsDefault').val();
+        if (!regitems.test(paramdefault)) {$('#formPopupCfgWindow .fieldItemsDefault').closest('td').next('td.cfgError').html('Поле заполнено неверно');errors = true;}
+        {% for locale in locales %}
+        var param{{locale['shortName']}} = $('#formPopupCfgWindow .fieldItems{{locale['shortName']}}').val();
+        if (!regitemslocale.test(param{{locale['shortName']}})) {$('#formPopupCfgWindow .fieldItems{{locale['shortName']}}').closest('td').next('td.cfgError').html('Поле заполнено неверно');errors = true;}
+        {% endfor %}
+    } else 
+    {
+        var paramdefault = '';
+        {% for locale in locales %}
+        var param{{locale['shortName']}} = '';
+        {% endfor %}
+    }
+    if (errors == false)
+    {
+        if (window.editedfield == null)
+        {
+            var inputs = '';
+            {% for locale in locales %}
+            inputs = inputs + '<input type="hidden" name="formfields['+window.indexoffields+'][name][{{locale['shortName']}}]" class="itemName{{locale['shortName']}}" value="" />'+
+                              '<input type="hidden" name="formfields['+window.indexoffields+'][parameter][{{locale['shortName']}}]" class="itemParameter{{locale['shortName']}}" value="" />';
+            {% endfor %}
+            window.editedfield = $('<li class="noselect"><span class="moveButton">&nbsp</span><span class="ierarhLeftButton">&nbsp</span><span class="ierarhRightButton">&nbsp</span><span class="deleteButton">&nbsp</span><a href="#"></a>'+
+                        '<input type="hidden" name="formfields['+window.indexoffields+'][enabled]" class="itemEnabled" value="" />'+
+                        '<input type="hidden" name="formfields['+window.indexoffields+'][required]" class="itemRequired" value="" />'+
+                        '<input type="hidden" name="formfields['+window.indexoffields+'][type]" class="itemType" value="" />'+
+                        '<input type="hidden" name="formfields['+window.indexoffields+'][ordering]" class="itemOrdering" value="" />'+
+                        '<input type="hidden" name="formfields['+window.indexoffields+'][nesting]" class="itemNesting" value="" />'+
+                        '<input type="hidden" name="formfields['+window.indexoffields+'][name][default]" class="itemNameDefault" value="" />'+
+                        '<input type="hidden" name="formfields['+window.indexoffields+'][parameter][default]" class="itemParameterDefault" value="" />'+
+                        inputs+
+                        '</li>');
+            window.indexoffields++;        
+            $(window.editedfield).appendTo('.formFieldTree > ul');
+        }
+        $(window.editedfield).find('a').html(namedefault).removeClass('disabled');
+        if (enabled == 0) $(window.editedfield).find('a').addClass('disabled');
+        $(window.editedfield).find('.itemEnabled').val(enabled);
+        $(window.editedfield).find('.itemRequired').val(required);
+        $(window.editedfield).find('.itemType').val(type);
+        $(window.editedfield).find('.itemNameDefault').val(namedefault);
+        $(window.editedfield).find('.itemParameterDefault').val(paramdefault);
+        {% for locale in locales %}
+        $(window.editedfield).find('.itemName{{locale['shortName']}}').val(name{{locale['shortName']}});
+        $(window.editedfield).find('.itemParameter{{locale['shortName']}}').val(param{{locale['shortName']}});
+        {% endfor %}
+        $('#formPopupCfgWindow').hide();
+        window.editedfield = null;
+        updateFormFieldIerarhy();
+    }
+    return false;
+});
+
+    function updateFieldsFromUl(ul, nesting, index)
+    {
+        $(ul).children('li').each(function (i, element)
+        {
+            $(element).find('.itemOrdering').val(index);
+            $(element).find('.itemNesting').val(nesting);
+            index++;
+            if ($(element).children('ul').length != 0) index = updateFieldsFromUl($(element).children('ul'), nesting + 1, index);
+        });
+        return index;
+    }
+
+    function updateFormFieldIerarhy()
+    {
+        updateFieldsFromUl('.formFieldTree > ul', 0, 0);
+        $('.formFieldTree li>a').unbind('click').click(function () 
+        {
+            window.editedfield = $(this).closest('li');
+            var enabled = $(window.editedfield).find('.itemEnabled').val();
+            var required = $(window.editedfield).find('.itemRequired').val();
+            var type = $(window.editedfield).find('.itemType').val();
+            var namedefault = $(window.editedfield).find('.itemNameDefault').val();
+            var paramdefault = $(window.editedfield).find('.itemParameterDefault').val();
+            {% for locale in locales %}
+            var name{{locale['shortName']}} = $(window.editedfield).find('.itemName{{locale['shortName']}}').val();
+            var param{{locale['shortName']}} = $(window.editedfield).find('.itemParameter{{locale['shortName']}}').val();
+            {% endfor %}
+            if (enabled == 0) $('#formPopupCfgWindow .fieldEnabled').removeAttr('checked'); else $('#formPopupCfgWindow .fieldEnabled').attr('checked','checked');
+            if (required == 0) $('#formPopupCfgWindow .fieldRequired').removeAttr('checked'); else $('#formPopupCfgWindow .fieldRequired').attr('checked','checked');
+            $.uniform.update("#formPopupCfgWindow .fieldEnabled, #formPopupCfgWindow .fieldRequired");
+            $('#formPopupCfgWindow .fieldType').val(type);
+            $.uniform.update("#formPopupCfgWindow .fieldType");
+            changeFormPopupVisible('#formPopupCfgWindow .fieldType');
+            $('#formPopupCfgWindow .fieldNameDefault').val(namedefault);
+            if ((type == 'text') || (type == 'textarea')) $('#formPopupCfgWindow .fieldRegExpDefault').val(paramdefault); else $('#formPopupCfgWindow .fieldRegExpDefault').val('');
+            if ((type == 'select') || (type == 'radio')) $('#formPopupCfgWindow .fieldItemsDefault').val(paramdefault); else $('#formPopupCfgWindow .fieldItemsDefault').val('');
+            {% for locale in locales %}
+            $('#formPopupCfgWindow .fieldName{{locale['shortName']}}').val(name{{locale['shortName']}});
+            if ((type == 'text') || (type == 'textarea')) $('#formPopupCfgWindow .fieldRegExp{{locale['shortName']}}').val(param{{locale['shortName']}}); else $('#formPopupCfgWindow .fieldRegExp{{locale['shortName']}}').val('');
+            if ((type == 'select') || (type == 'radio')) $('#formPopupCfgWindow .fieldItems{{locale['shortName']}}').val(param{{locale['shortName']}}); else $('#formPopupCfgWindow .fieldItems{{locale['shortName']}}').val('');
+            {% endfor %}
+            $('#formPopupCfgWindow').show();
+        });
+        $('.formFieldTree span.deleteButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.formFieldTree span.moveButton').unbind('mousedown').unbind('mouseenter').removeClass('active');
+        $('.formFieldTree span.ierarhLeftButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.formFieldTree span.ierarhRightButton').addClass('unactive').removeClass('active').unbind('mousedown').unbind('mouseleave').unbind('click');
+        $('.formFieldTree ul>li>span.deleteButton').removeClass('unactive');
+        $('.formFieldTree li ul li').children('span.ierarhLeftButton').removeClass('unactive');
+        $('.formFieldTree li+li').children('span.ierarhRightButton').removeClass('unactive');
+        
+        $('.formFieldTree span.ierarhLeftButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                                  mouseleave(function () {$(this).removeClass('active');}).
+                                                                  click(function () 
+        {
+            var element = $(this).closest('li').parent().closest('li');
+            var length = $(this).closest('li').parent().children('li').length;
+            var parent = $(this).closest('li').parent();
+            if (element.length != 0)
+            {
+                var savetr = $(this).closest('li').detach();
+                if (length == 1) parent.remove();
+                element.after(savetr);
+            }
+            updateFormFieldIerarhy();
+        });
+        $('.formFieldTree span.ierarhRightButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                                   mouseleave(function () {$(this).removeClass('active');}).
+                                                                   click(function () 
+        {
+            var element = $(this).closest('li').prev();
+            if (element.length != 0)
+            {
+                var savetr = $(this).closest('li').detach();
+                if (element.children('ul').length == 0) $('<ul></ul>').appendTo(element);
+                element.children('ul').append(savetr);
+            }
+            updateFormFieldIerarhy();
+        });
+        $('.formFieldTree span.deleteButton').not('.unactive').mousedown(function () {$(this).addClass('active');}).
+                                                              mouseleave(function () {$(this).removeClass('active');}).
+                                                              click(function () 
+        {
+            if (confirm('Вы действительно хотите удалить поле формы?')) $(this).closest('li').remove();
+            updateFormFieldIerarhy();
+        });
+        $('.formFieldTree span.moveButton').not('.unactive').mousedown(function()
+        {
+            $(this).addClass('active');
+            $(this).closest('li').find('ul').hide();
+            window.moveelement = $(this).closest('li');
+            $(window.moveelement).parent().children().children('span.moveButton').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().children();
+                    var indexnew = elements.index($(this).closest('li'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+        });
+    }
+    updateFormFieldIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateFormFieldIerarhy(); $('.formFieldTree ul').show();});
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-enabled">Позволяет включить или выключить форму.</div>
+    <div id="helpContainer-title">Задаёт название формы.</div>
+    <div id="helpContainer-email">Задаёт E-mail, на который будет послано сообщение пользователя, отправленно с помощью формы.</div>
+    <div id="helpContainer-sendEmail">При включении данной опции, сообщение пользователя, отправленное с помощью формы, будет отправлено на E-mail, указанный в следующем поле.</div>
+    <div id="helpContainer-regularExp">Регулярное выражение для проверки введенных данных от начала и до конца строки (в выражение уже включены строки /^ и $/ui). Если проверка не требуется, то заполните данное поле строкой <strong>[\s\S]*</strong></div>
+    <div id="helpContainer-captchaEnabled">Включает защиту капчей, что позволяет обезопасить сайт от роботов (спам-роботов или роботов для перебора паролей).</div>
+    <div id="helpContainer-seopageEnabled">При включении создаёт отдельную страницу сайта для данного объекта.</div>
+    <div id="helpContainer-seopageUrl">URL-адрес задаёт адрес страницы сайта. Указывается только часть после слеша (например указывается index.html, тогда как полный адрес страницы будет http://имя сайта.доменная зона/index.html). Должен содержать от 1 до 90 латинских букв, цифр и дефисов, и от 1 до 7 латинских букв или цифр после точки. Начинаться должен обязательно с буквы. Если оставить поле пустым, адрес присвоится автоматически.</div>
+    <div id="helpContainer-seopageLocale">Позволяет ограничить доступ к странице определённым языковым группам (локалям). См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms3">Локализация</a>.</div>
+    <div id="helpContainer-seopageLayout">Задаёт основной шаблон страницы сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageTemplate">Задаёт шаблон для контента. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageModules">Задаёт список модулей, которые будут отображаться на странице сайта. См. раздел руководства <a href="{{path('basic_cms_help')}}?page=basiccms2">Страницы сайта и система шаблонов</a>.</div>
+    <div id="helpContainer-seopageAccess">Позволяет ограничить доступ к странице пользователям с определёнными ролями.</div>
+</div>
+{% endblock %}       
+
+
+

@@ -1,0 +1,207 @@
+{% extends 'BasicCmsBundle:Default:layout.html.twig' %}
+{% block mainmenu %}
+    {% render "BasicCmsBundle:Default:menu" %}
+{% endblock %}
+{% block title %}Просмотр заказа{% endblock %}
+{% block breadcrumbs %}
+    <a href="{{path('basic_cms_index')}}" class="main">Главная</a>
+    <a href="{{path('shop_basket_orderlist')}}">Просмотр заказов</a>
+    <span>Просмотр заказа {{order['createDate'] | date('d.m.Y в G:i')}}</span>
+{% endblock %}
+{% block content %}
+<div id="tabsButtons">
+    <a href="#" onclick="return false;" id="tab1" {% if (activetab == 1) %}class="active"{% endif %}>Основные данные</a>
+    <a href="#" onclick="return false;" id="tab2" {% if (activetab == 2) %}class="active"{% endif %}>Список продуктов</a>
+    <a href="#" onclick="return false;" id="tab3" {% if (activetab == 3) %}class="active"{% endif %}>Поля формы</a>
+    <a href="#" onclick="return false;" id="tab4" {% if (activetab == 4) %}class="active"{% endif %}>Данные оплаты</a>
+</div>
+<form action="" method="post">
+<div id="tabsContent">
+        <div id="con_tab1" {% if (activetab == 1) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('basket_orderlist') == 1) %}<a class="button" href="{{path('shop_basket_orderlist')}}">Назад</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Дата создания заказа<span class="helpContainerButton" data-id="createDate">?</span></td>
+                    <td class="cfgValue">{{order['createDate'] | date('d.m.Y G:i')}}</td>
+                </tr>
+                <tr>
+                    <td>IP адрес пользователя<span class="helpContainerButton" data-id="ipAddress">?</span></td>
+                    <td class="cfgValue">{{order['ipAddress']}}</td>
+                </tr>
+                <tr>
+                    <td>Локаль пользователя<span class="helpContainerButton" data-id="locale">?</span></td>
+                    <td class="cfgValue">{{order['locale']}}</td>
+                </tr>
+                <tr>
+                    <td>Данные об обработке<span class="helpContainerButton" data-id="viewed">?</span></td>
+                    <td class="cfgValue" id="viewDataCell">{{(order['viewDate'] != null ? (order['viewUser']~' '~(order['viewDate'] | date('d.m.Y G:i'))) : 'Еще не обрабатывался')}}</td>
+                </tr>
+                <tr>
+                    <td>Способ оплаты<span class="helpContainerButton" data-id="paySystem">?</span></td>
+                    <td class="cfgValue">{{order['paySystem']}}</td>
+                </tr>
+                <tr>
+                    <td>Способ доставки<span class="helpContainerButton" data-id="shipSystem">?</span></td>
+                    <td class="cfgValue">{{order['shipSystem']}}</td>
+                </tr>
+                <tr>
+                    <td>Сумма заказа<span class="helpContainerButton" data-id="summ">?</span></td>
+                    <td class="cfgValue">{% for summ in order['formatSumm'] %}{{summ}}<br />{% endfor %}</td>
+                </tr>
+                <tr>
+                    <td>Статус<span class="helpContainerButton" data-id="status">?</span></td>
+                    {% if (order['payStatus'] == 2) %}
+                        {% if ((app.user.checkAccess('basket_ordereditnew') != 0) and ((order['viewUserId'] == app.user.id) or (order['viewUserId'] == null)) or (app.user.checkAccess('basket_ordereditall') != 0)) %}
+                    <td>
+                        <select autocomplete="off" onchange="changeOrderStauts({{order['id']}}, this, '#viewDataCell');" name="temp[]">
+                            <option value="0" {% if (order['status'] == 0) %}selected="selected"{% endif %}>Ожидает обработки</option>
+                            <option value="1" {% if (order['status'] == 1) %}selected="selected"{% endif %}>В работе</option>
+                            <option value="2" {% if (order['status'] == 2) %}selected="selected"{% endif %}>Обработан</option>
+                            <option value="3" {% if (order['status'] == 3) %}selected="selected"{% endif %}>Отменен</option>
+                        </select>
+                    </td>
+                        {% else %}
+                    <td class="cfgValue">
+                            {% if (order['status'] == 0) %}Ожидает обработки{% endif %}
+                            {% if (order['status'] == 1) %}В работе{% endif %}
+                            {% if (order['status'] == 2) %}Обработан{% endif %}
+                            {% if (order['status'] == 3) %}Отменен{% endif %}
+                    </td>
+                        {% endif %}
+                    {% else %}
+                    <td class="cfgValue">
+                        Не оплачен
+                    </td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+        <div id="con_tab2" {% if (activetab == 2) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('basket_orderlist') == 1) %}<a class="button" href="{{path('shop_basket_orderlist')}}">Назад</a>{% endif %}
+            </div>
+            <p>Список продуктов:</p>
+            <table class="tableContent">
+                <tr>
+                    <th>Заголовок продукта</th>
+                    <th>Цена за штуку</th>
+                    <th>Количетсво</th>
+                    <th>Сумма</th>
+                    <th>Опции</th>
+                </tr>
+                {% for product in order['products'] %}
+                <tr>
+                    <td><a href="{{path('shop_product_edit')}}?id={{product['id']}}">{{product['title']}}</a></td>
+                    <td>{% for summ in product['formatPrice']%}{{summ}}<br />{% endfor %}</td>
+                    <td>{{product['count']}}</td>
+                    <td>{% for summ in product['formatOrderPrice']%}{{summ}}<br />{% endfor %}</td>
+                    <td>
+                        {% for option in product['options'] %}
+                            {{option['title']}}:
+                            {% if (option['type'] == 'product') %}
+                            <a href="{{path('shop_product_edit')}}?id={{option['value']['id']}}">{{option['value']['title']}}</a>
+                            {% else %}
+                            {% if (option['type'] == 'color') %}
+                            <span style="padding-right:10px; display:inline-block; border:solid 1px #000; width:20px; height:20px; background: {{'#'~options['valueRaw']~';'}}">&nbsp;</span>{{option['value']}}
+                            {% else %}
+                            {{option['value']}}
+                            {% endif %}
+                            {% endif %}
+                            <br />
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <br />
+            <p>Другие составляющие стоимости заказа:</p>
+            <table class="tableContent">
+                <tr>
+                    <th>Описание</th>
+                    <th>Сумма</th>
+                </tr>
+                {% for info in order['summInfo'] %}
+                <tr>
+                    <td>{{info['description']}}</td>
+                    <td>{% for summ in info['formatPrice']%}{{summ}}<br />{% endfor %}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <br />
+            <table class="cfgTable">
+                <tr>
+                    <td>Итоговая сумма заказа:</td>
+                    <td class="cfgValue">{% for summ in order['formatSumm'] %}{{summ}}<br />{% endfor %}</td>
+                </tr>
+            </table>            
+        </div>
+        <div id="con_tab3" {% if (activetab == 3) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('basket_orderlist') == 1) %}<a class="button" href="{{path('shop_basket_orderlist')}}">Назад</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                {% for field in order['fields'] %}
+                <tr>
+                    <td>{{field['name'] | default('')}}</td>
+                    <td class="cfgValue"><pre>{{field['value'] | default('')}}</pre></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div id="con_tab4" {% if (activetab == 4) %}class="active"{% endif %}>
+            <div class="saveButtons">
+                {% if (app.user.checkAccess('basket_orderlist') == 1) %}<a class="button" href="{{path('shop_basket_orderlist')}}">Назад</a>{% endif %}
+            </div>
+            <table class="cfgTable">
+                <tr>
+                    <td>Способ оплаты</td>
+                    <td class="cfgValue"><pre>{{order['paySystem']}}</pre></td>
+                </tr>
+                {% for field in order['payInfo'] %}
+                <tr>
+                    <td>{{field['name'] | default('')}}</td>
+                    <td class="cfgValue"><pre>{{field['value'] | default('')}}</pre></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+</div>​
+</form>
+<script>
+    function changeOrderStauts(id, that, target)
+    {
+        var status = $(that).val();
+        $.ajax({
+            type: "POST",
+            url: '{{path('shop_basket_orderajaxstatus')}}',
+            data: "id="+id+"&stauts="+status,
+            error: function(){
+                alert('Ошибка обращения к серверу');
+            },
+            success: function(data){
+                var answer = $.parseJSON(data);
+                if (answer['result'] != 'OK') alert(answer['result']); else
+                    {
+                        $(target).html(answer['userName']+' '+answer['date']+'');
+                    }
+            }
+        });	      
+    }
+
+</script>
+<div id="helpContainer">
+    <div id="helpContainer-createDate">Дата создания заказа показывает когда пользователь оформил данный заказ.</div>
+    <div id="helpContainer-ipAddress">IP адрес пользователя, которых оформил заказ.</div>
+    <div id="helpContainer-locale">Локаль, в которой находился пользователь, оформивший данный заказ.</div>
+    <div id="helpContainer-viewed">Данные изменения статуса заказа.</div>
+    <div id="helpContainer-paySystem">Способ оплаты, который был выбран пользователем.</div>
+    <div id="helpContainer-shipSystem">Способ доставки, который был выбран пользователем.</div>
+    <div id="helpContainer-summ">Общая стоимость заказа.</div>
+    <div id="helpContainer-status">Статус заказа, если был выбран способ оплаты электронным переводом, а заказ не был оплачен, то смена статуса невозможна.</div>
+</div>
+{% endblock %}       
+
+
+

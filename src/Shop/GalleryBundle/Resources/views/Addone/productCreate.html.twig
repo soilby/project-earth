@@ -1,0 +1,98 @@
+<div id="imageCfgTable" class="noselect">
+    {% for item in images %}
+        <div class="imageItem">
+            <div class="imageWrap"><img src="{{item['url']}}" /></div>
+            <label><input type="checkbox" name="temp" class="imageEnabled" onclick="updateImageIerarhy();" autocomplate="off" {% if (item['enabled'] != 0) %}checked="checked"{% endif %}>Опубликована</label>
+            <button onclick="deleteImage(this);return false;">Удалить</button>
+        </div>
+    {% endfor %}
+</div>
+<div id="imageFromWrap">
+</div>
+<button id="imageAdd">Добавить изображение</button>
+<script>
+    window.moveelement = null;
+    function updateImageIerarhy()
+    {
+        var index = 0;
+        $('#imageFromWrap').html('');
+        $('#imageCfgTable').children('div.imageItem').each(function (i, element)
+        {
+            var enabled = ($(element).find('input.imageEnabled').is(':checked') == false ? 0 : 1);
+            var url = $(element).find('img').attr('src');
+            $('#imageFromWrap').append('<input type="hidden" name="images['+index+'][url]" value="'+url+'" /><input type="hidden" name="images['+index+'][enabled]" value="'+enabled+'" />');
+            index++;
+        });
+        $('#imageCfgTable div.imageWrap').unbind('mousedown').unbind('mouseenter');
+        $('#imageCfgTable div.imageWrap').mousedown(function()
+        {
+            window.moveelement = $(this).closest('div.imageItem');
+            $(window.moveelement).parent().find('div.imageWrap').mouseenter(function () 
+            {
+                if (window.moveelement != null)
+                {
+                    var elements = $(window.moveelement).parent().find('div.imageItem');
+                    var indexnew = elements.index($(this).closest('div.imageItem'));
+                    var indexold = elements.index($(window.moveelement));
+                    var element = elements.eq(indexnew);
+                    if (element.length != 0)
+                    {
+                        if (indexnew > indexold) {var savetr = $(window.moveelement).detach(); element.after(savetr);}
+                        if (indexnew < indexold) {var savetr = $(window.moveelement).detach(); element.before(savetr);}
+                    }
+                }
+            });
+            return false;
+        });
+    }
+    updateImageIerarhy();
+    $(document).mouseup(function () {window.moveelement = null; updateImageIerarhy();});
+    
+    $(function () 
+    {
+        new AjaxUpload('#imageAdd', 
+        {
+            action: '{{path('shop_gallery_ajaximage')}}',
+            name: 'image',
+            multiply: true,
+            inputFilter: 'image/jpeg,image/png,image/gif',
+            onSubmit: function(file, extension)
+            {
+                $('#preloader').show();
+            },
+            onComplete: function(file, response)
+            {
+                $('#preloader').hide();
+                if (!response) response = "[{file:'', error:'Ошибка загрузки файла'}]";
+                var answers = $.parseJSON(response);
+                var key;
+                for (key in answers)
+                {
+                    var answer = answers[key];
+                    if(answer.file)
+                    {
+                            $('#imageCfgTable').append(
+                                '        <div class="imageItem">'+
+                                '            <div class="imageWrap"><img src="'+answer.file+'" /></div>'+
+                                '            <label><input type="checkbox" name="temp" class="imageEnabled" onclick="updateImageIerarhy();" checked="checked">Опубликована</label>'+
+                                '            <button onclick="deleteImage(this);return false;">Удалить</button>'+
+                                '        </div>');
+                            $('#imageCfgTable input, #imageCfgTable button').not('.uniformOff').uniform();
+                            updateImageIerarhy();
+                    } else
+                    {
+                            alert(answer.error);
+                    }
+                }
+            }
+        });
+    });
+    
+    function deleteImage(that)
+    {
+        $(that).closest('div.imageItem').remove();
+        updateImageIerarhy();
+        return false;
+    }
+    
+</script>

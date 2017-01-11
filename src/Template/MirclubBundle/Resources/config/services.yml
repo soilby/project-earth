@@ -1,0 +1,4 @@
+services:
+    template.mirclub:
+        class: Template\MirclubBundle\TemplateMirclub
+        arguments: ['@service_container']
