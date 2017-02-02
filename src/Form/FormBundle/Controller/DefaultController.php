@@ -28,23 +28,23 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('form_form_list_tab');
-                      else $this->getRequest()->getSession()->set('form_form_list_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 1) $tab = 1;
         if ($this->getUser()->checkAccess('form_letterlist') == 0) $tab = 1;
         if ($this->getUser()->checkAccess('form_list') == 0) $tab = 0;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('form_form_list_page0');
-                        else $this->getRequest()->getSession()->set('form_form_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('form_form_list_sort0');
-                        else $this->getRequest()->getSession()->set('form_form_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('form_form_list_search0');
-                          else $this->getRequest()->getSession()->set('form_form_list_search0', $search0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_search0', $search0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -75,15 +75,15 @@ class DefaultController extends Controller
         $letters0 = $query->getResult();
         foreach ($letters0 as &$lett) $lett['title'] = $this->get('cms.cmsManager')->decodeLocalString($lett['title'], 'default');
         // Таб 2
-        $page1 = $this->getRequest()->get('page1');
-        $sort1 = $this->getRequest()->get('sort1');
-        $search1 = $this->getRequest()->get('search1');
-        if ($page1 === null) $page1 = $this->getRequest()->getSession()->get('form_form_list_page1');
-                        else $this->getRequest()->getSession()->set('form_form_list_page1', $page1);
-        if ($sort1 === null) $sort1 = $this->getRequest()->getSession()->get('form_form_list_sort1');
-                        else $this->getRequest()->getSession()->set('form_form_list_sort1', $sort1);
-        if ($search1 === null) $search1 = $this->getRequest()->getSession()->get('form_form_list_search1');
-                          else $this->getRequest()->getSession()->set('form_form_list_search1', $search1);
+        $page1 = $this->get('request_stack')->getMasterRequest()->get('page1');
+        $sort1 = $this->get('request_stack')->getMasterRequest()->get('sort1');
+        $search1 = $this->get('request_stack')->getMasterRequest()->get('search1');
+        if ($page1 === null) $page1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_page1');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_page1', $page1);
+        if ($sort1 === null) $sort1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_sort1');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_sort1', $sort1);
+        if ($search1 === null) $search1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_search1');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_search1', $search1);
         $page1 = intval($page1);
         $sort1 = intval($sort1);
         $search1 = trim($search1);
@@ -132,7 +132,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function formCreateAction()
     {
-        $this->getRequest()->getSession()->set('form_form_list_tab', 1);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_tab', 1);
         if ($this->getUser()->checkAccess('form_new') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -205,10 +205,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postform = $this->getRequest()->get('form');
+            $postform = $this->get('request_stack')->getMasterRequest()->get('form');
             if (isset($postform['title']['default'])) $form['title']['default'] = $postform['title']['default'];
             foreach ($locales as $locale)
             {
@@ -227,7 +227,7 @@ class DefaultController extends Controller
             if (($form['sendEmail'] != 0) && (!preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,24})$/ui", $form['email']))) {$errors = true; $formerror['email'] = 'Введен некорректный E-Mail';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -264,7 +264,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postformfields = $this->getRequest()->get('formfields');
+            $postformfields = $this->get('request_stack')->getMasterRequest()->get('formfields');
             if (is_array($postformfields))
             {
                 foreach ($postformfields as $field)
@@ -320,7 +320,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.form.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'formCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -375,7 +375,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.form.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'formCreate', $forment->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formCreate', $forment->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -391,7 +391,7 @@ class DefaultController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.form.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'formCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -416,9 +416,9 @@ class DefaultController extends Controller
 // *******************************************    
     public function formEditAction()
     {
-        $this->getRequest()->getSession()->set('form_form_list_tab', 1);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_tab', 1);
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $forment = $this->getDoctrine()->getRepository('FormFormBundle:Forms')->find($id);
         if (empty($forment))
         {
@@ -546,10 +546,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postform = $this->getRequest()->get('form');
+            $postform = $this->get('request_stack')->getMasterRequest()->get('form');
             if (isset($postform['title']['default'])) $form['title']['default'] = $postform['title']['default'];
             foreach ($locales as $locale)
             {
@@ -568,7 +568,7 @@ class DefaultController extends Controller
             if (($form['sendEmail'] != 0) && (!preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,24})$/ui", $form['email']))) {$errors = true; $formerror['email'] = 'Введен некорректный E-Mail';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -606,7 +606,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postformfields = $this->getRequest()->get('formfields');
+            $postformfields = $this->get('request_stack')->getMasterRequest()->get('formfields');
             if (is_array($postformfields))
             {
                 $formfields = array();
@@ -662,7 +662,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.form.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'formEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -746,7 +746,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.form.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'formEdit', $forment->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formEdit', $forment->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -762,7 +762,7 @@ class DefaultController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.form.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'formEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -790,7 +790,7 @@ class DefaultController extends Controller
     
     public function formAjaxAction()
     {
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         if ((($this->getUser()->checkAccess('form_letterlist') == 0) && ($tab == 0)) || (($this->getUser()->checkAccess('form_list') == 0) && ($tab != 0)))
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -801,7 +801,7 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         $errorsorder = array();
         if ($action == 'deleteletters')
@@ -816,7 +816,7 @@ class DefaultController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -826,7 +826,7 @@ class DefaultController extends Controller
                     foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
                     {
                         $serv = $this->container->get($item);
-                        $serv->getAdminController($this->getRequest(), 'formDeleteLetters', $key, 'save');
+                        $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formDeleteLetters', $key, 'save');
                     }       
                 }
         }
@@ -842,7 +842,7 @@ class DefaultController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -859,7 +859,7 @@ class DefaultController extends Controller
                         foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
                         {
                             $serv = $this->container->get($item);
-                            $serv->getAdminController($this->getRequest(), 'formDelete', $key, 'save');
+                            $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formDelete', $key, 'save');
                         }       
                     }
                     unset($forment);
@@ -877,7 +877,7 @@ class DefaultController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -903,7 +903,7 @@ class DefaultController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -929,7 +929,7 @@ class DefaultController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -947,9 +947,9 @@ class DefaultController extends Controller
         }
         if ($tab == 0)
         {
-            $page0 = $this->getRequest()->getSession()->get('form_form_list_page0');
-            $sort0 = $this->getRequest()->getSession()->get('form_form_list_sort0');
-            $search0 = $this->getRequest()->getSession()->get('form_form_list_search0');
+            $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_search0');
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -992,9 +992,9 @@ class DefaultController extends Controller
         if ($tab == 1)
         {
             // Таб 2
-            $page1 = $this->getRequest()->getSession()->get('form_form_list_page1');
-            $sort1 = $this->getRequest()->getSession()->get('form_form_list_sort1');
-            $search1 = $this->getRequest()->getSession()->get('form_form_list_search1');
+            $page1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_page1');
+            $sort1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_sort1');
+            $search1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('form_form_list_search1');
             $page1 = intval($page1);
             $sort1 = intval($sort1);
             $search1 = trim($search1);
@@ -1039,9 +1039,9 @@ class DefaultController extends Controller
 // *******************************************    
     public function formLetterViewAction()
     {
-        $this->getRequest()->getSession()->set('form_form_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('form_form_list_tab', 0);
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $letterent = $this->getDoctrine()->getRepository('FormFormBundle:FormLetters')->find($id);
         if (empty($letterent))
         {
@@ -1134,7 +1134,7 @@ class DefaultController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.form.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'formLetterView', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'formLetterView', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         // Записать данные о просмотре

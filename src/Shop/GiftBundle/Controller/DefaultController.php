@@ -18,8 +18,8 @@ class DefaultController extends Controller
     public function giftAjaxProductsAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $search = trim($this->getRequest()->get('search'));
-        $page = intval($this->getRequest()->get('page'));
+        $search = trim($this->get('request_stack')->getMasterRequest()->get('search'));
+        $page = intval($this->get('request_stack')->getMasterRequest()->get('page'));
         if ($page < 0) $page = 0;
         $query = $em->createQuery('SELECT count(p.id) as prodcount FROM ShopProductBundle:Products p WHERE p.title LIKE :search')
                     ->setParameter('search', '%'.$search.'%');

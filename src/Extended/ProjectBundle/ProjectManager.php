@@ -28,14 +28,14 @@ class ProjectManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Мастерские', $this->container->get('router')->generate('extended_project_list'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('project_list'));
-        $manager->addAdminMenu('Создать мастерскую', $this->container->get('router')->generate('extended_project_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('project_new'), 'Мастерские');
-        $manager->addAdminMenu('Список мастерских', $this->container->get('router')->generate('extended_project_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('project_list'), 'Мастерские');
+        $manager->addAdminMenu('Мастерские', $this->container->get('router')->generate('extended_project_list'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('project_list'));
+        $manager->addAdminMenu('Создать мастерскую', $this->container->get('router')->generate('extended_project_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('project_new'), 'Мастерские');
+        $manager->addAdminMenu('Список мастерских', $this->container->get('router')->generate('extended_project_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('project_list'), 'Мастерские');
         if ($this->container->has('object.taxonomy'))
         {
-            $manager->addAdminMenu('Категории', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.project', 9999, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Мастерские');
+            $manager->addAdminMenu('Категории', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.project', 9999, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Мастерские');
         }
-        $manager->addAdminMenu('Прочие настройки', $this->container->get('router')->generate('extended_project_messages'), 10000, $this->container->get('security.context')->getToken()->getUser()->checkAccess('project_editall'), 'Мастерские');
+        $manager->addAdminMenu('Прочие настройки', $this->container->get('router')->generate('extended_project_messages'), 10000, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('project_editall'), 'Мастерские');
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.project.') === 0) $this->container->get($item)->registerMenu();
 
@@ -420,11 +420,11 @@ class ProjectManager
              unset($doc);
              // Найти файлы
              $params['files'] = array();
-             $projectLink = @unserialize(file_get_contents('../secured/project/'.'.projectlink'));
+             $projectLink = @unserialize(file_get_contents('secured/project/'.'.projectlink'));
              if (!is_array($projectLink)) $projectLink = array();
              foreach ($projectLink as $projectKey=>$projectVal) 
              {
-                 if (($projectVal['projectId'] == $params['id']) && is_file('../secured/project/'.($projectVal['path'] != '' ? $projectVal['path'].'/' : '').$projectVal['file']))
+                 if (($projectVal['projectId'] == $params['id']) && is_file('secured/project/'.($projectVal['path'] != '' ? $projectVal['path'].'/' : '').$projectVal['file']))
                  {
                      if ($this->container->has('object.knowledge')) {
                          $info = $this->container->get('object.knowledge')->getKnowledgeParameters($locale, 1, $contentId, $projectVal['path'].'/'.$projectVal['file']);
@@ -440,7 +440,7 @@ class ProjectManager
                      } else {
                          $pathTitle = preg_replace('/[^\/]+#/ui', '', $pathTitle);
                      }
-                     $params['files'][] = array('title' => $nameFileTitle, 'file'=>$projectVal['file'], 'path'=>$projectVal['path'], 'pathTitle' => $pathTitle, 'downurl'=>$downloadurl, 'size'=>filesize('../secured/project/'.($projectVal['path'] != '' ? $projectVal['path'].'/' : '').$projectVal['file']));
+                     $params['files'][] = array('title' => $nameFileTitle, 'file'=>$projectVal['file'], 'path'=>$projectVal['path'], 'pathTitle' => $pathTitle, 'downurl'=>$downloadurl, 'size'=>filesize('secured/project/'.($projectVal['path'] != '' ? $projectVal['path'].'/' : '').$projectVal['file']));
                  }
              }
              // Прибавить счётчик просмотров
@@ -1769,7 +1769,7 @@ class ProjectManager
                                          'WHERE d.documentId != :id AND d.content LIKE :file')->setParameter('id', $documentId)->setParameter('file', '%'.$file.'%')->getSingleScalarResult();
             if (($docCount == 0) && ($locCount == 0))
             {
-                @unlink('..'.$file);
+                @unlink('.'.$file);
             }
         }
     }

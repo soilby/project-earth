@@ -28,27 +28,27 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('forum_forum_topic_list_tab');
-                      else $this->getRequest()->getSession()->set('forum_forum_topic_list_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 3) $tab = 3;
         if (($this->getUser()->checkAccess('forum_list') == 0) && (($tab == 0) || ($tab == 2))) $tab = 1;
         if (($this->getUser()->checkAccess('forum_createpage') == 0) && ($tab == 1)) $tab = 3;
         if (($this->getUser()->checkAccess('forum_commentsview') == 0) && ($tab == 3)) $tab = 0;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        $taxonomy0 = $this->getRequest()->get('taxonomy0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('forum_forum_topic_list_page0');
-                        else $this->getRequest()->getSession()->set('forum_forum_topic_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('forum_forum_topic_list_sort0');
-                        else $this->getRequest()->getSession()->set('forum_forum_topic_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('forum_forum_topic_list_search0');
-                          else $this->getRequest()->getSession()->set('forum_forum_topic_list_search0', $search0);
-        if ($taxonomy0 === null) $taxonomy0 = $this->getRequest()->getSession()->get('forum_forum_topic_list_taxonomy0');
-                          else $this->getRequest()->getSession()->set('forum_forum_topic_list_taxonomy0', $taxonomy0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->get('taxonomy0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_search0', $search0);
+        if ($taxonomy0 === null) $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_taxonomy0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_taxonomy0', $taxonomy0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -118,15 +118,15 @@ class DefaultController extends Controller
             unset($cat);
         }
         // Таб 4
-        $page3 = $this->getRequest()->get('page3');
-        $sort3 = $this->getRequest()->get('sort3');
-        $search3 = $this->getRequest()->get('search3');
-        if ($page3 === null) $page3 = $this->getRequest()->getSession()->get('forum_forum_topic_list_page3');
-                        else $this->getRequest()->getSession()->set('forum_forum_topic_list_page3', $page3);
-        if ($sort3 === null) $sort3 = $this->getRequest()->getSession()->get('forum_forum_topic_list_sort3');
-                        else $this->getRequest()->getSession()->set('forum_forum_topic_list_sort3', $sort3);
-        if ($search3 === null) $search3 = $this->getRequest()->getSession()->get('forum_forum_topic_list_search3');
-                          else $this->getRequest()->getSession()->set('forum_forum_topic_list_search3', $search3);
+        $page3 = $this->get('request_stack')->getMasterRequest()->get('page3');
+        $sort3 = $this->get('request_stack')->getMasterRequest()->get('sort3');
+        $search3 = $this->get('request_stack')->getMasterRequest()->get('search3');
+        if ($page3 === null) $page3 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_page3');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_page3', $page3);
+        if ($sort3 === null) $sort3 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_sort3');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_sort3', $sort3);
+        if ($search3 === null) $search3 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_search3');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_search3', $search3);
         $page3 = intval($page3);
         $sort3 = intval($sort3);
         $search3 = trim($search3);
@@ -188,7 +188,7 @@ class DefaultController extends Controller
     public function forumsTopicAjaxAvatarAction() 
     {
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -201,7 +201,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/forum/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -220,7 +220,7 @@ class DefaultController extends Controller
              $removeids = array();
              foreach ($files as $file)
              {
-                 @unlink('..'.$file['contentFile']);
+                 @unlink('.'.$file['contentFile']);
                  $removeids[] = $file['id'];
              }
              if (count($removeids) > 0)
@@ -231,14 +231,14 @@ class DefaultController extends Controller
          }
          unset($files);
         $userId = $this->getUser()->getId();
-        $files = $this->getRequest()->files->get('files');
+        $files = $this->get('request_stack')->getMasterRequest()->files->get('files');
         $answer = array();
         if (is_array($files))
         {
             foreach ($files as $file)
             {
                 $tmpfile = $file->getPathName();
-                $basepath = '../secured/forum/';
+                $basepath = 'secured/forum/';
                 $name = $this->getUser()->getId().'_'.md5(time()).'.dat';
                 if (move_uploaded_file($tmpfile, $basepath . $name)) 
                 {
@@ -262,8 +262,8 @@ class DefaultController extends Controller
     public function forumsTopicAjaxLoadUsersAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $search = trim($this->getRequest()->get('search'));
-        $page = intval($this->getRequest()->get('page'));
+        $search = trim($this->get('request_stack')->getMasterRequest()->get('search'));
+        $page = intval($this->get('request_stack')->getMasterRequest()->get('page'));
         if ($page < 0) $page = 0;
         $query = $em->createQuery('SELECT count(u.id) as usercount FROM BasicCmsBundle:Users u WHERE u.login LIKE :search OR u.fullName LIKE :search')
                     ->setParameter('search', '%'.$search.'%');
@@ -283,7 +283,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function forumsTopicCreateAction()
     {
-        $this->getRequest()->getSession()->set('forum_forum_topic_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_tab', 0);
         if ($this->getUser()->checkAccess('forum_new') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -373,10 +373,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postforum = $this->getRequest()->get('forum');
+            $postforum = $this->get('request_stack')->getMasterRequest()->get('forum');
             if (isset($postforum['title'])) $forum['title'] = $postforum['title'];
             if (isset($postforum['description'])) $forum['description'] = $postforum['description'];
             if (isset($postforum['avatar'])) $forum['avatar'] = $postforum['avatar'];
@@ -396,12 +396,12 @@ class DefaultController extends Controller
             if (isset($postforum['messageInPage'])) $forum['messageInPage'] = $postforum['messageInPage'];
             unset($postforum);
             if (!preg_match("/^.{3,}$/ui", $forum['title'])) {$errors = true; $forumerror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($forum['avatar'] != '') && (!file_exists('..'.$forum['avatar']))) {$errors = true; $forumerror['avatar'] = 'Файл не найден';}
+            if (($forum['avatar'] != '') && (!file_exists('.'.$forum['avatar']))) {$errors = true; $forumerror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^([A-z0-9]{1,10}(\s*\,\s*[A-z0-9]{1,10})*)?$/ui", $forum['allowTags'])) {$errors = true; $forumerror['allowTags'] = 'Тэги должны состоять из 1-10 латинских букв и разделяться запятыми';}
             if ((!preg_match("/^[\d]{2,3}$/ui", $forum['messageInPage'])) || (intval($forum['messageInPage']) < 10) || (intval($forum['messageInPage']) > 100)) {$errors = true; $forumerror['messageInPage'] = 'Должно быть указано число от 10 до 100';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -432,7 +432,7 @@ class DefaultController extends Controller
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Проверка сообщения (текст и вложения)
             if (!preg_match("/^[\s\S]{10,}$/ui", $forum['content'])) {$errors = true; $forumerror['content'] = 'Текст сообщения должен содержать более 10 символов';}
-            $postattachments = $this->getRequest()->get('attachments');
+            $postattachments = $this->get('request_stack')->getMasterRequest()->get('attachments');
             $forum['attachments'] = array();
             if (is_array($postattachments))
             {
@@ -441,8 +441,8 @@ class DefaultController extends Controller
                     $fileent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumAttachments')->find($attachmentid);
                     if (!empty($fileent))
                     {
-                        if (!file_exists('..'.$fileent->getContentFile())) {$errors = true; $forum['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
-                        else {$forum['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('..'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
+                        if (!file_exists('.'.$fileent->getContentFile())) {$errors = true; $forum['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
+                        else {$forum['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('.'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
                     }
                     unset($fileent);
                 }
@@ -450,7 +450,7 @@ class DefaultController extends Controller
             unset($postattachments);
             if (($errors == true) && ($activetab == 0)) $activetab = 3;
             // Проверка модераторов
-            $postmoderators = $this->getRequest()->get('moderators');
+            $postmoderators = $this->get('request_stack')->getMasterRequest()->get('moderators');
             $forum['moderators'] = array();
             if (is_array($postmoderators))
             {
@@ -471,7 +471,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.forum', 0, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.forum', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -479,7 +479,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.forum.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'forumsTopicCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'forumsTopicCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -561,7 +561,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.forum', $forument->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.forum', $forument->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                     $i++;
@@ -569,7 +569,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.forum.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'forumsTopicCreate', $forument->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'forumsTopicCreate', $forument->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                     $i++;
@@ -582,11 +582,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.forum', 0, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.forum', 0, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.forum.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'forumsTopicCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'forumsTopicCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -610,8 +610,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function forumsTopicEditAction()
     {
-        $this->getRequest()->getSession()->set('forum_forum_topic_list_tab', 0);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_tab', 0);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $forument = $this->getDoctrine()->getRepository('ForumForumBundle:Forums')->find($id);
         if (empty($forument))
         {
@@ -746,14 +746,14 @@ class DefaultController extends Controller
         if (!is_array($forum['attachments'])) $forum['attachments'] = array();
         foreach ($forum['attachments'] as &$attach)
         {
-            $attach['filesize'] = @filesize('..'.$attach['contentFile']);
+            $attach['filesize'] = @filesize('.'.$attach['contentFile']);
         }
         unset($attach);
         // Валидация
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('forum_edit') == 0)
             {
@@ -765,7 +765,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postforum = $this->getRequest()->get('forum');
+            $postforum = $this->get('request_stack')->getMasterRequest()->get('forum');
             if (isset($postforum['title'])) $forum['title'] = $postforum['title'];
             if (isset($postforum['description'])) $forum['description'] = $postforum['description'];
             if (isset($postforum['avatar'])) $forum['avatar'] = $postforum['avatar'];
@@ -785,12 +785,12 @@ class DefaultController extends Controller
             if (isset($postforum['messageInPage'])) $forum['messageInPage'] = $postforum['messageInPage'];
             unset($postforum);
             if (!preg_match("/^.{3,}$/ui", $forum['title'])) {$errors = true; $forumerror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($forum['avatar'] != '') && (!file_exists('..'.$forum['avatar']))) {$errors = true; $forumerror['avatar'] = 'Файл не найден';}
+            if (($forum['avatar'] != '') && (!file_exists('.'.$forum['avatar']))) {$errors = true; $forumerror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^([A-z0-9]{1,10}(\s*\,\s*[A-z0-9]{1,10})*)?$/ui", $forum['allowTags'])) {$errors = true; $forumerror['allowTags'] = 'Тэги должны состоять из 1-10 латинских букв и разделяться запятыми';}
             if ((!preg_match("/^[\d]{2,3}$/ui", $forum['messageInPage'])) || (intval($forum['messageInPage']) < 10) || (intval($forum['messageInPage']) > 100)) {$errors = true; $forumerror['messageInPage'] = 'Должно быть указано число от 10 до 100';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -822,7 +822,7 @@ class DefaultController extends Controller
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Проверка сообщения (текст и вложения)
             if (!preg_match("/^[\s\S]{10,}$/ui", $forum['content'])) {$errors = true; $forumerror['content'] = 'Текст сообщения должен содержать более 10 символов';}
-            $postattachments = $this->getRequest()->get('attachments');
+            $postattachments = $this->get('request_stack')->getMasterRequest()->get('attachments');
             $forum['attachments'] = array();
             if (is_array($postattachments))
             {
@@ -831,8 +831,8 @@ class DefaultController extends Controller
                     $fileent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumAttachments')->find($attachmentid);
                     if (!empty($fileent))
                     {
-                        if (!file_exists('..'.$fileent->getContentFile())) {$errors = true; $forum['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
-                        else {$forum['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('..'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
+                        if (!file_exists('.'.$fileent->getContentFile())) {$errors = true; $forum['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
+                        else {$forum['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('.'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
                     }
                     unset($fileent);
                 }
@@ -840,7 +840,7 @@ class DefaultController extends Controller
             unset($postattachments);
             if (($errors == true) && ($activetab == 0)) $activetab = 3;
             // Проверка модераторов
-            $postmoderators = $this->getRequest()->get('moderators');
+            $postmoderators = $this->get('request_stack')->getMasterRequest()->get('moderators');
             $forum['moderators'] = array();
             if (is_array($postmoderators))
             {
@@ -861,7 +861,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.forum', $id, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.forum', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -869,7 +869,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.forum.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'forumsTopicEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'forumsTopicEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -877,7 +877,7 @@ class DefaultController extends Controller
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                if (($forument->getAvatar() != '') && ($forument->getAvatar() != $forum['avatar'])) @unlink('..'.$forument->getAvatar());
+                if (($forument->getAvatar() != '') && ($forument->getAvatar() != $forum['avatar'])) @unlink('.'.$forument->getAvatar());
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($forum['avatar']);
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($forum['content'], $forument->getContent());
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($forum['description'], $forument->getDescription());
@@ -973,7 +973,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.forum', $forument->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.forum', $forument->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                     $i++;
@@ -981,7 +981,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.forum.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'forumsTopicEdit', $forument->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'forumsTopicEdit', $forument->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                     $i++;
@@ -994,11 +994,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.forum', $id, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.forum', $id, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.forum.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'forumsTopicEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'forumsTopicEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -1025,10 +1025,10 @@ class DefaultController extends Controller
     public function forumsTopicAjaxAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         $errorsorder = array();
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         if ($tab == 0)
         {
             if ($this->getUser()->checkAccess('forum_list') == 0)
@@ -1052,7 +1052,7 @@ class DefaultController extends Controller
                     ));
                 }
                 $cmsservices = $this->container->getServiceIds();
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1060,7 +1060,7 @@ class DefaultController extends Controller
                         $forument = $this->getDoctrine()->getRepository('ForumForumBundle:Forums')->find($key);
                         if (!empty($forument))
                         {
-                            if ($forument->getAvatar() != '') @unlink('..'.$forument->getAvatar());
+                            if ($forument->getAvatar() != '') @unlink('.'.$forument->getAvatar());
                             $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $forument->getContent());
                             $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $forument->getDescription());
                             $em->remove($forument);
@@ -1082,17 +1082,17 @@ class DefaultController extends Controller
                             $files = $query->getResult();
                             if (is_array($files))
                             {
-                                foreach ($files as $file) @unlink('..'.$file['contentFile']);
+                                foreach ($files as $file) @unlink('.'.$file['contentFile']);
                             }
                             $query = $em->createQuery('DELETE FROM ForumForumBundle:ForumAttachments a WHERE a.forumId = :id')->setParameter('id', $key);
                             $query->execute();
                             $query = $em->createQuery('DELETE FROM BasicCmsBundle:SeoPage p WHERE p.contentType = \'object.forum\' AND p.contentAction = \'view\' AND p.contentId = :id')->setParameter('id', $key);
                             $query->execute();
-                            if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'delete', 'object.forum', $key, 'save');
+                            if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'delete', 'object.forum', $key, 'save');
                             foreach ($cmsservices as $item) if (strpos($item,'addone.forum.') === 0) 
                             {
                                 $serv = $this->container->get($item);
-                                $serv->getAdminController($this->getRequest(), 'forumsTopicDelete', $key, 'save');
+                                $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'forumsTopicDelete', $key, 'save');
                             }       
                             unset($forument);    
                         }
@@ -1109,7 +1109,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1134,7 +1134,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1152,10 +1152,10 @@ class DefaultController extends Controller
             //if ($tab == 0)
             //{
             //}
-            $page0 = $this->getRequest()->getSession()->get('forum_forum_topic_list_page0');
-            $sort0 = $this->getRequest()->getSession()->get('forum_forum_topic_list_sort0');
-            $search0 = $this->getRequest()->getSession()->get('forum_forum_topic_list_search0');
-            $taxonomy0 = $this->getRequest()->getSession()->get('forum_forum_topic_list_taxonomy0');
+            $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_search0');
+            $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_taxonomy0');
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -1231,7 +1231,7 @@ class DefaultController extends Controller
             if ($action == 'deletepage')
             {
                 $cmsservices = $this->container->getServiceIds();
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1249,7 +1249,7 @@ class DefaultController extends Controller
             }
             if ($action == 'blockedpage')
             {
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1265,7 +1265,7 @@ class DefaultController extends Controller
             }
             if ($action == 'unblockedpage')
             {
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1312,8 +1312,8 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $userid = $this->getRequest()->get('userid');
-                $catid = $this->getRequest()->get('categoryid');
+                $userid = $this->get('request_stack')->getMasterRequest()->get('userid');
+                $catid = $this->get('request_stack')->getMasterRequest()->get('categoryid');
                 $userent = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
                 if (empty($userent))
                 {
@@ -1353,8 +1353,8 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $userid = $this->getRequest()->get('userid');
-                $catid = $this->getRequest()->get('categoryid');
+                $userid = $this->get('request_stack')->getMasterRequest()->get('userid');
+                $catid = $this->get('request_stack')->getMasterRequest()->get('categoryid');
                 $userent = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
                 $moderent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumModerators')->findOneBy(array('categoryId' => $catid, 'moderatorId' => $userid));
                 if (empty($moderent))
@@ -1410,7 +1410,7 @@ class DefaultController extends Controller
                     ));
                 }
                 $cmsservices = $this->container->getServiceIds();
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1425,7 +1425,7 @@ class DefaultController extends Controller
                             $files = $query->getResult();
                             if (is_array($files))
                             {
-                                foreach ($files as $file) @unlink('..'.$file['contentFile']);
+                                foreach ($files as $file) @unlink('.'.$file['contentFile']);
                             }
                             $query = $em->createQuery('DELETE FROM ForumForumBundle:ForumCommentAttachments a WHERE a.commentId = :id')->setParameter('id', $key);
                             $query->execute();
@@ -1444,7 +1444,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1469,7 +1469,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1483,9 +1483,9 @@ class DefaultController extends Controller
                         }
                     }
             }
-            $page3 = $this->getRequest()->getSession()->get('forum_forum_topic_list_page3');
-            $sort3 = $this->getRequest()->getSession()->get('forum_forum_topic_list_sort3');
-            $search3 = $this->getRequest()->getSession()->get('forum_forum_topic_list_search3');
+            $page3 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_page3');
+            $sort3 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_sort3');
+            $search3 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_topic_list_search3');
             $page3 = intval($page3);
             $sort3 = intval($sort3);
             $search3 = trim($search3);
@@ -1539,7 +1539,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function forumsCreatepageCreateAction()
     {
-        $this->getRequest()->getSession()->set('forum_forum_topic_list_tab', 1);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_tab', 1);
         if ($this->getUser()->checkAccess('forum_createpage') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -1658,10 +1658,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postcreatepage = $this->getRequest()->get('createpage');
+            $postcreatepage = $this->get('request_stack')->getMasterRequest()->get('createpage');
             if (isset($postcreatepage['title']['default'])) $createpage['title']['default'] = $postcreatepage['title']['default'];
             foreach ($locales as $locale) if (isset($postcreatepage['title'][$locale['shortName']])) $createpage['title'][$locale['shortName']] = $postcreatepage['title'][$locale['shortName']];
             if (isset($postcreatepage['enabled'])) $createpage['enabled'] = intval($postcreatepage['enabled']); else $createpage['enabled'] = 0;
@@ -1697,7 +1697,7 @@ class DefaultController extends Controller
             foreach ($locales as $locale) if (!preg_match("/^(.{3,})?$/ui", $createpage['title'][$locale['shortName']])) {$errors = true; $createpageerror['title'][$locale['shortName']] = 'Заголовок должен содержать более 3 символов или оставьте поле пустым';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -1746,7 +1746,7 @@ class DefaultController extends Controller
                 if (($createpage['seopageTemplate'] != '') && (!isset($forumtemplates[$createpage['seopageTemplate']]))) {$errors = true; $createpageerror['seopageTemplate'] = 'Шаблон не найден';}
             }
             // Проверка модераторов
-            $postmoderators = $this->getRequest()->get('moderators');
+            $postmoderators = $this->get('request_stack')->getMasterRequest()->get('moderators');
             $createpage['forumModerators'] = array();
             if (is_array($postmoderators))
             {
@@ -1845,8 +1845,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function forumsCreatepageEditAction()
     {
-        $this->getRequest()->getSession()->set('forum_forum_topic_list_tab', 1);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_tab', 1);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $createpageent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumCreatePages')->find($id);
         if (empty($createpageent))
         {
@@ -2015,10 +2015,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postcreatepage = $this->getRequest()->get('createpage');
+            $postcreatepage = $this->get('request_stack')->getMasterRequest()->get('createpage');
             if (isset($postcreatepage['title']['default'])) $createpage['title']['default'] = $postcreatepage['title']['default'];
             foreach ($locales as $locale) if (isset($postcreatepage['title'][$locale['shortName']])) $createpage['title'][$locale['shortName']] = $postcreatepage['title'][$locale['shortName']];
             if (isset($postcreatepage['enabled'])) $createpage['enabled'] = intval($postcreatepage['enabled']); else $createpage['enabled'] = 0;
@@ -2054,7 +2054,7 @@ class DefaultController extends Controller
             foreach ($locales as $locale) if (!preg_match("/^(.{3,})?$/ui", $createpage['title'][$locale['shortName']])) {$errors = true; $createpageerror['title'][$locale['shortName']] = 'Заголовок должен содержать более 3 символов или оставьте поле пустым';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -2104,7 +2104,7 @@ class DefaultController extends Controller
                 if (($createpage['seopageTemplate'] != '') && (!isset($forumtemplates[$createpage['seopageTemplate']]))) {$errors = true; $createpageerror['seopageTemplate'] = 'Шаблон не найден';}
             }
             // Проверка модераторов
-            $postmoderators = $this->getRequest()->get('moderators');
+            $postmoderators = $this->get('request_stack')->getMasterRequest()->get('moderators');
             $createpage['forumModerators'] = array();
             if (is_array($postmoderators))
             {
@@ -2205,7 +2205,7 @@ class DefaultController extends Controller
     
     public function forumsMessageListAction()
     {
-        $this->getRequest()->getSession()->set('forum_forum_topic_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_tab', 0);
         if ($this->getUser()->checkAccess('forum_view') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -2217,18 +2217,18 @@ class DefaultController extends Controller
         }
         $em = $this->getDoctrine()->getEntityManager();
         // Таб 1
-        $id = $this->getRequest()->get('id');
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        if ($id === null) $id = $this->getRequest()->getSession()->get('forum_forum_messages_list_id');
-                     else $this->getRequest()->getSession()->set('forum_forum_messages_list_id', $id);
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('forum_forum_messages_list_page0');
-                        else $this->getRequest()->getSession()->set('forum_forum_messages_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('forum_forum_messages_list_sort0');
-                        else $this->getRequest()->getSession()->set('forum_forum_messages_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('forum_forum_messages_list_search0');
-                          else $this->getRequest()->getSession()->set('forum_forum_messages_list_search0', $search0);
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        if ($id === null) $id = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_id');
+                     else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_id', $id);
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_search0', $search0);
         $forument = $this->getDoctrine()->getRepository('ForumForumBundle:Forums')->find($id);
         if (empty($forument))
         {
@@ -2239,16 +2239,16 @@ class DefaultController extends Controller
                 'paths'=>array('Вернуться к списку форумов'=>$this->get('router')->generate('forum_forum_topic_list'))
             ));
         }
-        $oldid = $this->getRequest()->getSession()->get('forum_forum_messages_list_oldid');
+        $oldid = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_oldid');
         if ($id != $oldid)
         {
             $page0 = null;
             $sort0 = null;
             $search0 = null;
-            $this->getRequest()->getSession()->set('forum_forum_messages_list_oldid', $id);
-            $this->getRequest()->getSession()->set('forum_forum_messages_list_page0', $page0);
-            $this->getRequest()->getSession()->set('forum_forum_messages_list_sort0', $sort0);
-            $this->getRequest()->getSession()->set('forum_forum_messages_list_search0', $search0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_oldid', $id);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_page0', $page0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_sort0', $sort0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_search0', $search0);
         }
         $page0 = intval($page0);
         $sort0 = intval($sort0);
@@ -2293,7 +2293,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function forumsMessageCreateAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $forument = $this->getDoctrine()->getRepository('ForumForumBundle:Forums')->find($id);
         if (empty($forument))
         {
@@ -2334,16 +2334,16 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postmessage = $this->getRequest()->get('message');
+            $postmessage = $this->get('request_stack')->getMasterRequest()->get('message');
             if (isset($postmessage['content'])) $message['content'] = $postmessage['content'];
             if (isset($postmessage['moderatorMessage'])) $message['moderatorMessage'] = $postmessage['moderatorMessage'];
             if (isset($postmessage['isVisible'])) $message['isVisible'] = intval($postmessage['isVisible']); else $message['isVisible'] = 0;
             unset($postmessage);
             if (!preg_match("/^[\s\S]{10,}$/ui", $message['content'])) {$errors = true; $messageerror['content'] = 'Текст сообщения должен содержать более 10 символов';}
-            $postattachments = $this->getRequest()->get('attachments');
+            $postattachments = $this->get('request_stack')->getMasterRequest()->get('attachments');
             $message['attachments'] = array();
             if (is_array($postattachments))
             {
@@ -2352,8 +2352,8 @@ class DefaultController extends Controller
                     $fileent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumAttachments')->find($attachmentid);
                     if (!empty($fileent))
                     {
-                        if (!file_exists('..'.$fileent->getContentFile())) {$errors = true; $message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
-                        else {$message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('..'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
+                        if (!file_exists('.'.$fileent->getContentFile())) {$errors = true; $message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
+                        else {$message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('.'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
                     }
                     unset($fileent);
                 }
@@ -2417,7 +2417,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function forumsMessageEditAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $messageent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumMessages')->find($id);
         if (empty($messageent))
         {
@@ -2472,7 +2472,7 @@ class DefaultController extends Controller
         if (!is_array($message['attachments'])) $message['attachments'] = array();
         foreach ($message['attachments'] as &$attach)
         {
-            $attach['filesize'] = @filesize('..'.$attach['contentFile']);
+            $attach['filesize'] = @filesize('.'.$attach['contentFile']);
         }
         unset($attach);
         
@@ -2480,16 +2480,16 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postmessage = $this->getRequest()->get('message');
+            $postmessage = $this->get('request_stack')->getMasterRequest()->get('message');
             if (isset($postmessage['content'])) $message['content'] = $postmessage['content'];
             if (isset($postmessage['moderatorMessage'])) $message['moderatorMessage'] = $postmessage['moderatorMessage'];
             if (isset($postmessage['isVisible'])) $message['isVisible'] = intval($postmessage['isVisible']); else $message['isVisible'] = 0;
             unset($postmessage);
             if (!preg_match("/^[\s\S]{10,}$/ui", $message['content'])) {$errors = true; $messageerror['content'] = 'Текст сообщения должен содержать более 10 символов';}
-            $postattachments = $this->getRequest()->get('attachments');
+            $postattachments = $this->get('request_stack')->getMasterRequest()->get('attachments');
             $message['attachments'] = array();
             if (is_array($postattachments))
             {
@@ -2498,8 +2498,8 @@ class DefaultController extends Controller
                     $fileent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumAttachments')->find($attachmentid);
                     if (!empty($fileent))
                     {
-                        if (!file_exists('..'.$fileent->getContentFile())) {$errors = true; $message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
-                        else {$message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('..'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
+                        if (!file_exists('.'.$fileent->getContentFile())) {$errors = true; $message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
+                        else {$message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('.'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
                     }
                     unset($fileent);
                 }
@@ -2559,7 +2559,7 @@ class DefaultController extends Controller
     
     public function forumsMessageAjaxAction()
     {
-        //$tab = intval($this->getRequest()->get('tab'));
+        //$tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         $tab = 0;
         if ($this->getUser()->checkAccess('forum_edit') == 0)
         {
@@ -2571,12 +2571,12 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'deletemessage')
         {
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             $forumids = array();
             if ($check != null)
             foreach ($check as $key=>$val)
@@ -2593,7 +2593,7 @@ class DefaultController extends Controller
                         $files = $query->getResult();
                         if (is_array($files))
                         {
-                            foreach ($files as $file) @unlink('..'.$file['contentFile']);
+                            foreach ($files as $file) @unlink('.'.$file['contentFile']);
                         }
                         $query = $em->createQuery('DELETE FROM ForumForumBundle:ForumAttachments a WHERE a.messageId = :id')->setParameter('id', $key);
                         $query->execute();
@@ -2614,7 +2614,7 @@ class DefaultController extends Controller
         }
         if ($action == 'blockedmessage')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -2630,7 +2630,7 @@ class DefaultController extends Controller
         }
         if ($action == 'unblockedmessage')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -2645,10 +2645,10 @@ class DefaultController extends Controller
                 }
         }
 
-        $id = $this->getRequest()->getSession()->get('forum_forum_messages_list_id');
-        $page0 = $this->getRequest()->getSession()->get('forum_forum_messages_list_page0');
-        $sort0 = $this->getRequest()->getSession()->get('forum_forum_messages_list_sort0');
-        $search0 = $this->getRequest()->getSession()->get('forum_forum_messages_list_search0');
+        $id = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_id');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_search0');
         $forument = $this->getDoctrine()->getRepository('ForumForumBundle:Forums')->find($id);
         if (empty($forument))
         {
@@ -2659,16 +2659,16 @@ class DefaultController extends Controller
                 'paths'=>array('Вернуться к списку форумов'=>$this->get('router')->generate('forum_forum_topic_list'))
             ));
         }
-        $oldid = $this->getRequest()->getSession()->get('forum_forum_messages_list_oldid');
+        $oldid = $this->get('request_stack')->getMasterRequest()->getSession()->get('forum_forum_messages_list_oldid');
         if ($id != $oldid)
         {
             $page0 = null;
             $sort0 = null;
             $search0 = null;
-            $this->getRequest()->getSession()->set('forum_forum_messages_list_oldid', $id);
-            $this->getRequest()->getSession()->set('forum_forum_messages_list_page0', $page0);
-            $this->getRequest()->getSession()->set('forum_forum_messages_list_sort0', $sort0);
-            $this->getRequest()->getSession()->set('forum_forum_messages_list_search0', $search0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_oldid', $id);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_page0', $page0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_sort0', $sort0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_messages_list_search0', $search0);
         }
         $page0 = intval($page0);
         $sort0 = intval($sort0);
@@ -2724,7 +2724,7 @@ class DefaultController extends Controller
              $removeids = array();
              foreach ($files as $file)
              {
-                 @unlink('..'.$file['contentFile']);
+                 @unlink('.'.$file['contentFile']);
                  $removeids[] = $file['id'];
              }
              if (count($removeids) > 0)
@@ -2734,14 +2734,14 @@ class DefaultController extends Controller
              }
          }
          unset($files);
-        $files = $this->getRequest()->files->get('files');
+        $files = $this->get('request_stack')->getMasterRequest()->files->get('files');
         $answer = array();
         if (is_array($files))
         {
             foreach ($files as $file)
             {
                 $tmpfile = $file->getPathName();
-                $basepath = '../secured/forum/';
+                $basepath = 'secured/forum/';
                 $name = 'f_'.md5($tmpfile.time()).'.dat';
                 if (move_uploaded_file($tmpfile, $basepath . $name)) 
                 {
@@ -2764,7 +2764,7 @@ class DefaultController extends Controller
 
     public function forumsFrontAjaxAvatarAction() 
     {
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -2777,7 +2777,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'format')));
             $basepath = '/images/forum/';
             $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -2792,20 +2792,20 @@ class DefaultController extends Controller
     
     public function forumsFrontDownloadAttachmentAction() 
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $fileent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumAttachments')->find($id);
         if (empty($fileent)) return new Response('File not found', 404);
         $forument = $this->getDoctrine()->getRepository('ForumForumBundle:Forums')->find($fileent->getForumId());
         // Проверить доступ к файлу
         if ((($fileent->getIsImage() == 0) && ($forument->getOnlyAutorizedDownload() != 0)) || (($fileent->getIsImage() != 0) && ($forument->getOnlyAutorizedImage() != 0)))
         {
-            $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+            $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
             $userEntity = null;
             if ($userid != null) $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
             if (empty($userEntity))
             {
-                $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-                $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+                $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+                $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
                 $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
                 $userEntity = $query->getResult();
                 if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) $userEntity = $userEntity[0];
@@ -2814,7 +2814,7 @@ class DefaultController extends Controller
             if ($userEntity->getBlocked() != 2) return new Response('Access denied', 403);
         }
         // Выдать файл
-        $filePath = '..'.$fileent->getContentFile();
+        $filePath = '.'.$fileent->getContentFile();
         $newFileName = $fileent->getFileName();
         if (is_file($filePath)) 
         {
@@ -2881,12 +2881,12 @@ class DefaultController extends Controller
             return new Response('File not found', 404);
         }
         die;
-        /*if (($this->container->get('security.context')->isGranted('ROLE_ADMIN')) || 
-            ($this->container->get('security.context')->isGranted('ROLE_RISK')) ||
-            ($this->container->get('security.context')->isGranted('ROLE_OPERATOR')))
+        /*if (($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) || 
+            ($this->container->get('security.authorization_checker')->isGranted('ROLE_RISK')) ||
+            ($this->container->get('security.authorization_checker')->isGranted('ROLE_OPERATOR')))
         {
-            $filename = '../secured/'.$type.'/'.$file;
-            $newfilename = $this->getRequest()->get('name');
+            $filename = 'secured/'.$type.'/'.$file;
+            $newfilename = $this->get('request_stack')->getMasterRequest()->get('name');
             if ($newfilename == null) $newfilename = $filename;
             if (!file_exists($filename)) return new Response('');
             $resp = new Response();
@@ -2919,7 +2919,7 @@ class DefaultController extends Controller
              $removeids = array();
              foreach ($files as $file)
              {
-                 @unlink('..'.$file['contentFile']);
+                 @unlink('.'.$file['contentFile']);
                  $removeids[] = $file['id'];
              }
              if (count($removeids) > 0)
@@ -2929,14 +2929,14 @@ class DefaultController extends Controller
              }
          }
          unset($files);
-        $files = $this->getRequest()->files->get('files');
+        $files = $this->get('request_stack')->getMasterRequest()->files->get('files');
         $answer = array();
         if (is_array($files))
         {
             foreach ($files as $file)
             {
                 $tmpfile = $file->getPathName();
-                $basepath = '../secured/forum/';
+                $basepath = 'secured/forum/';
                 $name = 'f_'.md5($tmpfile.time()).'.dat';
                 if (move_uploaded_file($tmpfile, $basepath . $name)) 
                 {
@@ -2972,7 +2972,7 @@ class DefaultController extends Controller
              $removeids = array();
              foreach ($files as $file)
              {
-                 @unlink('..'.$file['contentFile']);
+                 @unlink('.'.$file['contentFile']);
                  $removeids[] = $file['id'];
              }
              if (count($removeids) > 0)
@@ -2983,14 +2983,14 @@ class DefaultController extends Controller
          }
          unset($files);
         $userId = $this->getUser()->getId();
-        $files = $this->getRequest()->files->get('files');
+        $files = $this->get('request_stack')->getMasterRequest()->files->get('files');
         $answer = array();
         if (is_array($files))
         {
             foreach ($files as $file)
             {
                 $tmpfile = $file->getPathName();
-                $basepath = '../secured/forum/';
+                $basepath = 'secured/forum/';
                 $name = $this->getUser()->getId().'_'.md5(time()).'.dat';
                 if (move_uploaded_file($tmpfile, $basepath . $name)) 
                 {
@@ -3016,8 +3016,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function forumsCommentEditAction()
     {
-        $this->getRequest()->getSession()->set('forum_forum_topic_list_tab', 3);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('forum_forum_topic_list_tab', 3);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $messageent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumComments')->find($id);
         if (empty($messageent))
         {
@@ -3062,7 +3062,7 @@ class DefaultController extends Controller
         if (!is_array($message['attachments'])) $message['attachments'] = array();
         foreach ($message['attachments'] as &$attach)
         {
-            $attach['filesize'] = @filesize('..'.$attach['contentFile']);
+            $attach['filesize'] = @filesize('.'.$attach['contentFile']);
         }
         unset($attach);
         
@@ -3070,16 +3070,16 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postmessage = $this->getRequest()->get('message');
+            $postmessage = $this->get('request_stack')->getMasterRequest()->get('message');
             if (isset($postmessage['content'])) $message['content'] = $postmessage['content'];
             if (isset($postmessage['moderatorMessage'])) $message['moderatorMessage'] = $postmessage['moderatorMessage'];
             if (isset($postmessage['isVisible'])) $message['isVisible'] = intval($postmessage['isVisible']); else $message['isVisible'] = 0;
             unset($postmessage);
             if (!preg_match("/^[\s\S]{10,}$/ui", $message['content'])) {$errors = true; $messageerror['content'] = 'Текст сообщения должен содержать более 10 символов';}
-            $postattachments = $this->getRequest()->get('attachments');
+            $postattachments = $this->get('request_stack')->getMasterRequest()->get('attachments');
             $message['attachments'] = array();
             if (is_array($postattachments))
             {
@@ -3088,8 +3088,8 @@ class DefaultController extends Controller
                     $fileent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumCommentAttachments')->find($attachmentid);
                     if (!empty($fileent))
                     {
-                        if (!file_exists('..'.$fileent->getContentFile())) {$errors = true; $message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
-                        else {$message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('..'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
+                        if (!file_exists('.'.$fileent->getContentFile())) {$errors = true; $message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => 0, 'id' => $attachmentid, 'error' => 'Файл не найден');}
+                        else {$message['attachments'][] = array('filename' => $fileent->getFileName(), 'filesize' => filesize('.'.$fileent->getContentFile()), 'id' => intval($attachmentid), 'error' => '');}
                     }
                     unset($fileent);
                 }
@@ -3147,7 +3147,7 @@ class DefaultController extends Controller
     
     public function forumsFrontDownloadCommentAttachmentAction() 
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $fileent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumCommentAttachments')->find($id);
         if (empty($fileent)) return new Response('File not found', 404);
         $messageent = $this->getDoctrine()->getRepository('ForumForumBundle:ForumComments')->find($fileent->getCommentId());
@@ -3165,13 +3165,13 @@ class DefaultController extends Controller
         if (!isset($module['onlyAutorizedDownload']) || !isset($module['onlyAutorizedImage'])) return new Response('File not found', 404);
         if ((($fileent->getIsImage() == 0) && ($module['onlyAutorizedDownload'] != 0)) || (($fileent->getIsImage() != 0) && ($module['onlyAutorizedImage'] != 0)))
         {
-            $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+            $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
             $userEntity = null;
             if ($userid != null) $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
             if (empty($userEntity))
             {
-                $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-                $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+                $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+                $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
                 $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
                 $userEntity = $query->getResult();
                 if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) $userEntity = $userEntity[0];
@@ -3180,7 +3180,7 @@ class DefaultController extends Controller
             if ($userEntity->getBlocked() != 2) return new Response('Access denied', 403);
         }
         // Выдать файл
-        $filePath = '..'.$fileent->getContentFile();
+        $filePath = '.'.$fileent->getContentFile();
         $newFileName = $fileent->getFileName();
         if (is_file($filePath)) 
         {
@@ -3247,12 +3247,12 @@ class DefaultController extends Controller
             return new Response('File not found', 404);
         }
         die;
-        /*if (($this->container->get('security.context')->isGranted('ROLE_ADMIN')) || 
-            ($this->container->get('security.context')->isGranted('ROLE_RISK')) ||
-            ($this->container->get('security.context')->isGranted('ROLE_OPERATOR')))
+        /*if (($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) || 
+            ($this->container->get('security.authorization_checker')->isGranted('ROLE_RISK')) ||
+            ($this->container->get('security.authorization_checker')->isGranted('ROLE_OPERATOR')))
         {
-            $filename = '../secured/'.$type.'/'.$file;
-            $newfilename = $this->getRequest()->get('name');
+            $filename = 'secured/'.$type.'/'.$file;
+            $newfilename = $this->get('request_stack')->getMasterRequest()->get('name');
             if ($newfilename == null) $newfilename = $filename;
             if (!file_exists($filename)) return new Response('');
             $resp = new Response();

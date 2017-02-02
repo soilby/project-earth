@@ -18,7 +18,7 @@ class DefaultController extends Controller
     public function galerryAjaxImageAction() 
     {
         $userId = $this->getUser()->getId();
-        $files = $this->getRequest()->files->get('image');
+        $files = $this->get('request_stack')->getMasterRequest()->files->get('image');
         $answer = array();
         foreach ($files as $file)
         {
@@ -37,7 +37,7 @@ class DefaultController extends Controller
                 $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
                 if ($answeritem == null)
                 {
-                    if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                    if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                     {
                         $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                         $answeritem = array('file' => $basepath.$name, 'error' => '');

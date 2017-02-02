@@ -64,12 +64,12 @@ class DefaultController extends Controller
     
     public function import1LoadFileAction() 
     {
-        $file = $this->getRequest()->files->get('file');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('file');
         $tmpfile = $file->getPathName();
         // Проверка входного файла
         $xml = @simplexml_load_file($tmpfile);
         if ($xml === false) return new Response('<p>Неправильный формат файла</p>');
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'import1.yml';
         @unlink($basepath.$name);
         if (!move_uploaded_file($tmpfile, $basepath . $name)) return new Response('<p>Ошибка сохранения файла</p>');
@@ -141,12 +141,12 @@ class DefaultController extends Controller
         $mode = 'all';
         $em = $this->container->get('doctrine')->getEntityManager();
         // Загрузить файл
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'import1.yml';
         $xml = @simplexml_load_file($basepath.$name);
         if ($xml === false) return new Response(json_encode(array('result'=>'Ошибка открытия файла')));
         // Записать настройки
-        $importcfg = $this->getRequest()->get('categories');
+        $importcfg = $this->get('request_stack')->getMasterRequest()->get('categories');
         if (is_array($importcfg))
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.one.categories', serialize($importcfg));
@@ -156,7 +156,7 @@ class DefaultController extends Controller
             if ($importcfg != null) $importcfg = @unserialize($importcfg);
             if (!is_array($importcfg)) $importcfg = array();
         }
-        $curpost = intval($this->getRequest()->get('currency'));
+        $curpost = intval($this->get('request_stack')->getMasterRequest()->get('currency'));
         $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->find($curpost);
         if (!empty($currency))
         {
@@ -167,7 +167,7 @@ class DefaultController extends Controller
             $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->find($curpost);
             if (empty($currency)) $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->findOneBy(array('main'=>1));
         }
-        $layout = $this->getRequest()->get('layout');
+        $layout = $this->get('request_stack')->getMasterRequest()->get('layout');
         if ($layout !== null)
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.one.layout', $layout);
@@ -175,7 +175,7 @@ class DefaultController extends Controller
         {
             $layout = $this->container->get('cms.cmsManager')->getConfigValue('shop.import.one.layout');
         }
-        $template = $this->getRequest()->get('template');
+        $template = $this->get('request_stack')->getMasterRequest()->get('template');
         if ($layout !== null)
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.one.template', $template);
@@ -183,7 +183,7 @@ class DefaultController extends Controller
         {
             $template = $this->container->get('cms.cmsManager')->getConfigValue('shop.import.one.template');
         }
-        $modules = $this->getRequest()->get('modules');
+        $modules = $this->get('request_stack')->getMasterRequest()->get('modules');
         if (is_array($modules))
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.one.modules', implode(',', $modules));
@@ -194,7 +194,7 @@ class DefaultController extends Controller
         }
         // Обработать файлы
         $starttime = time();
-        $start = intval($this->getRequest()->get('start'));
+        $start = intval($this->get('request_stack')->getMasterRequest()->get('start'));
         for ($i = 0; $i < 30; $i++)
         {
             if ((time() - $starttime) > 20) break;
@@ -241,13 +241,13 @@ class DefaultController extends Controller
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
                     $photobuffer = curl_exec($ch);
                     curl_close($ch);
-                    $basepathimg = '../images/product/';
+                    $basepathimg = 'images/product/';
                     $nameimg = $this->getUser()->getId().'_'.md5(time() + rand()).'.jpg';
                     if (@file_put_contents($basepathimg.$nameimg, $photobuffer)) 
                     {
                         if (@getimagesize($basepathimg.$nameimg)) 
                         {
-                            if (strpos($avatar,'/images/product/') === 0) @unlink('..'.$avatar);
+                            if (strpos($avatar,'/images/product/') === 0) @unlink('.'.$avatar);
                             $avatar = '/images/product/'.$nameimg;
                         } else
                         {
@@ -324,7 +324,7 @@ class DefaultController extends Controller
     
     public function import2LoadCsv($filename)
     {
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'import2.tmp';
         $str = @file_get_contents($filename);
         if ($str == null) return false;
@@ -371,13 +371,13 @@ class DefaultController extends Controller
     
     public function import2LoadFileAction() 
     {
-        $file = $this->getRequest()->files->get('file');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('file');
         $tmpfile = $file->getPathName();
         // Проверка входного файла
         $csv = $this->import2LoadCsv($tmpfile);
         if ($csv === false) return new Response('<p>Неправильный формат файла</p>');
         if ($csv === null) return new Response('<p>Файл должен содержать поля item_code, name, info, price, status, image, type_id.</p>');
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'import2.csv';
         @unlink($basepath.$name);
         if (!move_uploaded_file($tmpfile, $basepath . $name)) return new Response('<p>Ошибка сохранения файла</p>');
@@ -448,7 +448,7 @@ class DefaultController extends Controller
     
     public function import2LoadPicFileAction() 
     {
-        $file = $this->getRequest()->files->get('file');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('file');
         $tmpfile = $file->getPathName();
         // Проверка файла
         $zip = zip_open($tmpfile);
@@ -462,7 +462,7 @@ class DefaultController extends Controller
         }
         zip_close($zip);
         // Вывод результата
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'images2.zip';
         @unlink($basepath.$name);
         if (!move_uploaded_file($tmpfile, $basepath . $name)) return new Response('');
@@ -474,13 +474,13 @@ class DefaultController extends Controller
         $mode = 'all';
         $em = $this->container->get('doctrine')->getEntityManager();
         // Загрузить файл
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'import2.csv';
         $nameimage = 'images2.zip';
         $csv = $this->import2LoadCsv($basepath.$name);
         if (!is_array($csv)) return new Response(json_encode(array('result'=>'Ошибка открытия файла')));
         // Записать настройки
-        $importcfg = $this->getRequest()->get('categories');
+        $importcfg = $this->get('request_stack')->getMasterRequest()->get('categories');
         if (is_array($importcfg))
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.two.categories', serialize($importcfg));
@@ -490,7 +490,7 @@ class DefaultController extends Controller
             if ($importcfg != null) $importcfg = @unserialize($importcfg);
             if (!is_array($importcfg)) $importcfg = array();
         }
-        $curpost = intval($this->getRequest()->get('currency'));
+        $curpost = intval($this->get('request_stack')->getMasterRequest()->get('currency'));
         $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->find($curpost);
         if (!empty($currency))
         {
@@ -501,7 +501,7 @@ class DefaultController extends Controller
             $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->find($curpost);
             if (empty($currency)) $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->findOneBy(array('main'=>1));
         }
-        $layout = $this->getRequest()->get('layout');
+        $layout = $this->get('request_stack')->getMasterRequest()->get('layout');
         if ($layout !== null)
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.two.layout', $layout);
@@ -509,7 +509,7 @@ class DefaultController extends Controller
         {
             $layout = $this->container->get('cms.cmsManager')->getConfigValue('shop.import.two.layout');
         }
-        $template = $this->getRequest()->get('template');
+        $template = $this->get('request_stack')->getMasterRequest()->get('template');
         if ($layout !== null)
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.two.template', $template);
@@ -517,7 +517,7 @@ class DefaultController extends Controller
         {
             $template = $this->container->get('cms.cmsManager')->getConfigValue('shop.import.two.template');
         }
-        $modules = $this->getRequest()->get('modules');
+        $modules = $this->get('request_stack')->getMasterRequest()->get('modules');
         if (is_array($modules))
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.two.modules', implode(',', $modules));
@@ -528,7 +528,7 @@ class DefaultController extends Controller
         }
         // Обработать файлы
         $starttime = time();
-        $start = intval($this->getRequest()->get('start'));
+        $start = intval($this->get('request_stack')->getMasterRequest()->get('start'));
         for ($i = 0; $i < 30; $i++)
         {
             if ((time() - $starttime) > 20) break;
@@ -576,13 +576,13 @@ class DefaultController extends Controller
                             if (basename(zip_entry_name($entry)) == $product['avatar'])
                             {
                                 $photobuffer = zip_entry_read($entry, zip_entry_filesize($entry));
-                                $basepathimg = '../images/product/';
+                                $basepathimg = 'images/product/';
                                 $nameimg = $this->getUser()->getId().'_'.md5(time() + rand()).'.jpg';
                                 if (@file_put_contents($basepathimg.$nameimg, $photobuffer)) 
                                 {
                                     if (@getimagesize($basepathimg.$nameimg)) 
                                     {
-                                        if (strpos($avatar,'/images/product/') === 0) @unlink('..'.$avatar);
+                                        if (strpos($avatar,'/images/product/') === 0) @unlink('.'.$avatar);
                                         $avatar = '/images/product/'.$nameimg;
                                     } else
                                     {
@@ -646,7 +646,7 @@ class DefaultController extends Controller
                                 if (basename(zip_entry_name($entry)) == $product['image1'])
                                 {
                                     $photobuffer = zip_entry_read($entry, zip_entry_filesize($entry));
-                                    $basepathimg = '../images/product/';
+                                    $basepathimg = 'images/product/';
                                     $nameimg = $this->getUser()->getId().'_'.md5(time() + rand()).'.jpg';
                                     if (@file_put_contents($basepathimg.$nameimg, $photobuffer)) 
                                     {
@@ -681,7 +681,7 @@ class DefaultController extends Controller
                                 if (basename(zip_entry_name($entry)) == $product['image2'])
                                 {
                                     $photobuffer = zip_entry_read($entry, zip_entry_filesize($entry));
-                                    $basepathimg = '../images/product/';
+                                    $basepathimg = 'images/product/';
                                     $nameimg = $this->getUser()->getId().'_'.md5(time() + rand()).'.jpg';
                                     if (@file_put_contents($basepathimg.$nameimg, $photobuffer)) 
                                     {
@@ -737,7 +737,7 @@ class DefaultController extends Controller
     
     public function import3LoadFileAction() 
     {
-        $file = $this->getRequest()->files->get('file');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('file');
         $tmpfile = $file->getPathName();
         // Проверка входного файла
         $filetype = \PHPExcel_IOFactory::identify($tmpfile);
@@ -760,7 +760,7 @@ class DefaultController extends Controller
             if ($datadetected == true) $cellmatrix[$x] = $tmp;
         }
         // Переместить файл
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'import3.xls';
         @unlink($basepath.$name);
         if (!move_uploaded_file($tmpfile, $basepath . $name)) return new Response('<p>Ошибка сохранения файла</p>');
@@ -775,7 +775,7 @@ class DefaultController extends Controller
     {
         $em = $this->container->get('doctrine')->getEntityManager();
         // Принять настройки
-        $tablerowcfg = $this->getRequest()->get('tablerowcfg');
+        $tablerowcfg = $this->get('request_stack')->getMasterRequest()->get('tablerowcfg');
         if (!is_array($tablerowcfg)) $tablerowcfg = array();
         foreach ($tablerowcfg as $key=>$val)
         {
@@ -783,7 +783,7 @@ class DefaultController extends Controller
         }
         if ((!in_array('title', $tablerowcfg)) || (!in_array('price',$tablerowcfg))) return new Response('<p>Для импорта должны быть указаны как минимум название и цена товара</p>');
         // Считать файл
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'import3.xls';
         $filetype = \PHPExcel_IOFactory::identify($basepath.$name);
         $reader = \PHPExcel_IOFactory::createReader($filetype);
@@ -882,7 +882,7 @@ class DefaultController extends Controller
         $mode = 'all';
         $em = $this->container->get('doctrine')->getEntityManager();
         // Загрузить файл
-        $basepath = '../secured/shopimport/';
+        $basepath = 'secured/shopimport/';
         $name = 'import3.xls';
         $filetype = \PHPExcel_IOFactory::identify($basepath.$name);
         $reader = \PHPExcel_IOFactory::createReader($filetype);
@@ -890,16 +890,16 @@ class DefaultController extends Controller
         $excel = $reader->load($basepath.$name);
         $sheet = $excel->getSheet();
         // Записать настройки
-        $categorycfg = $this->getRequest()->get('categories');
-        $statuscfg = $this->getRequest()->get('statuses');
-        $tablerowcfg = $this->getRequest()->get('tablerowcfg');
+        $categorycfg = $this->get('request_stack')->getMasterRequest()->get('categories');
+        $statuscfg = $this->get('request_stack')->getMasterRequest()->get('statuses');
+        $tablerowcfg = $this->get('request_stack')->getMasterRequest()->get('tablerowcfg');
         if (!is_array($tablerowcfg)) $tablerowcfg = array();
         foreach ($tablerowcfg as $key=>$val)
         {
             if (!in_array($val, array('title','description','price','onStock','avatar','article','category'))) unset($tablerowcfg[$key]);
         }
         
-        $curpost = intval($this->getRequest()->get('currency'));
+        $curpost = intval($this->get('request_stack')->getMasterRequest()->get('currency'));
         $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->find($curpost);
         if (!empty($currency))
         {
@@ -910,7 +910,7 @@ class DefaultController extends Controller
             $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->find($curpost);
             if (empty($currency)) $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->findOneBy(array('main'=>1));
         }
-        $layout = $this->getRequest()->get('layout');
+        $layout = $this->get('request_stack')->getMasterRequest()->get('layout');
         if ($layout !== null)
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.three.layout', $layout);
@@ -918,7 +918,7 @@ class DefaultController extends Controller
         {
             $layout = $this->container->get('cms.cmsManager')->getConfigValue('shop.import.three.layout');
         }
-        $template = $this->getRequest()->get('template');
+        $template = $this->get('request_stack')->getMasterRequest()->get('template');
         if ($layout !== null)
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.three.template', $template);
@@ -926,7 +926,7 @@ class DefaultController extends Controller
         {
             $template = $this->container->get('cms.cmsManager')->getConfigValue('shop.import.three.template');
         }
-        $modules = $this->getRequest()->get('modules');
+        $modules = $this->get('request_stack')->getMasterRequest()->get('modules');
         if (is_array($modules))
         {
             $this->container->get('cms.cmsManager')->setConfigValue('shop.import.three.modules', implode(',', $modules));
@@ -937,7 +937,7 @@ class DefaultController extends Controller
         }
         // Обработать файлы
         $starttime = time();
-        $start = intval($this->getRequest()->get('start'));
+        $start = intval($this->get('request_stack')->getMasterRequest()->get('start'));
         $savestart = $start;
         $findcategories = array();
         $findstatuses = array();
@@ -1018,7 +1018,7 @@ class DefaultController extends Controller
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
                         $photobuffer = curl_exec($ch);
                         curl_close($ch);
-                        $basepathimg = '../images/product/';
+                        $basepathimg = 'images/product/';
                         $nameimg = $this->getUser()->getId().'_'.md5(time() + rand()).'.jpg';
                         if (@file_put_contents($basepathimg.$nameimg, $photobuffer)) 
                         {

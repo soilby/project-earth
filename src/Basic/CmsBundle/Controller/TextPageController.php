@@ -28,26 +28,26 @@ class TextPageController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('basic_cms_textpage_list_tab');
-                      else $this->getRequest()->getSession()->set('basic_cms_textpage_list_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 1) $tab = 1;
         if ($this->getUser()->checkAccess('textpage_list') == 0) $tab = 1;
         if ($this->getUser()->checkAccess('textpage_listsite') == 0) $tab = 0;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        $taxonomy0 = $this->getRequest()->get('taxonomy0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_page0');
-                        else $this->getRequest()->getSession()->set('basic_cms_textpage_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_sort0');
-                        else $this->getRequest()->getSession()->set('basic_cms_textpage_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_search0');
-                          else $this->getRequest()->getSession()->set('basic_cms_textpage_list_search0', $search0);
-        if ($taxonomy0 === null) $taxonomy0 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_taxonomy0');
-                          else $this->getRequest()->getSession()->set('basic_cms_textpage_list_taxonomy0', $taxonomy0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->get('taxonomy0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_search0', $search0);
+        if ($taxonomy0 === null) $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_taxonomy0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_taxonomy0', $taxonomy0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -95,18 +95,18 @@ class TextPageController extends Controller
             $taxonomyinfo0 = null;
         }
         // Таб 2
-        $page1 = $this->getRequest()->get('page1');
-        $sort1 = $this->getRequest()->get('sort1');
-        $search1 = $this->getRequest()->get('search1');
-        $taxonomy1 = $this->getRequest()->get('taxonomy1');
-        if ($page1 === null) $page1 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_page1');
-                        else $this->getRequest()->getSession()->set('basic_cms_textpage_list_page1', $page1);
-        if ($sort1 === null) $sort1 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_sort1');
-                        else $this->getRequest()->getSession()->set('basic_cms_textpage_list_sort1', $sort1);
-        if ($search1 === null) $search1 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_search1');
-                          else $this->getRequest()->getSession()->set('basic_cms_textpage_list_search1', $search1);
-        if ($taxonomy1 === null) $taxonomy1 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_taxonomy1');
-                          else $this->getRequest()->getSession()->set('basic_cms_textpage_list_taxonomy1', $taxonomy1);
+        $page1 = $this->get('request_stack')->getMasterRequest()->get('page1');
+        $sort1 = $this->get('request_stack')->getMasterRequest()->get('sort1');
+        $search1 = $this->get('request_stack')->getMasterRequest()->get('search1');
+        $taxonomy1 = $this->get('request_stack')->getMasterRequest()->get('taxonomy1');
+        if ($page1 === null) $page1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_page1');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_page1', $page1);
+        if ($sort1 === null) $sort1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_sort1');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_sort1', $sort1);
+        if ($search1 === null) $search1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_search1');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_search1', $search1);
+        if ($taxonomy1 === null) $taxonomy1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_taxonomy1');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_taxonomy1', $taxonomy1);
         $page1 = intval($page1);
         $sort1 = intval($sort1);
         $search1 = trim($search1);
@@ -183,7 +183,7 @@ class TextPageController extends Controller
     public function textPageAjaxAvatarAction() 
     {
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -196,7 +196,7 @@ class TextPageController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/textpage/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -211,8 +211,8 @@ class TextPageController extends Controller
 // *******************************************    
     public function textPageCreateAction()
     {
-        $pagetype = intval($this->getRequest()->get('pagetype'));
-        $this->getRequest()->getSession()->set('basic_cms_textpage_list_tab', ($pagetype != 0 ? 1 : 0));
+        $pagetype = intval($this->get('request_stack')->getMasterRequest()->get('pagetype'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_tab', ($pagetype != 0 ? 1 : 0));
         if ((($this->getUser()->checkAccess('textpage_new') == 0) && ($pagetype == 0)) || (($this->getUser()->checkAccess('textpage_newsite') == 0) && ($pagetype != 0)))
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -294,10 +294,10 @@ class TextPageController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $posttext = $this->getRequest()->get('text');
+            $posttext = $this->get('request_stack')->getMasterRequest()->get('text');
             if (isset($posttext['title'])) $text['title'] = $posttext['title'];
             if (isset($posttext['description'])) $text['description'] = $posttext['description'];
             if (isset($posttext['avatar'])) $text['avatar'] = $posttext['avatar'];
@@ -307,12 +307,12 @@ class TextPageController extends Controller
             if (isset($posttext['metakey'])) $text['metakey'] = $posttext['metakey'];
             unset($posttext);
             if (!preg_match("/^.{3,}$/ui", $text['title'])) {$errors = true; $texterror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($text['avatar'] != '') && (!file_exists('..'.$text['avatar']))) {$errors = true; $texterror['avatar'] = 'Файл не найден';}
+            if (($text['avatar'] != '') && (!file_exists('.'.$text['avatar']))) {$errors = true; $texterror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $text['metadescr'])) {$errors = true; $texterror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $text['metakey'])) {$errors = true; $texterror['metakey'] = 'Использованы недопустимые символы';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -349,7 +349,7 @@ class TextPageController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $posttextloc = $this->getRequest()->get('textloc');
+            $posttextloc = $this->get('request_stack')->getMasterRequest()->get('textloc');
             foreach ($locales as $locale)
             {
                 if (isset($posttextloc[$locale['shortName']]['title'])) $textloc[$locale['shortName']]['title'] = $posttextloc[$locale['shortName']]['title'];
@@ -368,7 +368,7 @@ class TextPageController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.textpage', 0, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.textpage', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -376,7 +376,7 @@ class TextPageController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.textpage.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'textPageCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'textPageCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -450,7 +450,7 @@ class TextPageController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.textpage', $textpageent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.textpage', $textpageent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -458,7 +458,7 @@ class TextPageController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.textpage.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'textPageCreate', $textpageent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'textPageCreate', $textpageent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -471,11 +471,11 @@ class TextPageController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.textpage', 0, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.textpage', 0, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.textpage.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'textPageCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'textPageCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -503,7 +503,7 @@ class TextPageController extends Controller
     public function textPageEditAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $textpageent = $this->getDoctrine()->getRepository('BasicCmsBundle:TextPages')->find($id);
         if (empty($textpageent))
         {
@@ -543,7 +543,7 @@ class TextPageController extends Controller
         }
         $pageent = $this->getDoctrine()->getRepository('BasicCmsBundle:SeoPage')->findOneBy(array('contentType'=>'object.textpage','contentId'=>$id,'contentAction'=>'view'));
         $pagetype = $textpageent->getPageType();
-        $this->getRequest()->getSession()->set('basic_cms_textpage_list_tab', ($pagetype != 0 ? 1 : 0));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_tab', ($pagetype != 0 ? 1 : 0));
         
         $text = array();
         $texterror = array();
@@ -648,7 +648,7 @@ class TextPageController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if (($textpageent->getPageType() == 0) && ($this->getUser()->checkAccess('textpage_editall') == 0) && ($this->getUser()->getId() != $textpageent->getCreaterId()))
             {
@@ -678,7 +678,7 @@ class TextPageController extends Controller
                 ));
             }
             // Проверка основных данных
-            $posttext = $this->getRequest()->get('text');
+            $posttext = $this->get('request_stack')->getMasterRequest()->get('text');
             if (isset($posttext['title'])) $text['title'] = $posttext['title'];
             if (isset($posttext['description'])) $text['description'] = $posttext['description'];
             if (isset($posttext['avatar'])) $text['avatar'] = $posttext['avatar'];
@@ -688,12 +688,12 @@ class TextPageController extends Controller
             if (isset($posttext['metakey'])) $text['metakey'] = $posttext['metakey'];
             unset($posttext);
             if (!preg_match("/^.{3,}$/ui", $text['title'])) {$errors = true; $texterror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($text['avatar'] != '') && (!file_exists('..'.$text['avatar']))) {$errors = true; $texterror['avatar'] = 'Файл не найден';}
+            if (($text['avatar'] != '') && (!file_exists('.'.$text['avatar']))) {$errors = true; $texterror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $text['metadescr'])) {$errors = true; $texterror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $text['metakey'])) {$errors = true; $texterror['metakey'] = 'Использованы недопустимые символы';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -731,7 +731,7 @@ class TextPageController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $posttextloc = $this->getRequest()->get('textloc');
+            $posttextloc = $this->get('request_stack')->getMasterRequest()->get('textloc');
             foreach ($locales as $locale)
             {
                 if (isset($posttextloc[$locale['shortName']]['title'])) $textloc[$locale['shortName']]['title'] = $posttextloc[$locale['shortName']]['title'];
@@ -750,7 +750,7 @@ class TextPageController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.textpage', $id, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.textpage', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -758,7 +758,7 @@ class TextPageController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.textpage.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'textPageEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'textPageEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -766,7 +766,7 @@ class TextPageController extends Controller
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                if (($textpageent->getAvatar() != '') && ($textpageent->getAvatar() != $text['avatar'])) @unlink('..'.$textpageent->getAvatar());
+                if (($textpageent->getAvatar() != '') && ($textpageent->getAvatar() != $text['avatar'])) @unlink('.'.$textpageent->getAvatar());
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($text['avatar']);
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($text['content'], $textpageent->getContent());
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($text['description'], $textpageent->getDescription());
@@ -849,7 +849,7 @@ class TextPageController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.textpage', $textpageent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.textpage', $textpageent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -857,7 +857,7 @@ class TextPageController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.textpage.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'textPageEdit', $textpageent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'textPageEdit', $textpageent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -870,11 +870,11 @@ class TextPageController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.textpage', $id, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.textpage', $id, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.textpage.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'textPageEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'textPageEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -904,7 +904,7 @@ class TextPageController extends Controller
     
     public function textPageAjaxAction()
     {
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         
         if ((($tab == 0) && ($this->getUser()->checkAccess('textpage_list') == 0)) || (($tab != 0) && ($this->getUser()->checkAccess('textpage_listsite') == 0)))
         {
@@ -916,7 +916,7 @@ class TextPageController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         $errorsorder = array();
         if ($action == 'delete')
@@ -931,7 +931,7 @@ class TextPageController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -939,7 +939,7 @@ class TextPageController extends Controller
                     $textpageent = $this->getDoctrine()->getRepository('BasicCmsBundle:TextPages')->find($key);
                     if (!empty($textpageent))
                     {
-                        if ($textpageent->getAvatar() != '') @unlink('..'.$textpageent->getAvatar());
+                        if ($textpageent->getAvatar() != '') @unlink('.'.$textpageent->getAvatar());
                         $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $textpageent->getContent());
                         $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $textpageent->getDescription());
                         $em->remove($textpageent);
@@ -958,11 +958,11 @@ class TextPageController extends Controller
                         $query->execute();
                         $query = $em->createQuery('DELETE FROM BasicCmsBundle:SeoPage p WHERE p.contentType = \'object.textpage\' AND p.contentAction = \'view\' AND p.contentId = :id')->setParameter('id', $key);
                         $query->execute();
-                        if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'delete', 'object.textpage', $key, 'save');
+                        if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'delete', 'object.textpage', $key, 'save');
                         foreach ($cmsservices as $item) if (strpos($item,'addone.textpage.') === 0) 
                         {
                             $serv = $this->container->get($item);
-                            $serv->getAdminController($this->getRequest(), 'textPageDelete', $key, 'save');
+                            $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'textPageDelete', $key, 'save');
                         }       
                         unset($textpageent);    
                     }
@@ -979,7 +979,7 @@ class TextPageController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1004,7 +1004,7 @@ class TextPageController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1029,7 +1029,7 @@ class TextPageController extends Controller
                     'paths'=>array()
                 ));
             }
-            $ordering = $this->getRequest()->get('ordering');
+            $ordering = $this->get('request_stack')->getMasterRequest()->get('ordering');
             $error = false;
             $ids = array();
             foreach ($ordering as $key=>$val) $ids[] = $key;
@@ -1062,10 +1062,10 @@ class TextPageController extends Controller
         if ($tab == 0)
         {
             // Таб 1
-            $page0 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_page0');
-            $sort0 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_sort0');
-            $search0 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_search0');
-            $taxonomy0 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_taxonomy0');
+            $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_search0');
+            $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_taxonomy0');
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -1133,10 +1133,10 @@ class TextPageController extends Controller
         } else 
         {
             // Таб 2
-            $page1 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_page1');
-            $sort1 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_sort1');
-            $search1 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_search1');
-            $taxonomy1 = $this->getRequest()->getSession()->get('basic_cms_textpage_list_taxonomy1');
+            $page1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_page1');
+            $sort1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_sort1');
+            $search1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_search1');
+            $taxonomy1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_taxonomy1');
             $page1 = intval($page1);
             $sort1 = intval($sort1);
             $search1 = trim($search1);

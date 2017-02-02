@@ -69,10 +69,10 @@ class DefaultController extends Controller
         }
         $errors = array();
         $activetab = null;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
-            $posttitle = $this->getRequest()->get('title');
-            $postbody = $this->getRequest()->get('body');
+            $posttitle = $this->get('request_stack')->getMasterRequest()->get('title');
+            $postbody = $this->get('request_stack')->getMasterRequest()->get('body');
             foreach ($objectTypes as $objectTypesName=>$objectTypesDescription)
             {
                 $parameters[$objectTypesName]['title'] = array('default' => '');
@@ -190,9 +190,9 @@ class DefaultController extends Controller
         
         $facebook = $this->container->get('cms.cmsManager')->getConfigValue('alerts.facebookcfg');
         
-        if (($this->getRequest()->getMethod() == 'POST') && ($this->getRequest()->get('facebook') != null))
+        if (($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST') && ($this->get('request_stack')->getMasterRequest()->get('facebook') != null))
         {
-            $facebook = $this->getRequest()->get('facebook');
+            $facebook = $this->get('request_stack')->getMasterRequest()->get('facebook');
             if (!is_array($facebook)) 
             {
                 $facebook = array('appid' => '', 'secret' => '', 'token' => '', 'group' => '');
@@ -202,9 +202,9 @@ class DefaultController extends Controller
 
         $vkontakte = $this->container->get('cms.cmsManager')->getConfigValue('alerts.vkontaktecfg');
         
-        if (($this->getRequest()->getMethod() == 'POST') && ($this->getRequest()->get('vkontakte') != null))
+        if (($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST') && ($this->get('request_stack')->getMasterRequest()->get('vkontakte') != null))
         {
-            $vkontakte = $this->getRequest()->get('vkontakte');
+            $vkontakte = $this->get('request_stack')->getMasterRequest()->get('vkontakte');
             if (!is_array($vkontakte)) 
             {
                 $vkontakte = array('appid' => '', 'secret' => '', 'token' => '', 'group' => '');
@@ -234,10 +234,10 @@ class DefaultController extends Controller
             ));
         }
         
-        $module = intval($this->getRequest()->get('module'));
-        $description = trim($this->getRequest()->get('description'));
-        $title = trim($this->getRequest()->get('title'));
-        $message = trim($this->getRequest()->get('message'));
+        $module = intval($this->get('request_stack')->getMasterRequest()->get('module'));
+        $description = trim($this->get('request_stack')->getMasterRequest()->get('description'));
+        $title = trim($this->get('request_stack')->getMasterRequest()->get('title'));
+        $message = trim($this->get('request_stack')->getMasterRequest()->get('message'));
         
         $em = $this->getDoctrine()->getEntityManager();
         $query = $em->createQuery('SELECT m.name, m.id, m.parameters FROM BasicCmsBundle:Modules m WHERE m.objectName = \'object.module\' AND m.moduleType = \'menu\' AND m.id = :module')->setParameter('module', $module);
@@ -286,21 +286,21 @@ class DefaultController extends Controller
         }
         
         $filename = '/images/facebook_'.md5(time()).'.jpg';
-        /*$source = imagecreatefromjpeg('../img/logo.jpg');
+        /*$source = imagecreatefromjpeg('img/logo.jpg');
         imagecopyresampled($image, $source, 73 , 10, 0, 0, 217, 239, 217, 239);*/
-        imagejpeg($image, '..'.$filename, 95);
+        imagejpeg($image, '.'.$filename, 95);
         
         // сохранение имени файла
         $oldfilename = $this->container->get('cms.cmsManager')->getConfigValue('alerts.facebookimage');
         $oldfilename = explode('###', $oldfilename);
         
-        if (isset($oldfilename[0]) && ($oldfilename[0] != '') && (file_exists('..'.$oldfilename[0])))
+        if (isset($oldfilename[0]) && ($oldfilename[0] != '') && (file_exists('.'.$oldfilename[0])))
         {
-            @unlink('..'.$oldfilename[0]);
+            @unlink('.'.$oldfilename[0]);
         }
         $this->container->get('cms.cmsManager')->setConfigValue('alerts.facebookimage', $filename.'###'.$description. '###'.$title.'###'.$message);
         
-            $url = "http://".$this->getRequest()->getHttpHost().'/';
+            $url = "http://".$this->get('request_stack')->getMasterRequest()->getHttpHost().'/';
             $vars = array('id' => $url, 'scrape' => 'true');
             $body = http_build_query($vars);
             $fp = fsockopen('ssl://graph.facebook.com', 443);
@@ -330,10 +330,10 @@ class DefaultController extends Controller
             ));
         }
         
-        /*$module = intval($this->getRequest()->get('module'));
-        $description = trim($this->getRequest()->get('description'));
-        $title = trim($this->getRequest()->get('title'));
-        $message = trim($this->getRequest()->get('message'));
+        /*$module = intval($this->get('request_stack')->getMasterRequest()->get('module'));
+        $description = trim($this->get('request_stack')->getMasterRequest()->get('description'));
+        $title = trim($this->get('request_stack')->getMasterRequest()->get('title'));
+        $message = trim($this->get('request_stack')->getMasterRequest()->get('message'));
         
         $em = $this->getDoctrine()->getEntityManager();
         $query = $em->createQuery('SELECT m.name, m.id, m.parameters FROM BasicCmsBundle:Modules m WHERE m.objectName = \'object.module\' AND m.moduleType = \'menu\' AND m.id = :module')->setParameter('module', $module);
@@ -382,15 +382,15 @@ class DefaultController extends Controller
         }
         
         $filename = '/images/facebook_'.md5(time()).'.jpg';
-        imagejpeg($image, '..'.$filename, 95);
+        imagejpeg($image, '.'.$filename, 95);
         
         // сохранение имени файла
         $oldfilename = $this->container->get('cms.cmsManager')->getConfigValue('alerts.facebookimage');
         $oldfilename = explode('###', $oldfilename);
         
-        if (isset($oldfilename[0]) && ($oldfilename[0] != '') && (file_exists('..'.$oldfilename[0])))
+        if (isset($oldfilename[0]) && ($oldfilename[0] != '') && (file_exists('.'.$oldfilename[0])))
         {
-            @unlink('..'.$oldfilename[0]);
+            @unlink('.'.$oldfilename[0]);
         }
         $this->container->get('cms.cmsManager')->setConfigValue('alerts.facebookimage', $filename.'###'.$description. '###'.$title.'###'.$message);
         */
@@ -411,7 +411,7 @@ class DefaultController extends Controller
         }
         if (isset($facebookcfg['appid']) && isset($facebookcfg['secret']) && isset($facebookcfg['token']) && isset($facebookcfg['group']) && ($facebookcfg['appid'] != '') && ($facebookcfg['secret'] != '') && ($facebookcfg['token'] != '') && ($facebookcfg['group'] != ''))
         {
-            $url = "http://".$this->getRequest()->getHttpHost().'/';
+            $url = "http://".$this->get('request_stack')->getMasterRequest()->getHttpHost().'/';
 
             $facebook = new Facebook(array(
                 'app_id'  => $facebookcfg['appid'],
@@ -451,7 +451,7 @@ class DefaultController extends Controller
         }
         if (isset($vkcfg['appid']) && isset($vkcfg['secret']) && isset($vkcfg['token']) && isset($vkcfg['group']) && ($vkcfg['appid'] != '') && ($vkcfg['secret'] != '') && ($vkcfg['token'] != '') && ($vkcfg['group'] != ''))
         {
-            $url = "http://".$this->getRequest()->getHttpHost().'/';
+            $url = "http://".$this->get('request_stack')->getMasterRequest()->getHttpHost().'/';
             $vkurl = "https://api.vk.com/method/wall.post?access_token={$vkcfg['token']}";
             $data = array(
                 'owner_id' => 0 - intval($vkcfg['group']),
@@ -564,7 +564,7 @@ class DefaultController extends Controller
                 'paths'=>array()
             ));
         }
-        $code = $this->getRequest()->get('code');
+        $code = $this->get('request_stack')->getMasterRequest()->get('code');
         $mUrl = $this->generateUrl('extended_alert_social_vkontaktegettoken', array(), true);
         if ($code) {
             $sUrl = "https://api.vk.com/oauth/access_token?client_id={$vkcfg['appid']}&client_secret={$vkcfg['secret']}&code=$code&redirect_uri=$mUrl";
@@ -592,9 +592,9 @@ class DefaultController extends Controller
             ));
         }
         
-        $subject = $this->getRequest()->get('subject');
-        $from = $this->getRequest()->get('from');
-        $message = $this->getRequest()->get('message');
+        $subject = $this->get('request_stack')->getMasterRequest()->get('subject');
+        $from = $this->get('request_stack')->getMasterRequest()->get('from');
+        $message = $this->get('request_stack')->getMasterRequest()->get('message');
         $result = false;
         if (($subject != null) && ($from != null) && ($message != null)) {
             // Отправка сообщения
@@ -621,7 +621,7 @@ class DefaultController extends Controller
             $result = true;
         }
         if ($from == '') {
-            $from = 'admin@'.$this->getRequest()->getHttpHost();
+            $from = 'admin@'.$this->get('request_stack')->getMasterRequest()->getHttpHost();
         }
         
         return $this->render('ExtendedAlertBundle:Default:subscribe.html.twig', array(

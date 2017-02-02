@@ -25,7 +25,7 @@ class DefaultController extends Controller
              $removeids = array();
              foreach ($files as $file)
              {
-                 @unlink('..'.$file['attachment']);
+                 @unlink('.'.$file['attachment']);
                  $removeids[] = $file['id'];
              }
              if (count($removeids) > 0)
@@ -36,10 +36,10 @@ class DefaultController extends Controller
          }
          unset($files);
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('attachment');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('attachment');
         $tmpfile = $file->getPathName();
         $source = "";
-        $basepath = '../secured/productattachment/';
+        $basepath = 'secured/productattachment/';
         $name = $this->getUser()->getId().'_'.md5(time()).'.dat';
         if (!move_uploaded_file($tmpfile, $basepath . $name)) return new Response(json_encode(array('fileid' => '', 'filename' => '', 'error' => 'Ошибка добавления файла')));
         $attachent = new \Shop\AttachmentBundle\Entity\ProductAttachment();
@@ -61,10 +61,10 @@ class DefaultController extends Controller
     public function attachmentAjaxRemoveAction() 
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $attachent = $this->getDoctrine()->getRepository('ShopAttachmentBundle:ProductAttachment')->find($id);
         if (empty($attachent)) return new Response('Ошибка удаления');
-        @unlink('..'.$attachent->getAttachment());
+        @unlink('.'.$attachent->getAttachment());
         $em->remove($attachent);
         $em->flush();
         return new Response('');
@@ -77,20 +77,20 @@ class DefaultController extends Controller
     public function attachmentDownloadAction() 
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $attachent = $this->getDoctrine()->getRepository('ShopAttachmentBundle:ProductAttachment')->find($id);
         if (empty($attachent)) return new Response('Page not found', 404);
-        if (!file_exists('..'.$attachent->getAttachment())) return new Response('');
+        if (!file_exists('.'.$attachent->getAttachment())) return new Response('');
         $resp = new Response();
         $resp->headers->set('Content-Type','application/octet-stream');
-        $resp->headers->set('Last-Modified',gmdate('r', filemtime('..'.$attachent->getAttachment())));
-        $resp->headers->set('Content-Length',filesize('..'.$attachent->getAttachment()));
+        $resp->headers->set('Last-Modified',gmdate('r', filemtime('.'.$attachent->getAttachment())));
+        $resp->headers->set('Content-Length',filesize('.'.$attachent->getAttachment()));
         $resp->headers->set('Connection','close');
         if (strpos($_SERVER['HTTP_USER_AGENT'],"MSIE" ) > 0 )
             $resp->headers->set('Content-Disposition','attachment; filename="' . rawurlencode(basename($attachent->getFileName()))  . '";' );
         else
             $resp->headers->set('Content-Disposition','attachment; filename*=UTF-8\'\'' . rawurlencode(basename($attachent->getFileName())) .';');
-        $resp->setContent(file_get_contents('..'.$attachent->getAttachment()));
+        $resp->setContent(file_get_contents('.'.$attachent->getAttachment()));
         return $resp;
     }
     

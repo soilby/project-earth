@@ -24,9 +24,9 @@ class DefaultController extends Controller
         $em = $this->getDoctrine()->getEntityManager();
         $tab = 0;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('template_mirclub_index_page0');
-                        else $this->getRequest()->getSession()->set('template_mirclub_index_page0', $page0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('template_mirclub_index_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('template_mirclub_index_page0', $page0);
         $page0 = intval($page0);
         // Поиск контента для 1 таба (текстовые страницы)
         $query = $em->createQuery('SELECT count(i.id) as imgcount FROM TemplateMirclubBundle:TemplateMirclubImage i');
@@ -62,7 +62,7 @@ class DefaultController extends Controller
             return new Response('Доступ запрещен');
         }
         $userId = $this->getUser()->getId();
-        $files = $this->getRequest()->files->get('image');
+        $files = $this->get('request_stack')->getMasterRequest()->files->get('image');
         $answer = array();
         foreach ($files as $file)
         {
@@ -78,11 +78,11 @@ class DefaultController extends Controller
                 $imageTypeArray = array(0=>'', 1=>'gif', 2=>'jpg', 3=>'png', 4=>'', 5=>'', 6=>'', 7=>'', 8=>'', 9=>'jpg', 10=>'jpg', 11=>'jpg', 12=>'jpg', 13=>'', 14=>'', 15=>'', 16=>'', 17=>'', 18=>'');
                 if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) $answeritem = array('title' => '', 'file' => '', 'error' => 'Формат файла не поддерживается');
                 $basepath = '/images/templatemirclub/';
-                if (!is_dir('..'.$basepath)) mkdir('..'.$basepath);
+                if (!is_dir('.'.$basepath)) mkdir('.'.$basepath);
                 $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
                 if ($answeritem == null)
                 {
-                    if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                    if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                     {
                         $image = new \Template\MirclubBundle\Entity\TemplateMirclubImage();
                         $image->setTitle($file->getClientOriginalName());
@@ -114,7 +114,7 @@ class DefaultController extends Controller
             }
         }
         $userId = $this->getUser()->getId();
-        $files = $this->getRequest()->get('image');
+        $files = $this->get('request_stack')->getMasterRequest()->get('image');
         
         preg_match_all('/http:\/\/\S+/ui', $files, $matches);
         if (isset($matches[0])) $files = $matches[0]; else $files = array();
@@ -137,11 +137,11 @@ class DefaultController extends Controller
                 $imageTypeArray = array(0=>'', 1=>'gif', 2=>'jpg', 3=>'png', 4=>'', 5=>'', 6=>'', 7=>'', 8=>'', 9=>'jpg', 10=>'jpg', 11=>'jpg', 12=>'jpg', 13=>'', 14=>'', 15=>'', 16=>'', 17=>'', 18=>'');
                 if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) $answeritem = array('title' => '', 'file' => '', 'error' => 'Формат файла не поддерживается');
                 $basepath = '/images/templatemirclub/';
-                if (!is_dir('..'.$basepath)) mkdir('..'.$basepath);
+                if (!is_dir('.'.$basepath)) mkdir('.'.$basepath);
                 $name = $this->getUser()->getId().'_'.md5($file.time()).'.'.$imageTypeArray[$params[2]];
                 if ($answeritem == null)
                 {
-                    if (file_put_contents('..'.$basepath.$name, $photobuffer)) 
+                    if (file_put_contents('.'.$basepath.$name, $photobuffer)) 
                     {
                         $image = new \Template\MirclubBundle\Entity\TemplateMirclubImage();
                         $image->setTitle(basename($file));
@@ -165,14 +165,14 @@ class DefaultController extends Controller
             return new Response('Доступ запрещен');
         }
         
-        $id = $this->getRequest()->get('id');
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
         
         $imageent = $this->getDoctrine()->getRepository('TemplateMirclubBundle:TemplateMirclubImage')->find($id);
         if (empty($imageent)) return new Response('Изображение не найдено');
         
         $em = $this->getDoctrine()->getEntityManager();
         
-        @unlink('..'.$imageent->getImage());
+        @unlink('.'.$imageent->getImage());
         $em->remove($imageent);
         $em->flush();
         $em->createQuery('DELETE FROM TemplateMirclubBundle:TemplateMirclubLink l WHERE l.imageId = :id')->setParameter('id', $id)->execute();
@@ -187,7 +187,7 @@ class DefaultController extends Controller
             return new Response('Доступ запрещен');
         }
         
-        $state = ($this->getRequest()->get('state') == 'true' ? 1 : 0);
+        $state = ($this->get('request_stack')->getMasterRequest()->get('state') == 'true' ? 1 : 0);
 
         $this->get('cms.cmsManager')->setConfigValue('template.mirclub.random', $state);
         
@@ -199,7 +199,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function imageEditAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $imageent = $this->getDoctrine()->getRepository('TemplateMirclubBundle:TemplateMirclubImage')->find($id);
         if (empty($imageent))
         {
@@ -241,20 +241,20 @@ class DefaultController extends Controller
         // Валидация
         $activetab = 0;
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postimage = $this->getRequest()->get('image');
+            $postimage = $this->get('request_stack')->getMasterRequest()->get('image');
             if (isset($postimage['title'])) $image['title'] = $postimage['title'];
             unset($postimage);
             if (!preg_match("/^.{3,}$/ui", $image['title'])) {$errors = true; $imageerror['title'] = 'Заголовок должен содержать более 3 символов';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка параметров
-            $parameters = $this->getRequest()->get('parameters');
+            $parameters = $this->get('request_stack')->getMasterRequest()->get('parameters');
             if (!is_array($parameters)) $parameters = array();
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация страниц
-            $postpages = $this->getRequest()->get('pages');
+            $postpages = $this->get('request_stack')->getMasterRequest()->get('pages');
             $pages = array();
             if (is_array($postpages))
             {

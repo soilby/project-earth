@@ -27,7 +27,7 @@ class ExportManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Экспорт продукции', $this->container->get('router')->generate('extended_shop_export'), 201, $this->container->get('security.context')->getToken()->getUser()->checkAccess('product_export'), 'Магазин');
+        $manager->addAdminMenu('Экспорт продукции', $this->container->get('router')->generate('extended_shop_export'), 201, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('product_export'), 'Магазин');
     }
     
     public function registerRoles()

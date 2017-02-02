@@ -27,9 +27,9 @@ class FormManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Формы', $this->container->get('router')->generate('form_form_list'), 5, $this->container->get('security.context')->getToken()->getUser()->checkAccess('form_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('form_letterlist'));
-        $manager->addAdminMenu('Создать форму', $this->container->get('router')->generate('form_form_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('form_new'), 'Формы');
-        $manager->addAdminMenu('Список форм', $this->container->get('router')->generate('form_form_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('form_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('form_letterlist'), 'Формы');
+        $manager->addAdminMenu('Формы', $this->container->get('router')->generate('form_form_list'), 5, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('form_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('form_letterlist'));
+        $manager->addAdminMenu('Создать форму', $this->container->get('router')->generate('form_form_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('form_new'), 'Формы');
+        $manager->addAdminMenu('Список форм', $this->container->get('router')->generate('form_form_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('form_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('form_letterlist'), 'Формы');
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.form.') === 0) $this->container->get($item)->registerMenu();
 

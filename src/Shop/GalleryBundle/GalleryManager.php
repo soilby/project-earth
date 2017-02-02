@@ -27,7 +27,7 @@ class GalleryManager
     {
         //$manager = $this->container->get('cms.cmsManager');
         
-        //$manager->addAdminMenu('Профиль пользователя', $this->container->get('router')->generate('addone_profile_parameter_list'), 1, $this->container->get('security.context')->getToken()->getUser()->checkAccess('user_profile'), 'Администрирование');
+        //$manager->addAdminMenu('Профиль пользователя', $this->container->get('router')->generate('addone_profile_parameter_list'), 1, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('user_profile'), 'Администрирование');
     }
     
     public function registerRoles()
@@ -104,7 +104,7 @@ class GalleryManager
                 if (($actionType == 'save') && ($errors == false))
                 {
                     $newimages = array(); foreach ($images as $image) $newimages[] = $image['url'];
-                    foreach ($oldimages as $image) if (!in_array($image, $newimages)) @unlink('..'.$image);
+                    foreach ($oldimages as $image) if (!in_array($image, $newimages)) @unlink('.'.$image);
                     $query = $em->createQuery('DELETE FROM ShopGalleryBundle:ProductImage i WHERE i.productId = :id')->setParameter('id', $actionId);
                     $query->execute();
                     foreach ($images as $index => $item)
@@ -136,7 +136,7 @@ class GalleryManager
                 $delpages = $query->getResult();
                 if (is_array($delpages))
                 {
-                    foreach ($delpages as $delpage) @unlink('..'.$delpage['image']);
+                    foreach ($delpages as $delpage) @unlink('.'.$delpage['image']);
                 }
                 $query = $em->createQuery('DELETE FROM ShopGalleryBundle:ProductImage i WHERE i.productId = :id')->setParameter('id', $actionId);
                 $query->execute();

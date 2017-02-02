@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ProjectBlogLink
  *
- * @ORM\Table()
+ * @ORM\Table(name="ProjectBlogLink")
  * @ORM\Entity
  */
 class ProjectBlogLink

@@ -23,7 +23,7 @@ class SitemapCommand extends ContainerAwareCommand {
         $query = $em->createQuery('SELECT l.shortName FROM BasicCmsBundle:Locales l');
         $locales = $query->getResult();
         if (!is_array($locales)) $locales = array();
-        $file = @fopen('../sitemap.tmp', "w"); 
+        $file = @fopen('sitemap.tmp', "w"); 
         fwrite($file,
             '<?xml version="1.0" encoding="UTF-8"?>'."\r\n".
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\r\n");
@@ -92,10 +92,10 @@ class SitemapCommand extends ContainerAwareCommand {
         fwrite($file, '</urlset>'."\r\n");
         fclose($file);
         // переместить файл в sitemap.xml
-        @unlink('../sitemap.xml');
-        rename('../sitemap.tmp', '../sitemap.xml');
+        @unlink('sitemap.xml');
+        rename('sitemap.tmp', 'sitemap.xml');
         // записать robots.txt
-        $filer = @fopen('../robots.txt', "w"); 
+        $filer = @fopen('robots.txt', "w"); 
         fwrite($filer,
                 'User-agent: *'."\r\n".
                 'Disallow: /admin/'."\r\n".

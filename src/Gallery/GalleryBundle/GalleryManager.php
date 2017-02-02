@@ -27,12 +27,12 @@ class GalleryManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Галерея', $this->container->get('router')->generate('gallery_gallery_images_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('image_list'));
-        $manager->addAdminMenu('Создать новое изображение', $this->container->get('router')->generate('gallery_gallery_images_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('image_new'), 'Галерея');
-        $manager->addAdminMenu('Список изображений', $this->container->get('router')->generate('gallery_gallery_images_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('image_list'), 'Галерея');
+        $manager->addAdminMenu('Галерея', $this->container->get('router')->generate('gallery_gallery_images_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('image_list'));
+        $manager->addAdminMenu('Создать новое изображение', $this->container->get('router')->generate('gallery_gallery_images_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('image_new'), 'Галерея');
+        $manager->addAdminMenu('Список изображений', $this->container->get('router')->generate('gallery_gallery_images_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('image_list'), 'Галерея');
         if ($this->container->has('object.taxonomy'))
         {
-            $manager->addAdminMenu('Категории', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.image', 9999, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Галерея');
+            $manager->addAdminMenu('Категории', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.image', 9999, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Галерея');
         }
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.image.') === 0) $this->container->get($item)->registerMenu();

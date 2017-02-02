@@ -27,7 +27,7 @@ class ParameterManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Параметры продукции', $this->container->get('router')->generate('shop_parameter_list'), 80, $this->container->get('security.context')->getToken()->getUser()->checkAccess('product_parameter'), 'Магазин');
+        $manager->addAdminMenu('Параметры продукции', $this->container->get('router')->generate('shop_parameter_list'), 80, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('product_parameter'), 'Магазин');
     }
     
     public function registerRoles()

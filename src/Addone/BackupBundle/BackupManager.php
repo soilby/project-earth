@@ -26,7 +26,7 @@ class BackupManager
     public function registerMenu()
     {
         $manager = $this->container->get('cms.cmsManager');
-        $manager->addAdminMenu('Резервные копии', $this->container->get('router')->generate('addone_backup_homepage'), 70, $this->container->get('security.context')->getToken()->getUser()->checkAccess('backup_create'), 'Администрирование');
+        $manager->addAdminMenu('Резервные копии', $this->container->get('router')->generate('addone_backup_homepage'), 70, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('backup_create'), 'Администрирование');
     }
     
     public function registerRoles()

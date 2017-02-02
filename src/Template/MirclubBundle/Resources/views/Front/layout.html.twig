@@ -188,7 +188,7 @@
 	<footer>
 		<p>Разработка и создание сайта <a href="http://indebora.mir-club.by/">Indebora WEB</a> &copy; 2014</p>
 	</footer>
-        {% render "TemplateMirclubBundle:Default:front" with {'seoPage': currentSeoPage}  %}
+        {{ render(controller("TemplateMirclubBundle:Default:front", {'seoPage': currentSeoPage})) }}
 </body>
 </html>
 #}

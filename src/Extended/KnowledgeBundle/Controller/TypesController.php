@@ -50,9 +50,9 @@ class TypesController extends Controller
         $activetab = 0;
         $tabs = array();
         $errors = false;
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
-            $categoriespost = $this->getRequest()->get('categories');
+            $categoriespost = $this->get('request_stack')->getMasterRequest()->get('categories');
             if (is_array($categoriespost))
             {
                 $categories = array();
@@ -76,7 +76,7 @@ class TypesController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', null, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', null, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                 $i++;
@@ -113,7 +113,7 @@ class TypesController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', null, 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', null, 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -131,7 +131,7 @@ class TypesController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', null, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', null, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -145,7 +145,7 @@ class TypesController extends Controller
     public function ajaxDeleteAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $taxent = $this->getDoctrine()->getRepository('ExtendedKnowledgeBundle:KnowledgeType')->find($id);
         if (empty($taxent)) return new Response(json_encode(array('result'=>'error','message'=>'Категория не найдена')));
         if ($this->getUser()->checkAccess('knowledge_typelist') == 0) return new Response(json_encode(array('result'=>'error','message'=>'Доступ запрещён')));
@@ -177,7 +177,7 @@ class TypesController extends Controller
         {
             foreach ($deltaxes as $deltax)
             {
-                if ($deltax['avatar'] != '') @unlink('..'.$deltax['avatar']);
+                if ($deltax['avatar'] != '') @unlink('.'.$deltax['avatar']);
                 if ($deltax['description'] != '') $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $deltax['description']);
             }
         }
@@ -187,7 +187,7 @@ class TypesController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
         {
             $serv = $this->container->get($item);
-            $serv->getAdminController($this->getRequest(), 'tobjectTypeEditDelete', $id, 'save');
+            $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'tobjectTypeEditDelete', $id, 'save');
         }       
         return new Response(json_encode(array('result'=>'OK','message'=>'')));
     }
@@ -195,7 +195,7 @@ class TypesController extends Controller
     public function ajaxAddAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $name = $this->getRequest()->get('name');
+        $name = $this->get('request_stack')->getMasterRequest()->get('name');
         if ($this->getUser()->checkAccess('knowledge_typelist') == 0) return new Response(json_encode(array('result'=>'error','message'=>'Доступ запрещён')));
         if (!preg_match("/^.{3,}$/ui", $name)) return new Response(json_encode(array('result'=>'error','message'=>'Заголовок должен содержать более 3 символов')));
         $query = $em->createQuery('SELECT MAX(t.ordering) as maxordering FROM ExtendedKnowledgeBundle:KnowledgeType t');
@@ -279,9 +279,9 @@ class TypesController extends Controller
                                   'ORDER BY t.ordering');
         $tree = $query->getResult();
         $errors = false;
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
-            $categoriespost = $this->getRequest()->get('categories');
+            $categoriespost = $this->get('request_stack')->getMasterRequest()->get('categories');
             if (is_array($categoriespost))
             {
                 $categories = array();
@@ -304,7 +304,7 @@ class TypesController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', null, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', null, 'validate');
                 if ($localerror == true) $errors = true;
                 $i++;
             }     
@@ -337,7 +337,7 @@ class TypesController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', null, 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', null, 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -356,7 +356,7 @@ class TypesController extends Controller
     public function editAjaxAvatarAction() 
     {
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -369,7 +369,7 @@ class TypesController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/knowledge/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -385,7 +385,7 @@ class TypesController extends Controller
     public function editAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $taxonomyent = $this->getDoctrine()->getRepository('ExtendedKnowledgeBundle:KnowledgeType')->find($id);
         if (empty($taxonomyent))
         {
@@ -510,11 +510,11 @@ class TypesController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
-            $changeCategoryChilds = intval($this->getRequest()->get('changecategorychilds'));
+            $changeCategoryChilds = intval($this->get('request_stack')->getMasterRequest()->get('changecategorychilds'));
             // Проверка основных данных
-            $posttax = $this->getRequest()->get('tax');
+            $posttax = $this->get('request_stack')->getMasterRequest()->get('tax');
             if (isset($posttax['title'])) $tax['title'] = $posttax['title'];
             if (isset($posttax['description'])) $tax['description'] = $posttax['description'];
             if (isset($posttax['avatar'])) $tax['avatar'] = $posttax['avatar'];
@@ -523,12 +523,12 @@ class TypesController extends Controller
             if (isset($posttax['metakey'])) $tax['metakey'] = $posttax['metakey'];
             unset($posttax);
             if (!preg_match("/^.{3,}$/ui", $tax['title'])) {$errors = true; $taxerror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($tax['avatar'] != '') && (!file_exists('..'.$tax['avatar']))) {$errors = true; $taxerror['avatar'] = 'Файл не найден';}
+            if (($tax['avatar'] != '') && (!file_exists('.'.$tax['avatar']))) {$errors = true; $taxerror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $tax['metadescr'])) {$errors = true; $taxerror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $tax['metakey'])) {$errors = true; $taxerror['metakey'] = 'Использованы недопустимые символы';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['childsUrl'])) $page['childsUrl'] = trim($postpage['childsUrl']);
@@ -571,7 +571,7 @@ class TypesController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $posttaxloc = $this->getRequest()->get('taxloc');
+            $posttaxloc = $this->get('request_stack')->getMasterRequest()->get('taxloc');
             foreach ($locales as $locale)
             {
                 if (isset($posttaxloc[$locale['shortName']]['title'])) $taxloc[$locale['shortName']]['title'] = $posttaxloc[$locale['shortName']]['title'];
@@ -590,7 +590,7 @@ class TypesController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -598,7 +598,7 @@ class TypesController extends Controller
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                if (($taxonomyent->getAvatar() != '') && ($taxonomyent->getAvatar() != $tax['avatar'])) @unlink('..'.$taxonomyent->getAvatar());
+                if (($taxonomyent->getAvatar() != '') && ($taxonomyent->getAvatar() != $tax['avatar'])) @unlink('.'.$taxonomyent->getAvatar());
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($tax['avatar']);
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($tax['description'], $taxonomyent->getDescription());
                 $taxonomyent->setTitle($tax['title']);
@@ -675,7 +675,7 @@ class TypesController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', $taxonomyent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', $taxonomyent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -739,7 +739,7 @@ class TypesController extends Controller
                             foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
                             {
                                 $serv = $this->container->get($item);
-                                $localerror = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', $taxonomychildent->getId(), 'saveChilds');
+                                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', $taxonomychildent->getId(), 'saveChilds');
                                 if ($localerror == true) $errors = true;
                                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                                 $i++;
@@ -766,7 +766,7 @@ class TypesController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'objectTypeEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'objectTypeEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;

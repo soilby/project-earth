@@ -31,7 +31,9 @@
         "jms/aop-bundle": "^1.2",
         "jms/di-extra-bundle": "^1.8",
         "jms/security-extra-bundle": "^1.6",
-        "liuggio/ExcelBundle": "^2.1"
+        "liuggio/ExcelBundle": "^2.1",
+        "facebook/graph-sdk": "^5.4",
+        "sabre/dav": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

@@ -293,10 +293,10 @@ class KnowledgeManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Реестр объектов', $this->container->get('router')->generate('extended_knowledge_list'), 1, $this->container->get('security.context')->getToken()->getUser()->checkAccess('knowledge_list'));
-        $manager->addAdminMenu('Браузер объектов', $this->container->get('router')->generate('extended_knowledge_list'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('knowledge_list'), 'Реестр объектов');
-        /*$manager->addAdminMenu('Создать представление', $this->container->get('router')->generate('basic_cms_taxonomyshow_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_newshow'), 'Реестр объектов');*/
-        $manager->addAdminMenu('Дерево объектов', $this->container->get('router')->generate('extended_knowledge_typelist'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('knowledge_typelist'), 'Реестр объектов');
+        $manager->addAdminMenu('Реестр объектов', $this->container->get('router')->generate('extended_knowledge_list'), 1, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('knowledge_list'));
+        $manager->addAdminMenu('Браузер объектов', $this->container->get('router')->generate('extended_knowledge_list'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('knowledge_list'), 'Реестр объектов');
+        /*$manager->addAdminMenu('Создать представление', $this->container->get('router')->generate('basic_cms_taxonomyshow_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_newshow'), 'Реестр объектов');*/
+        $manager->addAdminMenu('Дерево объектов', $this->container->get('router')->generate('extended_knowledge_typelist'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('knowledge_typelist'), 'Реестр объектов');
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->registerMenu();
     }

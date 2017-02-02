@@ -27,7 +27,7 @@ class ImportManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Импорт продукции', $this->container->get('router')->generate('extended_shop_import'), 200, $this->container->get('security.context')->getToken()->getUser()->checkAccess('product_import'), 'Магазин');
+        $manager->addAdminMenu('Импорт продукции', $this->container->get('router')->generate('extended_shop_import'), 200, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('product_import'), 'Магазин');
     }
     
     public function registerRoles()

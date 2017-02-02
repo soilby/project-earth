@@ -14,8 +14,8 @@ class File extends Node implements DAV\IFile {
         }
         do {
             $contentFile = md5(time().rand());
-        } while (file_exists('../'.Node::FOLDER.$contentFile));
-        file_put_contents('../'.Node::FOLDER.$contentFile, $data);
+        } while (file_exists(''.Node::FOLDER.$contentFile));
+        file_put_contents(''.Node::FOLDER.$contentFile, $data);
         
         $newVersion = new \Extended\ProjectBundle\Entity\ProjectFileVersion();
         $newVersion
@@ -36,7 +36,7 @@ class File extends Node implements DAV\IFile {
         if (empty($version)) {
             throw new DAV\Exception\NotFound('Not found');
         }
-        return fopen('../'.Node::FOLDER.$version->getContentFile(), 'r');
+        return fopen(''.Node::FOLDER.$version->getContentFile(), 'r');
     }
 
     public function delete() 
@@ -50,7 +50,7 @@ class File extends Node implements DAV\IFile {
         if (empty($version)) {
             return 0;
         }
-        return filesize('../'.Node::FOLDER.$version->getContentFile());
+        return filesize(''.Node::FOLDER.$version->getContentFile());
     }
 
     public function getETag() 

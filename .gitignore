@@ -14,6 +14,9 @@
 !var/SymfonyRequirements.php
 /vendor/
 /web/bundles/
-/helper/*
-!/helper/imageresize.php
+/web/helper/*
+!/web/helper/imageresize.php
 /.idea
+/nbproject/
+/web/secured/*
+/web/images/*

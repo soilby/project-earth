@@ -27,14 +27,14 @@ class ProductManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Магазин', $this->container->get('router')->generate('shop_product_list'), 1, $this->container->get('security.context')->getToken()->getUser()->checkAccess('product_list'));
-        $manager->addAdminMenu('Создать продукцию', $this->container->get('router')->generate('shop_product_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('product_new'), 'Магазин');
-        $manager->addAdminMenu('Список продукции', $this->container->get('router')->generate('shop_product_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('product_list'), 'Магазин');
-        $manager->addAdminMenu('Настройки валюты', $this->container->get('router')->generate('shop_product_currency_list'), 20, $this->container->get('security.context')->getToken()->getUser()->checkAccess('product_currencyview'), 'Магазин');
-        $manager->addAdminMenu('Страницы сравнения', $this->container->get('router')->generate('shop_product_compare_list'), 30, $this->container->get('security.context')->getToken()->getUser()->checkAccess('product_compareview'), 'Магазин');
+        $manager->addAdminMenu('Магазин', $this->container->get('router')->generate('shop_product_list'), 1, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('product_list'));
+        $manager->addAdminMenu('Создать продукцию', $this->container->get('router')->generate('shop_product_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('product_new'), 'Магазин');
+        $manager->addAdminMenu('Список продукции', $this->container->get('router')->generate('shop_product_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('product_list'), 'Магазин');
+        $manager->addAdminMenu('Настройки валюты', $this->container->get('router')->generate('shop_product_currency_list'), 20, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('product_currencyview'), 'Магазин');
+        $manager->addAdminMenu('Страницы сравнения', $this->container->get('router')->generate('shop_product_compare_list'), 30, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('product_compareview'), 'Магазин');
         if ($this->container->has('object.taxonomy'))
         {
-            $manager->addAdminMenu('Категории продукции', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.product', 9999, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Магазин');
+            $manager->addAdminMenu('Категории продукции', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.product', 9999, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Магазин');
         }
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) $this->container->get($item)->registerMenu();

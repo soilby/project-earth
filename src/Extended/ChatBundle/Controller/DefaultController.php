@@ -12,17 +12,17 @@ class DefaultController extends Controller
     
     public function downloadAttachmentAction() 
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $fileent = $this->getDoctrine()->getRepository('ExtendedChatBundle:ChatMessage')->find($id);
         if (empty($fileent)) return new Response('File not found', 404);
         // Проверить доступ к файлу
-        $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+        $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
         $userEntity = null;
         if ($userid != null) $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
         if (empty($userEntity))
         {
-            $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-            $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+            $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+            $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
             $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
             $userEntity = $query->getResult();
             if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) $userEntity = $userEntity[0];
@@ -32,7 +32,7 @@ class DefaultController extends Controller
         $linkEnt = $this->getDoctrine()->getRepository('ExtendedChatBundle:ChatUser')->findOneBy(array('userId' => $userEntity->getId(), 'chatId' => $fileent->getChatId(), 'chatType' => $fileent->getChatType()));
         if (empty($linkEnt)) return new Response('Access denied', 403);
         // Выдать файл
-        $filePath = '..'.$fileent->getAttachment();
+        $filePath = '.'.$fileent->getAttachment();
         $newFileName = $fileent->getAttachmentFilename();
         if (is_file($filePath)) 
         {

@@ -258,10 +258,10 @@ class FrontController extends Controller
             if (empty($lastVersions)) {
                 return new Response('Not found');
             }
-            $content = file_get_contents('../'.Node::FOLDER.$lastVersions[0]->getContentFile());
+            $content = file_get_contents(''.Node::FOLDER.$lastVersions[0]->getContentFile());
             $diffContent = null;
             if (isset($lastVersions[1])) {
-                $diffContent = $this->diff(file_get_contents('../'.Node::FOLDER.$lastVersions[1]->getContentFile()), $content);
+                $diffContent = $this->diff(file_get_contents(''.Node::FOLDER.$lastVersions[1]->getContentFile()), $content);
             }
             
             
@@ -338,10 +338,10 @@ class FrontController extends Controller
             if (empty($lastVersions)) {
                 return new Response('Not found');
             }
-            $content = file_get_contents('../'.Node::FOLDER.$lastVersions[0]->getContentFile());
+            $content = file_get_contents(''.Node::FOLDER.$lastVersions[0]->getContentFile());
             $diffContent = null;
             if (isset($lastVersions[1])) {
-                $diffContent = $this->diff(file_get_contents('../'.Node::FOLDER.$lastVersions[1]->getContentFile()), $content);
+                $diffContent = $this->diff(file_get_contents(''.Node::FOLDER.$lastVersions[1]->getContentFile()), $content);
             }
             
             
@@ -401,14 +401,14 @@ class FrontController extends Controller
                 'locale' => 'ru',
             ))->setMaxResults(1)->getOneOrNullResult();
             if (!empty($htmlLastVersionRu)) {
-                $htmlContentRu = file_get_contents('../'.Node::FOLDER.$htmlLastVersionRu->getContentFile());
+                $htmlContentRu = file_get_contents(''.Node::FOLDER.$htmlLastVersionRu->getContentFile());
             }
             $htmlLastVersionEn = $em->createQuery('SELECT v FROM ExtendedProjectBundle:ProjectFileVersion v WHERE v.fileId = :fileid AND v.locale = :locale ORDER BY v.id DESC')->setParameters(array(
                 'fileid' => $file->getId(),
                 'locale' => 'en',
             ))->setMaxResults(1)->getOneOrNullResult();
             if (!empty($htmlLastVersionEn)) {
-                $htmlContentEn = file_get_contents('../'.Node::FOLDER.$htmlLastVersionEn->getContentFile());
+                $htmlContentEn = file_get_contents(''.Node::FOLDER.$htmlLastVersionEn->getContentFile());
             }
         }
         
@@ -434,8 +434,8 @@ class FrontController extends Controller
                 if ($htmlContentEn != $postContentEn) {
                     do {
                         $fileUploadFileName = md5(time().rand());
-                    } while (file_exists('../'.Node::FOLDER.$fileUploadFileName));
-                    file_put_contents('../'.Node::FOLDER.$fileUploadFileName, $postContentEn);
+                    } while (file_exists(''.Node::FOLDER.$fileUploadFileName));
+                    file_put_contents(''.Node::FOLDER.$fileUploadFileName, $postContentEn);
                     $htmlLastVersionEn = new \Extended\ProjectBundle\Entity\ProjectFileVersion();
                     $htmlLastVersionEn
                             ->setContentFile($fileUploadFileName)
@@ -449,8 +449,8 @@ class FrontController extends Controller
                 if ($htmlContentRu != $postContentRu) {
                     do {
                         $fileUploadFileName = md5(time().rand());
-                    } while (file_exists('../'.Node::FOLDER.$fileUploadFileName));
-                    file_put_contents('../'.Node::FOLDER.$fileUploadFileName, $postContentRu);
+                    } while (file_exists(''.Node::FOLDER.$fileUploadFileName));
+                    file_put_contents(''.Node::FOLDER.$fileUploadFileName, $postContentRu);
                     $htmlLastVersionRu = new \Extended\ProjectBundle\Entity\ProjectFileVersion();
                     $htmlLastVersionRu
                             ->setContentFile($fileUploadFileName)
@@ -502,13 +502,13 @@ class FrontController extends Controller
     
     private function getCurrentUser()
     {
-        $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+        $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
         $userEntity = null;
         if ($userid != null) $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
         if (empty($userEntity))
         {
-            $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-            $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+            $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+            $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
             $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
             $userEntity = $query->getResult();
             if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) $userEntity = $userEntity[0];
@@ -594,8 +594,8 @@ class FrontController extends Controller
         $em->flush();
         do {
             $fileUploadFileName = md5(time().rand());
-        } while (file_exists('../'.Node::FOLDER.$fileUploadFileName));
-        file_put_contents('../'.Node::FOLDER.$fileUploadFileName, '');
+        } while (file_exists(''.Node::FOLDER.$fileUploadFileName));
+        file_put_contents(''.Node::FOLDER.$fileUploadFileName, '');
         $projectFileVersion = new \Extended\ProjectBundle\Entity\ProjectFileVersion();
         $projectFileVersion
                 ->setContentFile($fileUploadFileName)
@@ -671,7 +671,7 @@ class FrontController extends Controller
                 }
                 do {
                     $fileUploadFileName = md5(time().rand());
-                } while (file_exists('../'.Node::FOLDER.$fileUploadFileName));
+                } while (file_exists(''.Node::FOLDER.$fileUploadFileName));
                 $session[$fileUploadId] = array(
                     'fileName' => $fileUploadFileName,
                     'originalName' => $fileUploadOriginalName,
@@ -680,15 +680,15 @@ class FrontController extends Controller
                 $request->getSession()->set('ajaxupload.partial', $session);
             }
             if ($fileUploadFileName) {
-                if (file_exists('../'.Node::FOLDER.$fileUploadFileName)) {
-                    $fileUploadCurrentPosition = filesize('../'.Node::FOLDER.$fileUploadFileName);
+                if (file_exists(''.Node::FOLDER.$fileUploadFileName)) {
+                    $fileUploadCurrentPosition = filesize(''.Node::FOLDER.$fileUploadFileName);
                 } else {
                     $fileUploadCurrentPosition = 0;
                 }
                 if ($fileUploadCurrentPosition != $fileUploadPosition) {
                     return new Response(json_encode(array('next' => $fileUploadCurrentPosition)));
                 }
-                $f = fopen('../'.Node::FOLDER.$fileUploadFileName, 'a+b');
+                $f = fopen(''.Node::FOLDER.$fileUploadFileName, 'a+b');
                 $data = $request->getContent();
                 fwrite($f, $data);
                 fclose($f);
@@ -702,7 +702,7 @@ class FrontController extends Controller
                             ->setCreateDate(new \DateTime('now'))
                             ->setExtension(pathinfo($fileUploadOriginalName, PATHINFO_EXTENSION))
                             ->setIsCollection(0)
-                            ->setMimeType($this->getMimeType('../'.Node::FOLDER.$fileUploadFileName))
+                            ->setMimeType($this->getMimeType(''.Node::FOLDER.$fileUploadFileName))
                             ->setModifyDate(new \DateTime('now'))
                             ->setParentId(($folder != null ? $folder->getId() : null))
                             ->setProjectId($project)
@@ -714,7 +714,7 @@ class FrontController extends Controller
                     $projectFile
                             ->setExtension(pathinfo($fileUploadOriginalName, PATHINFO_EXTENSION))
                             ->setIsCollection(0)
-                            ->setMimeType($this->getMimeType('../'.Node::FOLDER.$fileUploadFileName))
+                            ->setMimeType($this->getMimeType(''.Node::FOLDER.$fileUploadFileName))
                             ->setModifyDate(new \DateTime('now'));
                     $em->flush();
                 }
@@ -733,7 +733,7 @@ class FrontController extends Controller
                 return new Response(json_encode(array('result' => 'OK', 'message' => '')));
             }
         } else {
-            /*$file = $this->getRequest()->files->get('file');
+            /*$file = $this->get('request_stack')->getMasterRequest()->files->get('file');
             $tmpfile = $file->getPathName(); 
             $fileInfo = @unserialize(file_get_contents($projectFolder.'/'.'.folderinfo'));
             if (!is_array($fileInfo)) $fileInfo = array();

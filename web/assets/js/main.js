@@ -1,128 +1,131 @@
-$(function () {
-    function autoHeight()
-    {
-		$('#contentMainWrap').animate({'min-height':($(window).height() - $('header').outerHeight(true) - $('footer').outerHeight(true))+'px'},500);
-    }
-	$('#contentMainWrap').css('min-height',($(window).height() - $('header').outerHeight(true) - $('footer').outerHeight(true))+'px');
-	setInterval(function () {autoHeight();}, 2000);
+
+var earthTools = {
+    
+    currentLocale: null,
+    
+    /*
+    preloaderDelay : 200,
+    preloaderShowTimeout : null,
+    
+    preloaderShow : function() {
+        if (this.preloaderShowTimeout) clearTimeout(this.preloaderShowTimeout);
+        this.preloaderShowTimeout = setTimeout(function() {
+            $('#ec-preloader').show();
+        }, this.preloaderDelay);
+    },
+    
+    preloaderHide : function() {
+        clearTimeout(this.preloaderShowTimeout);
+        $('#ec-preloader').hide();
+    },
+    */
+    init : function (locale) {
+        
+        this.currentLocale = locale;
+        
+        $(function () {
+            $('<div id="earth-menu-wrap"></div>').appendTo('body');
+            $('#earth-menu-btn').click(function () {
+                if ($('#earth-menu').is('.active')) {
+                    $('#earth-menu').removeClass('active').animate({width: 0}, 300, function () {$(this).hide();});
+                    $('#earth-menu-wrap').hide();
+                } else {
+                    $('#earth-menu').width(0).show().addClass('active').animate({width: 300}, 300);
+                    $('#earth-menu-wrap').show();
+                }
+                return false;
+            });
+            $('#earth-menu-wrap').click(function () {
+                $('#earth-menu').removeClass('active').animate({width: 0}, 300, function () {$(this).hide();});
+                $('#earth-menu-wrap').hide();
+            });
+            
+            earthTools.transliterate();
+            earthTools.initModileMenu();
+            /*
+            
+            $(document).ajaxSend(function(e, xhr, settings) {
+                gabyTools.preloaderShow();
+            });
+            $(document).ajaxSuccess(function(e, xhr, settings) {
+                gabyTools.preloaderHide();
+            });
+            $(document).ajaxError(function(e, xhr, settings) {
+                gabyTools.preloaderHide();
+            });
+            */
+        });
+        
+    },
+    
+    initModileMenu: function () {
+        var choices = $('.earth-nav-language').html();
+        $('#earth-menu-lang').append('<ul class="earth-menu-lang-mobile">'+choices+'</ul>')
+    },
+    
+    transliterate: function () {
+        var transliteration = new Array();
+        transliteration['А'] = 'A';        transliteration['а'] = 'a';        transliteration['Б'] = 'B';        transliteration['б'] = 'b';        transliteration['В'] = 'V';
+        transliteration['в'] = 'v';        transliteration['Г'] = 'G';        transliteration['г'] = 'g';        transliteration['Д'] = 'D';        transliteration['д'] = 'd';
+        transliteration['Е'] = 'E';        transliteration['е'] = 'e';        transliteration['Ё'] = 'Yo';        transliteration['ё'] = 'yo';        transliteration['Ж'] = 'Zh';
+        transliteration['ж'] = 'zh';        transliteration['З'] = 'Z';        transliteration['з'] = 'z';        transliteration['И'] = 'I';        transliteration['и'] = 'i';
+        transliteration['Й'] = 'J';        transliteration['й'] = 'j';        transliteration['К'] = 'K';        transliteration['к'] = 'k';        transliteration['Л'] = 'L';
+        transliteration['л'] = 'l';        transliteration['М'] = 'M';        transliteration['м'] = 'm';        transliteration['Н'] = 'N';        transliteration['н'] = 'n';
+        transliteration['О'] = 'O';        transliteration['о'] = 'o';        transliteration['П'] = 'P';        transliteration['п'] = 'p';        transliteration['Р'] = 'R';
+        transliteration['р'] = 'r';        transliteration['С'] = 'S';        transliteration['с'] = 's';        transliteration['Т'] = 'T';        transliteration['т'] = 't';
+        transliteration['У'] = 'U';        transliteration['у'] = 'u';        transliteration['Ф'] = 'F';        transliteration['ф'] = 'f';        transliteration['Х'] = 'H';
+        transliteration['х'] = 'h';        transliteration['Ц'] = 'C';        transliteration['ц'] = 'c';        transliteration['Ч'] = 'Ch';        transliteration['ч'] = 'ch';
+        transliteration['Ш'] = 'Sh';        transliteration['ш'] = 'sh';        transliteration['Щ'] = 'Shch';        transliteration['щ'] = 'shch';        transliteration['Ъ'] = '"';
+        transliteration['ъ'] = '"';        transliteration['Ы'] = 'Y\'';        transliteration['ы'] = 'y\'';        transliteration['Ь'] = '\'';        transliteration['ь'] = '\'';
+        transliteration['Э'] = 'E\'';        transliteration['э'] = 'e\'';        transliteration['Ю'] = 'Yu';        transliteration['ю'] = 'yu';        transliteration['Я'] = 'Ya';
+        transliteration['я'] = 'ya';
+        $('span.mirclubTransliterationImportant'+(this.currentLocale == 'en' ? ',span.mirclubTransliteration' : '')).each(function () {
+            var text = $(this).html();
+            var result = '';
+            for (var i = 0; i < text.length; i++) {
+                if (transliteration[text[i]] != undefined)
+                    result += transliteration[text[i]];
+                else
+                    result += text[i];
+            }
+            $(this).html(result);
+        });
+    },
+    
+    
+    alert : function (message, type) {
+        sergsxmUIFunctions.alert(message, type, '#earth-alerts');
+    },
+    
+    confirm : function (message, title, okText, cancelText, callBack) {
+        sergsxmUIFunctions.confirm(message, title, okText, cancelText, callBack);
+    },
 /*
-	if ($('.parallaxWrap').length > 0)
-	{
-		$('body').on('mousemove', function (e)
-		{
-			var centerX = $('.parallaxWrap').offset().left + $('.parallaxWrap').width() / 2;
-			var centerY = $('.parallaxWrap').offset().top + $('.parallaxWrap').height() / 2;
-			
-			var movementX = (e.pageX - centerX) / 50;
-			var movementY = (e.pageY - centerY) / 50;
-			if (movementX > 20) movementX = 20;
-			if (movementX < -20) movementX = -20;
-			if (movementY > 20) movementY = 20;
-			if (movementY < -20) movementY = -20;
-			$('.parallaxLayer').each(function (index, element) 
-			{
-				$(element).css('margin-top', Math.round(movementY * (index + 1))+'px');
-				$(element).css('margin-left', Math.round(movementX * (index + 1))+'px');
-			});
-		});
-	}
-
+            $(function () {
+                var transliteration = new Array();
+                transliteration['А']='A'; transliteration['а']='a'; transliteration['Б']='B'; transliteration['б']='b'; transliteration['В']='V'; transliteration['в']='v';
+                transliteration['Г']='G'; transliteration['г']='g'; transliteration['Д']='D'; transliteration['д']='d'; transliteration['Е']='E'; transliteration['е']='e';
+                transliteration['Ё']='Yo'; transliteration['ё']='yo'; transliteration['Ж']='Zh'; transliteration['ж']='zh'; transliteration['З']='Z'; transliteration['з']='z';
+                transliteration['И']='I'; transliteration['и']='i'; transliteration['Й']='J'; transliteration['й']='j'; transliteration['К']='K'; transliteration['к']='k';
+                transliteration['Л']='L'; transliteration['л']='l'; transliteration['М']='M'; transliteration['м']='m'; transliteration['Н']='N'; transliteration['н']='n';
+                transliteration['О']='O'; transliteration['о']='o'; transliteration['П']='P'; transliteration['п']='p'; transliteration['Р']='R'; transliteration['р']='r';
+                transliteration['С']='S'; transliteration['с']='s'; transliteration['Т']='T'; transliteration['т']='t'; transliteration['У']='U'; transliteration['у']='u';
+                transliteration['Ф']='F'; transliteration['ф']='f'; transliteration['Х']='H'; transliteration['х']='h'; transliteration['Ц']='C'; transliteration['ц']='c';
+                transliteration['Ч']='Ch'; transliteration['ч']='ch'; transliteration['Ш']='Sh'; transliteration['ш']='sh'; transliteration['Щ']='Shch'; transliteration['щ']='shch';
+                transliteration['Ъ']='"'; transliteration['ъ']='"'; transliteration['Ы']='Y\''; transliteration['ы']='y\''; transliteration['Ь']='\''; transliteration['ь']='\'';
+                transliteration['Э']='E\''; transliteration['э']='e\''; transliteration['Ю']='Yu'; transliteration['ю']='yu'; transliteration['Я']='Ya'; transliteration['я']='ya';
+                $('span.mirclubTransliterationImportant{% if currentLocale == 'en' %},span.mirclubTransliteration{% endif %}').each(function () {
+                    var text = $(this).html();
+                    var result = '';
+                    for (i = 0; i < text.length; i++) {
+                        if (transliteration[text[i]] != undefined) result += transliteration[text[i]]; else result += text[i];
+                    }                
+                    $(this).html(result);                    
+                });
+            });
 */
-});
 
+    
+};
 
-var backgroundImages = [
-'http://elga.ecoby.info/wp-content/uploads/80-на-100.jpg',
-'http://elga.ecoby.info/wp-content/uploads/DSC0328а.jpg',
-'http://elga.ecoby.info/wp-content/uploads/l-7l4MX7QR8.jpg',
-'http://elga.ecoby.info/wp-content/uploads/DSC0332ро.jpg',
-'http://elga.ecoby.info/wp-content/uploads/DSC0332о.jpg',
-'http://elga.ecoby.info/wp-content/uploads/DSC0335а.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_1837.jpg',
-'http://elga.ecoby.info/wp-content/uploads/4iIklQuAXZY.jpg',
-'http://elga.ecoby.info/wp-content/uploads/85-на-90.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_4941.jpg',
-'http://elga.ecoby.info/wp-content/uploads/beR6yUDlGR4.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_7658.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_5263а.jpg',
-'http://elga.ecoby.info/wp-content/uploads/lG2XdokQChE.jpg',
-'http://elga.ecoby.info/wp-content/uploads/NXPBqTdWnc4.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_5baf94b5.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_8efb9bab.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_e95e2c90.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_4038ао.jpg',
-'http://elga.ecoby.info/wp-content/uploads/7r5MeKCO4mw.jpg',
-'http://elga.ecoby.info/wp-content/uploads/szBb2EHMZFE.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_1e28c435.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_6e3bc6e6.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_7eb86002.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_39ddf41a.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_98d6e807.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_621ba67f.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_9607c228.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_4796627d.jpg',
-'http://elga.ecoby.info/wp-content/uploads/y_fd4499c6.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_7483a.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_8375.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_7489a.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_1919.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_2027.jpg',
-'http://elga.ecoby.info/wp-content/uploads/MG_6107о.jpg',
-'http://elga.ecoby.info/wp-content/uploads/MG_6110.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_1692.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0340f.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0343.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0348f.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0586а.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_5090.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0337f.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_1939.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_2813.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_1933.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_1927.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_1922.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_1842.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_2815.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_2817.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_2395.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_2766.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_2772.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_2274.jpg',
-'http://elga.ecoby.info/wp-content/uploads/2014-04-17-17-40-30.jpg',
-'http://elga.ecoby.info/wp-content/uploads/2014-04-17-17-42-07.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_5853.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_9040.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_4966.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_3837.jpg',
-'http://elga.ecoby.info/wp-content/uploads/20141124_101534.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0281.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0259-kopiya.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0545.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0535f.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0323.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0321.jpg',
-'http://elga.ecoby.info/wp-content/uploads/IMG_0540.jpg'];
-
-function parseGetParams() { 
-   var $_GET = {}; 
-   var __GET = window.location.search.substring(1).split("&"); 
-   for(var i=0; i<__GET.length; i++) { 
-      var getVar = __GET[i].split("="); 
-      $_GET[getVar[0]] = typeof(getVar[1])=="undefined" ? "" : getVar[1]; 
-   } 
-   return $_GET; 
-}
-$(function () {
-	var $_GET = parseGetParams();
-	console.log($_GET['image']);
-	if (typeof backgroundImages[$_GET['image']] != 'undefined') {
-		console.log(backgroundImages[$_GET['image']]);
-		$('body').css('background', 'url('+backgroundImages[$_GET['image']]+') center no-repeat fixed #000');
-		$('body').css('-webkit-background-size', 'contain');
-		$('body').css('-moz-background-size', 'contain');
-		$('body').css('-o-background-size', 'contain');
-		$('body').css('background-size', 'contain');
-		$('body').prepend('<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;opacity:0.5;z-index:-1;"></div>');
-	}
-});
 

@@ -28,12 +28,12 @@ class UserManager
         $manager = $this->container->get('cms.cmsManager');
         
         $manager->addAdminMenu('Администрирование', '#', 254, 1);
-        $manager->addAdminMenu('Пользователи', $this->container->get('router')->generate('basic_cms_user_list'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('user_list'), 'Администрирование');
-        $manager->addAdminMenu('Роли', $this->container->get('router')->generate('basic_cms_role_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('role_list'), 'Администрирование');
-        $manager->addAdminMenu('Локализация', $this->container->get('router')->generate('basic_cms_locale_list'), 20, $this->container->get('security.context')->getToken()->getUser()->checkAccess('locale_edit'), 'Администрирование');
-        $manager->addAdminMenu('Карта сайта', $this->container->get('router')->generate('basic_cms_sitemap'), 30, $this->container->get('security.context')->getToken()->getUser()->checkAccess('site_map'), 'Администрирование');
-        $manager->addAdminMenu('Прочие страницы', $this->container->get('router')->generate('basic_cms_sitemap_pageslist'), 40, $this->container->get('security.context')->getToken()->getUser()->checkAccess('site_pages'), 'Администрирование');
-        $manager->addAdminMenu('Оформление ошибок', $this->container->get('router')->generate('basic_cms_errorcfg'), 50, $this->container->get('security.context')->getToken()->getUser()->checkAccess('error_view'), 'Администрирование');
+        $manager->addAdminMenu('Пользователи', $this->container->get('router')->generate('basic_cms_user_list'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('user_list'), 'Администрирование');
+        $manager->addAdminMenu('Роли', $this->container->get('router')->generate('basic_cms_role_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('role_list'), 'Администрирование');
+        $manager->addAdminMenu('Локализация', $this->container->get('router')->generate('basic_cms_locale_list'), 20, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('locale_edit'), 'Администрирование');
+        $manager->addAdminMenu('Карта сайта', $this->container->get('router')->generate('basic_cms_sitemap'), 30, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('site_map'), 'Администрирование');
+        $manager->addAdminMenu('Прочие страницы', $this->container->get('router')->generate('basic_cms_sitemap_pageslist'), 40, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('site_pages'), 'Администрирование');
+        $manager->addAdminMenu('Оформление ошибок', $this->container->get('router')->generate('basic_cms_errorcfg'), 50, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('error_view'), 'Администрирование');
         $manager->addAdminMenu('Статистика', $this->container->get('router')->generate('basic_cms_statistics'), 60, 1, 'Администрирование');
         $manager->addAdminMenu('Журнал событий', $this->container->get('router')->generate('basic_cms_logs'), 61, 1, 'Администрирование');
 
@@ -589,7 +589,7 @@ class UserManager
                          if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) {$result['errors'] = true; $result['avatar']['error'] = 'format';}
                          $basepath = '/images/user/';
                          $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-                         if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                         if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                          {
                              $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $postfiles['avatar']->getClientOriginalName());
                              $result['avatar']['value'] = $basepath.$name;
@@ -619,7 +619,7 @@ class UserManager
                      $checkname = $query->getResult();
                      if ($checkname[0]['namecount'] != 0) {$result['errors'] = true; $result['fullName']['error'] = 'exist';}
                  }
-                 if (($result['avatar']['value'] != '') && ($result['avatar']['error'] == '') && (!file_exists('..'.$result['avatar']['value']))) {$result['errors'] = true; $result['avatar']['error'] = 'not found';}
+                 if (($result['avatar']['value'] != '') && ($result['avatar']['error'] == '') && (!file_exists('.'.$result['avatar']['value']))) {$result['errors'] = true; $result['avatar']['error'] = 'not found';}
                  if ($regpage->getCaptchaEnabled() != 0)
                  {
                      $needle = $this->container->get('request_stack')->getCurrentRequest()->getSession()->get('front_captcha_userregister'.$regpage->getId());
@@ -757,7 +757,7 @@ class UserManager
                          if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) {$result['errors'] = true; $result['avatar']['error'] = 'format';}
                          $basepath = '/images/user/';
                          $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-                         if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                         if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                          {
                              $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $postfiles['avatar']->getClientOriginalName());
                              $result['avatar']['value'] = $basepath.$name;
@@ -786,12 +786,12 @@ class UserManager
                      $checkname = $query->getResult();
                      if ($checkname[0]['namecount'] != 0) {$result['errors'] = true; $result['fullName']['error'] = 'exist';}
                  }
-                 if (($result['avatar']['value'] != '') && ($result['avatar']['error'] == '') && (!file_exists('..'.$result['avatar']['value']))) {$result['errors'] = true; $result['avatar']['error'] = 'not found';}
+                 if (($result['avatar']['value'] != '') && ($result['avatar']['error'] == '') && (!file_exists('.'.$result['avatar']['value']))) {$result['errors'] = true; $result['avatar']['error'] = 'not found';}
                  $cmsservices = $this->container->getServiceIds();
                  foreach ($cmsservices as $item) if (strpos($item,'addone.user.') === 0) $this->container->get($item)->setFrontActionPrepare($locale, $seoPage, $action, $result);
                  if ($result['errors'] == false)
                  {
-                     if (($userent->getAvatar() != '') && ($userent->getAvatar() != $result['avatar']['value'])) @unlink('..'.$userent->getAvatar());
+                     if (($userent->getAvatar() != '') && ($userent->getAvatar() != $result['avatar']['value'])) @unlink('.'.$userent->getAvatar());
                      $this->container->get('cms.cmsManager')->unlockTemporaryFile($result['avatar']['value']);
                      if ($profpage->getChangeEmail() != 0) $userent->setEmail($result['email']['value']);
                      $userent->setFullName($result['fullName']['value']);

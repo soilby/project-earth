@@ -9,14 +9,14 @@ class FrontController extends Controller
 {
     private function checkUser()
     {
-        $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+        $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
         $userEntity = null;
         if ($userid != null) {
             $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
         }
         if (empty($userEntity)) {
-            $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-            $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+            $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+            $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
             $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
             $userEntity = $query->getResult();
             if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) {
@@ -39,10 +39,10 @@ class FrontController extends Controller
         if ($this->checkUser() == false) {
             return null;
         }
-        $locale = $this->getRequest()->get('locale');
-        $type = $this->getRequest()->get('type');
-        $id = $this->getRequest()->get('id');
-        $textId = $this->getRequest()->get('textid');
+        $locale = $this->get('request_stack')->getMasterRequest()->get('locale');
+        $type = $this->get('request_stack')->getMasterRequest()->get('type');
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
+        $textId = $this->get('request_stack')->getMasterRequest()->get('textid');
         $result = $this->container->get('object.knowledge')->getKnowledgeParameters($locale, $type, $id, $textId);
         return new JsonResponse($result);
     }        
@@ -52,10 +52,10 @@ class FrontController extends Controller
         if ($this->checkUser() == false) {
             return null;
         }
-        $type = $this->getRequest()->get('type');
-        $id = $this->getRequest()->get('id');
-        $textId = $this->getRequest()->get('textid');
-        $postfields = $this->getRequest()->get('actionfields');
+        $type = $this->get('request_stack')->getMasterRequest()->get('type');
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
+        $textId = $this->get('request_stack')->getMasterRequest()->get('textid');
+        $postfields = $this->get('request_stack')->getMasterRequest()->get('actionfields');
         
         $knowledgeTitle = (isset($postfields['knowledgetitle']) ? $postfields['knowledgetitle'] : null);
         $knowledgeTypes = (isset($postfields['knowledgetypes']) ? $postfields['knowledgetypes'] : null);
