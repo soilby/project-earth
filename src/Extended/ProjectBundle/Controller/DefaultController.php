@@ -28,24 +28,24 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('extended_project_list_tab');
-                      else $this->getRequest()->getSession()->set('extended_project_list_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_list_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 0) $tab = 0;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        $taxonomy0 = $this->getRequest()->get('taxonomy0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('extended_project_list_page0');
-                        else $this->getRequest()->getSession()->set('extended_project_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('extended_project_list_sort0');
-                        else $this->getRequest()->getSession()->set('extended_project_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('extended_project_list_search0');
-                          else $this->getRequest()->getSession()->set('extended_project_list_search0', $search0);
-        if ($taxonomy0 === null) $taxonomy0 = $this->getRequest()->getSession()->get('extended_project_list_taxonomy0');
-                          else $this->getRequest()->getSession()->set('extended_project_list_taxonomy0', $taxonomy0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->get('taxonomy0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_list_search0', $search0);
+        if ($taxonomy0 === null) $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_taxonomy0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_list_taxonomy0', $taxonomy0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -111,7 +111,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function projectCreateAction()
     {
-        $this->getRequest()->getSession()->set('extended_project_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_list_tab', 0);
         if ($this->getUser()->checkAccess('project_new') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -194,10 +194,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postproject = $this->getRequest()->get('project');
+            $postproject = $this->get('request_stack')->getMasterRequest()->get('project');
             if (isset($postproject['title'])) $project['title'] = $postproject['title'];
             if (isset($postproject['description'])) $project['description'] = $postproject['description'];
             if (isset($postproject['content'])) $project['content'] = $postproject['content'];
@@ -210,7 +210,7 @@ class DefaultController extends Controller
             if (!preg_match("/^.{3,}$/ui", $project['title'])) {$errors = true; $projecterror['title'] = 'Заголовок должен содержать более 3 символов';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -240,7 +240,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postprojloc = $this->getRequest()->get('projloc');
+            $postprojloc = $this->get('request_stack')->getMasterRequest()->get('projloc');
             foreach ($locales as $locale)
             {
                 if (isset($postprojloc[$locale['shortName']]['title'])) $projloc[$locale['shortName']]['title'] = $postprojloc[$locale['shortName']]['title'];
@@ -251,9 +251,9 @@ class DefaultController extends Controller
             unset($postprojloc);
             if (($errors == true) && ($activetab == 0)) $activetab = 3;
             // Валидация пользователей
-            $postusers = $this->getRequest()->get('users');
+            $postusers = $this->get('request_stack')->getMasterRequest()->get('users');
             if (!is_array($postusers)) $postusers = array();
-            $postusersrole = $this->getRequest()->get('usersrole');
+            $postusersrole = $this->get('request_stack')->getMasterRequest()->get('usersrole');
             if (!is_array($postusersrole)) $postusersrole = array();
             $users = array();
             foreach ($postusers as $postuserid=>$postuserro)
@@ -273,7 +273,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.project', 0, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.project', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -281,7 +281,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.project.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'projectCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'projectCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -356,7 +356,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.project', $projectent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.project', $projectent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                     $i++;
@@ -364,7 +364,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.project.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'projectCreate', $projectent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'projectCreate', $projectent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                     $i++;
@@ -377,11 +377,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.project', 0, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.project', 0, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.project.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'projectCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'projectCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -406,8 +406,8 @@ class DefaultController extends Controller
     public function projectAjaxUsersAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $search = trim($this->getRequest()->get('search'));
-        $page = intval($this->getRequest()->get('page'));
+        $search = trim($this->get('request_stack')->getMasterRequest()->get('search'));
+        $page = intval($this->get('request_stack')->getMasterRequest()->get('page'));
         if ($page < 0) $page = 0;
         $query = $em->createQuery('SELECT count(u.id) as usercount FROM BasicCmsBundle:Users u WHERE u.login LIKE :search OR u.fullName LIKE :search')
                     ->setParameter('search', '%'.$search.'%');
@@ -427,9 +427,9 @@ class DefaultController extends Controller
 // *******************************************    
     public function projectEditAction()
     {
-        $this->getRequest()->getSession()->set('extended_project_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_list_tab', 0);
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $projectent = $this->getDoctrine()->getRepository('ExtendedProjectBundle:Projects')->find($id);
         if (empty($projectent))
         {
@@ -562,7 +562,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ((($this->getUser()->checkAccess('project_editall') == 0) && ($this->getUser()->getId() != $projectent->getCreaterId())) || 
                 (($this->getUser()->checkAccess('project_editown') == 0) && ($this->getUser()->getId() == $projectent->getCreaterId())))
@@ -575,7 +575,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postproject = $this->getRequest()->get('project');
+            $postproject = $this->get('request_stack')->getMasterRequest()->get('project');
             if (isset($postproject['title'])) $project['title'] = $postproject['title'];
             if (isset($postproject['description'])) $project['description'] = $postproject['description'];
             if (isset($postproject['content'])) $project['content'] = $postproject['content'];
@@ -588,7 +588,7 @@ class DefaultController extends Controller
             if (!preg_match("/^.{3,}$/ui", $project['title'])) {$errors = true; $projecterror['title'] = 'Заголовок должен содержать более 3 символов';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -619,7 +619,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postprojloc = $this->getRequest()->get('projloc');
+            $postprojloc = $this->get('request_stack')->getMasterRequest()->get('projloc');
             foreach ($locales as $locale)
             {
                 if (isset($postprojloc[$locale['shortName']]['title'])) $projloc[$locale['shortName']]['title'] = $postprojloc[$locale['shortName']]['title'];
@@ -630,9 +630,9 @@ class DefaultController extends Controller
             unset($postprojloc);
             if (($errors == true) && ($activetab == 0)) $activetab = 3;
             // Валидация пользователей
-            $postusers = $this->getRequest()->get('users');
+            $postusers = $this->get('request_stack')->getMasterRequest()->get('users');
             if (!is_array($postusers)) $postusers = array();
-            $postusersrole = $this->getRequest()->get('usersrole');
+            $postusersrole = $this->get('request_stack')->getMasterRequest()->get('usersrole');
             if (!is_array($postusersrole)) $postusersrole = array();
             $users = array();
             foreach ($postusers as $postuserid=>$postuserro)
@@ -652,7 +652,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.project', $id, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.project', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -660,7 +660,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.project.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'projectEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'projectEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -772,7 +772,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.project', $projectent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.project', $projectent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                     $i++;
@@ -780,7 +780,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.project.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'projectEdit', $projectent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'projectEdit', $projectent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                     $i++;
@@ -793,11 +793,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.project', $id, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.project', $id, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.project.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'projectEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'projectEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -829,7 +829,7 @@ class DefaultController extends Controller
     
     public function projectAjaxAction()
     {
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         if ($this->getUser()->checkAccess('project_list') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -840,7 +840,7 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'delete')
         {
@@ -854,7 +854,7 @@ class DefaultController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -879,11 +879,11 @@ class DefaultController extends Controller
                         $query->execute();
                         $query = $em->createQuery('DELETE FROM ExtendedProjectBundle:ProjectUsers u WHERE u.projectId = :id')->setParameter('id', $key);
                         $query->execute();
-                        if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'delete', 'object.project', $key, 'save');
+                        if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'delete', 'object.project', $key, 'save');
                         foreach ($cmsservices as $item) if (strpos($item,'addone.project.') === 0) 
                         {
                             $serv = $this->container->get($item);
-                            $serv->getAdminController($this->getRequest(), 'projectDelete', $key, 'save');
+                            $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'projectDelete', $key, 'save');
                         }       
                         unset($projectent);    
                     }
@@ -900,7 +900,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -925,7 +925,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -942,10 +942,10 @@ class DefaultController extends Controller
         /*if ($tab == 0)
         {*/
         // Таб 1
-        $page0 = $this->getRequest()->getSession()->get('extended_project_list_page0');
-        $sort0 = $this->getRequest()->getSession()->get('extended_project_list_sort0');
-        $search0 = $this->getRequest()->getSession()->get('extended_project_list_search0');
-        $taxonomy0 = $this->getRequest()->getSession()->get('extended_project_list_taxonomy0');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_list_taxonomy0');
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -1014,21 +1014,21 @@ class DefaultController extends Controller
     
     public function projectDocumentsListAction()
     {
-        $this->getRequest()->getSession()->set('extended_project_documents_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_tab', 0);
         $em = $this->getDoctrine()->getEntityManager();
         // Таб 1
-        $id = $this->getRequest()->get('id');
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        if ($id === null) $id = $this->getRequest()->getSession()->get('extended_project_documents_list_id');
-                     else $this->getRequest()->getSession()->set('extended_project_documents_list_id', $id);
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('extended_project_documents_list_page0');
-                        else $this->getRequest()->getSession()->set('extended_project_documents_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('extended_project_documents_list_sort0');
-                        else $this->getRequest()->getSession()->set('extended_project_documents_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('extended_project_documents_list_search0');
-                          else $this->getRequest()->getSession()->set('extended_project_documents_list_search0', $search0);
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        if ($id === null) $id = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_id');
+                     else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_id', $id);
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_search0', $search0);
         $projectent = $this->getDoctrine()->getRepository('ExtendedProjectBundle:Projects')->find($id);
         if (empty($projectent))
         {
@@ -1049,16 +1049,16 @@ class DefaultController extends Controller
                 'paths'=>array()
             ));
         }
-        $oldid = $this->getRequest()->getSession()->get('extended_project_documents_list_oldid');
+        $oldid = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_oldid');
         if ($id != $oldid)
         {
             $page0 = null;
             $sort0 = null;
             $search0 = null;
-            $this->getRequest()->getSession()->set('extended_project_documents_list_oldid', $id);
-            $this->getRequest()->getSession()->set('extended_project_documents_list_page0', $page0);
-            $this->getRequest()->getSession()->set('extended_project_documents_list_sort0', $sort0);
-            $this->getRequest()->getSession()->set('extended_project_documents_list_search0', $search0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_oldid', $id);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_page0', $page0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_sort0', $sort0);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_documents_list_search0', $search0);
         }
         $page0 = intval($page0);
         $sort0 = intval($sort0);
@@ -1100,7 +1100,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function projectDocumentsCreateAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $projectent = $this->getDoctrine()->getRepository('ExtendedProjectBundle:Projects')->find($id);
         if (empty($projectent))
         {
@@ -1152,10 +1152,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postdocument = $this->getRequest()->get('document');
+            $postdocument = $this->get('request_stack')->getMasterRequest()->get('document');
             if (isset($postdocument['title'])) $document['title'] = $postdocument['title'];
             if (isset($postdocument['content'])) $document['content'] = $postdocument['content'];
             if (isset($postdocument['readOnly'])) $document['readOnly'] = intval($postdocument['readOnly']); else $document['readOnly'] = 0;
@@ -1220,7 +1220,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function projectDocumentsEditAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $documentent = $this->getDoctrine()->getRepository('ExtendedProjectBundle:ProjectDocuments')->find($id);
         if (empty($documentent))
         {
@@ -1284,7 +1284,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ((($this->getUser()->checkAccess('project_editall') == 0) && ($this->getUser()->getId() != $projectent->getCreaterId())) || 
                 (($this->getUser()->checkAccess('project_editown') == 0) && ($this->getUser()->getId() == $projectent->getCreaterId())))
@@ -1297,7 +1297,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postdocument = $this->getRequest()->get('document');
+            $postdocument = $this->get('request_stack')->getMasterRequest()->get('document');
             if (isset($postdocument['title'])) $document['title'] = $postdocument['title'];
             if (isset($postdocument['content'])) $document['content'] = $postdocument['content'];
             if (isset($postdocument['readOnly'])) $document['readOnly'] = intval($postdocument['readOnly']); else $document['readOnly'] = 0;
@@ -1365,15 +1365,15 @@ class DefaultController extends Controller
     
     public function projectDocumentsAjaxAction()
     {
-        //$tab = intval($this->getRequest()->get('tab'));
+        //$tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         $tab = 0;
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'deletedocument')
         {
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             $restoreids = array();
             if ($check != null)
             foreach ($check as $key=>$val)
@@ -1416,7 +1416,7 @@ class DefaultController extends Controller
         }
         if ($action == 'blockeddocument')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1432,7 +1432,7 @@ class DefaultController extends Controller
         }
         if ($action == 'unblockeddocument')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1448,10 +1448,10 @@ class DefaultController extends Controller
         }
 
         // Таб 1
-        $id = $this->getRequest()->getSession()->get('extended_project_documents_list_id');
-        $page0 = $this->getRequest()->getSession()->get('extended_project_documents_list_page0');
-        $sort0 = $this->getRequest()->getSession()->get('extended_project_documents_list_sort0');
-        $search0 = $this->getRequest()->getSession()->get('extended_project_documents_list_search0');
+        $id = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_id');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('extended_project_documents_list_search0');
         $projectent = $this->getDoctrine()->getRepository('ExtendedProjectBundle:Projects')->find($id);
         if (empty($projectent))
         {
@@ -1519,13 +1519,13 @@ class DefaultController extends Controller
     
     public function tinyMceUploadAction()
     {
-        $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+        $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
         $userEntity = null;
         if ($userid != null) $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
         if (empty($userEntity))
         {
-            $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-            $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+            $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+            $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
             $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
             $userEntity = $query->getResult();
             if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) $userEntity = $userEntity[0];
@@ -1533,7 +1533,7 @@ class DefaultController extends Controller
         if (empty($userEntity)) return $this->render('ExtendedProjectBundle:Default:tinyMceBlank.html.twig', array());
         if ($userEntity->getBlocked() != 2) return $this->render('ExtendedProjectBundle:Default:tinyMceBlank.html.twig', array());
         
-        $file = $this->getRequest()->files->get('userfile');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('userfile');
         $tmpfile = $file->getPathName(); 
         $source = "";
         $error = '';
@@ -1548,7 +1548,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) $error = 'Формат файла не поддерживается';
             if ($error == '')
             {
-                $basepath = '../images/editor/';
+                $basepath = 'images/editor/';
                 $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
                 if (move_uploaded_file($tmpfile, $basepath . $name)) 
                 {
@@ -1582,13 +1582,13 @@ class DefaultController extends Controller
     
     public function tinyMceFileListAction()
     {
-        $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+        $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
         $userEntity = null;
         if ($userid != null) $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
         if (empty($userEntity))
         {
-            $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-            $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+            $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+            $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
             $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
             $userEntity = $query->getResult();
             if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) $userEntity = $userEntity[0];
@@ -1598,7 +1598,7 @@ class DefaultController extends Controller
         // Найти права пользователя
         $premissionRead = 0;
         $premissionWrite = 0;
-        $documentId = $this->getRequest()->get('documentid');
+        $documentId = $this->get('request_stack')->getMasterRequest()->get('documentid');
         $projectId = null;
         if ($documentId !== null)
         {
@@ -1608,7 +1608,7 @@ class DefaultController extends Controller
             if (empty($projectent)) return new Response(json_encode(array('result'=>'Error', 'message'=>'Доступ запрещен', 'list'=>array())));
         } else
         {
-            $projectId = $this->getRequest()->get('projectid');
+            $projectId = $this->get('request_stack')->getMasterRequest()->get('projectid');
             $projectent = $this->getDoctrine()->getRepository('ExtendedProjectBundle:Projects')->findOneBy(array('id'=>$projectId, 'enabled'=>1));
             if (empty($projectent)) return new Response(json_encode(array('result'=>'Error', 'message'=>'Доступ запрещен', 'list'=>array())));
         }
@@ -1631,22 +1631,22 @@ class DefaultController extends Controller
         if ((!empty($documentent)) && ($documentent->getReadOnly() != 0)) $premissionWrite = 0;
         if ($premissionRead == 0) return new Response(json_encode(array('result'=>'Error', 'message'=>'Доступ запрещен', 'list'=>array())));
         // Выполнить действия
-        $projectFolder = '../secured/project';
+        $projectFolder = 'secured/project';
         $projectFolderBase = $projectFolder;
-        $path = $this->getRequest()->get('path');
-        if ($this->getRequest()->headers->get('x-ajaxupload-partial-module') == 'ajaxupload.partial') {
-            $path = urldecode($this->getRequest()->headers->get('x-ajaxupload-partial-path'));
+        $path = $this->get('request_stack')->getMasterRequest()->get('path');
+        if ($this->get('request_stack')->getMasterRequest()->headers->get('x-ajaxupload-partial-module') == 'ajaxupload.partial') {
+            $path = urldecode($this->get('request_stack')->getMasterRequest()->headers->get('x-ajaxupload-partial-path'));
         }
         if (($path != '') && (is_dir($projectFolder.'/'.$path))) $projectFolder = $projectFolder.'/'.$path;
         $operationResult = 'OK';
         $operationMessage = '';
-        $operation = $this->getRequest()->get('operation');
+        $operation = $this->get('request_stack')->getMasterRequest()->get('operation');
         if ($operation == 'upload')
         {
             if ($premissionWrite != 0)
             {
-                if ($this->getRequest()->headers->get('x-ajaxupload-partial-module') == 'ajaxupload.partial') {
-                    $request = $this->getRequest();
+                if ($this->get('request_stack')->getMasterRequest()->headers->get('x-ajaxupload-partial-module') == 'ajaxupload.partial') {
+                    $request = $this->get('request_stack')->getMasterRequest();
                     $session = $request->getSession()->get('ajaxupload.partial');
                     if (!is_array($session)) {
                         $session = array();
@@ -1698,7 +1698,7 @@ class DefaultController extends Controller
                         }
                     }
                 } else {
-                    $file = $this->getRequest()->files->get('file');
+                    $file = $this->get('request_stack')->getMasterRequest()->files->get('file');
                     $tmpfile = $file->getPathName(); 
                     $fileInfo = @unserialize(file_get_contents($projectFolder.'/'.'.folderinfo'));
                     if (!is_array($fileInfo)) $fileInfo = array();
@@ -1717,7 +1717,7 @@ class DefaultController extends Controller
         {
             if ($premissionWrite != 0)
             {
-                $name = $this->getRequest()->get('name');
+                $name = $this->get('request_stack')->getMasterRequest()->get('name');
                 if (preg_match("/^[\w\s]{3,}(#[\w\s]{3,})?$/ui", $name)) 
                 {
                     mkdir($projectFolder.'/'.$name);
@@ -1728,8 +1728,8 @@ class DefaultController extends Controller
         {
             if ($premissionWrite != 0)
             {
-                $oldname = $this->getRequest()->get('oldname');
-                $name = $this->getRequest()->get('name');
+                $oldname = $this->get('request_stack')->getMasterRequest()->get('oldname');
+                $name = $this->get('request_stack')->getMasterRequest()->get('name');
                 if (preg_match("/^[\w\s]{3,}(#[\w\s]{3,})?$/ui", $name) || !is_dir($projectFolder.'/'.$oldname)) 
                 {
                     rename($projectFolder.'/'.$oldname, $projectFolder.'/'.$name);
@@ -1749,7 +1749,7 @@ class DefaultController extends Controller
         {
             if ($premissionWrite != 0)
             {
-                $file = $this->getRequest()->get('file');
+                $file = $this->get('request_stack')->getMasterRequest()->get('file');
                 if (is_file($projectFolder.'/'.$file))
                 {
                     $fileInfo = @unserialize(file_get_contents($projectFolder.'/'.'.folderinfo'));
@@ -1785,7 +1785,7 @@ class DefaultController extends Controller
         {
             if ($premissionWrite != 0)
             {
-                $file = $this->getRequest()->get('file');
+                $file = $this->get('request_stack')->getMasterRequest()->get('file');
                 if (is_file($projectFolder.'/'.$file))
                 {
                     $projectLink = @unserialize(file_get_contents($projectFolderBase.'/'.'.projectlink'));
@@ -1810,7 +1810,7 @@ class DefaultController extends Controller
         {
             if ($premissionWrite != 0)
             {
-                $file = $this->getRequest()->get('file');
+                $file = $this->get('request_stack')->getMasterRequest()->get('file');
                 if (is_file($projectFolder.'/'.$file))
                 {
                     $fileInfo = @unserialize(file_get_contents($projectFolder.'/'.'.folderinfo'));
@@ -1837,7 +1837,7 @@ class DefaultController extends Controller
         {
             if ($premissionWrite != 0)
             {
-                $file = $this->getRequest()->get('file');
+                $file = $this->get('request_stack')->getMasterRequest()->get('file');
                 $baseName = basename($file);
                 if (is_file($projectFolderBase.'/'.$file))
                 {
@@ -1912,20 +1912,20 @@ class DefaultController extends Controller
 
     public function tinyMceFileDownloadAction()
     {
-        $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+        $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
         $userEntity = null;
         if ($userid != null) $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
         if (empty($userEntity))
         {
-            $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-            $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+            $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+            $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
             $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
             $userEntity = $query->getResult();
             if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) $userEntity = $userEntity[0];
         }
         // Найти права пользователя
         $premissionRead = 0;
-        $documentId = $this->getRequest()->get('documentid');
+        $documentId = $this->get('request_stack')->getMasterRequest()->get('documentid');
         if ($documentId !== null)
         {
             $documentent = $this->getDoctrine()->getRepository('ExtendedProjectBundle:ProjectDocuments')->findOneBy(array('id'=>$documentId, 'enabled'=>1));
@@ -1934,7 +1934,7 @@ class DefaultController extends Controller
             if (empty($projectent)) return new Response('Access denied', 403);
         } else 
         {
-            $projectId = $this->getRequest()->get('projectid');
+            $projectId = $this->get('request_stack')->getMasterRequest()->get('projectid');
             $projectent = $this->getDoctrine()->getRepository('ExtendedProjectBundle:Projects')->findOneBy(array('id'=>$projectId, 'enabled'=>1));
             if (empty($projectent)) return new Response('Access denied', 403);
         }
@@ -1957,8 +1957,8 @@ class DefaultController extends Controller
         }
         if ($premissionRead == 0) return new Response('Access denied', 403);
         // Выдать файл
-        $file = $this->getRequest()->get('file');
-        $filePath = '../secured/project/'.$file;
+        $file = $this->get('request_stack')->getMasterRequest()->get('file');
+        $filePath = 'secured/project/'.$file;
         $newFileName = $file;
         if (is_file($filePath)) 
         {
@@ -2033,7 +2033,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function projectMessagesAction()
     {
-        $this->getRequest()->getSession()->set('extended_project_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('extended_project_list_tab', 0);
         if ($this->getUser()->checkAccess('project_editall') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -2060,9 +2060,9 @@ class DefaultController extends Controller
         }
         
         $errors = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
-            $postparameters = $this->getRequest()->get('parameters');
+            $postparameters = $this->get('request_stack')->getMasterRequest()->get('parameters');
             
             if (isset($postparameters['default']))
             {

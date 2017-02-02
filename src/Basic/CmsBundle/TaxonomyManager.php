@@ -27,10 +27,10 @@ class TaxonomyManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Категории', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=', 99, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_listshow'));
-        $manager->addAdminMenu('Создать группу категорий', $this->container->get('router')->generate('basic_cms_taxonomy_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_new'), 'Категории');
-        $manager->addAdminMenu('Создать представление', $this->container->get('router')->generate('basic_cms_taxonomyshow_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_newshow'), 'Категории');
-        $manager->addAdminMenu('Список категорий', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=', 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Категории');
+        $manager->addAdminMenu('Категории', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=', 99, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_listshow'));
+        $manager->addAdminMenu('Создать группу категорий', $this->container->get('router')->generate('basic_cms_taxonomy_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_new'), 'Категории');
+        $manager->addAdminMenu('Создать представление', $this->container->get('router')->generate('basic_cms_taxonomyshow_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_newshow'), 'Категории');
+        $manager->addAdminMenu('Список категорий', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=', 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Категории');
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) $this->container->get($item)->registerMenu();
     }

@@ -26,7 +26,7 @@ class TemplateTest
     public function registerMenu()
     {
         //$manager = $this->container->get('cms.cmsManager');
-        //$manager->addAdminMenu('Текстовые страницы', $this->container->get('router')->generate('basic_cms_textpage_list'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('textpage_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('textpage_listsite'));
+        //$manager->addAdminMenu('Текстовые страницы', $this->container->get('router')->generate('basic_cms_textpage_list'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('textpage_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('textpage_listsite'));
     }
     
     public function registerRoles()

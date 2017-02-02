@@ -29,9 +29,9 @@ class UserAlertManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Оповещения пользователей', $this->container->get('router')->generate('extended_alert_config'), 2, $this->container->get('security.context')->getToken()->getUser()->checkAccess('user_alert'), 'Администрирование');
-        $manager->addAdminMenu('Социальные сети', $this->container->get('router')->generate('extended_alert_social'), 3, $this->container->get('security.context')->getToken()->getUser()->checkAccess('user_social'), 'Администрирование');
-        $manager->addAdminMenu('Рассылка', $this->container->get('router')->generate('extended_alert_subscribe'), 4, $this->container->get('security.context')->getToken()->getUser()->checkAccess('user_subscribe'), 'Администрирование');
+        $manager->addAdminMenu('Оповещения пользователей', $this->container->get('router')->generate('extended_alert_config'), 2, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('user_alert'), 'Администрирование');
+        $manager->addAdminMenu('Социальные сети', $this->container->get('router')->generate('extended_alert_social'), 3, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('user_social'), 'Администрирование');
+        $manager->addAdminMenu('Рассылка', $this->container->get('router')->generate('extended_alert_subscribe'), 4, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('user_subscribe'), 'Администрирование');
     }
     
     public function registerRoles()

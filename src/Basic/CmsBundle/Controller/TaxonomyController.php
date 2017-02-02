@@ -28,9 +28,9 @@ class TaxonomyController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $taxonomyobject = $this->getRequest()->get('object');
-        if ($taxonomyobject === null) $taxonomyobject = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_object');
-                                 else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_object', $taxonomyobject);
+        $taxonomyobject = $this->get('request_stack')->getMasterRequest()->get('object');
+        if ($taxonomyobject === null) $taxonomyobject = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_object');
+                                 else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_object', $taxonomyobject);
         $taxonomydescription = '';
         $taxonomyobjectsql = '';
         if ($taxonomyobject != '')
@@ -44,23 +44,23 @@ class TaxonomyController extends Controller
                 $taxonomyobject = '';
             }
         }
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_tab');
-                      else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 1) $tab = 1;
         if ($this->getUser()->checkAccess('taxonomy_list') == 0) $tab = 1;
         if ($this->getUser()->checkAccess('taxonomy_listshow') == 0) $tab = 0;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_page0');
-                        else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_sort0');
-                        else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_search0');
-                          else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_search0', $search0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_search0', $search0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -91,15 +91,15 @@ class TaxonomyController extends Controller
             if ($this->container->has($taxon['object'])) $taxon['objectName'] = $this->container->get($taxon['object'])->getDescription(); else $taxon['objectName'] = '';
         }
         // Таб 2
-        $page1 = $this->getRequest()->get('page1');
-        $sort1 = $this->getRequest()->get('sort1');
-        $search1 = $this->getRequest()->get('search1');
-        if ($page1 === null) $page1 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_page1');
-                        else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_page1', $page1);
-        if ($sort1 === null) $sort1 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_sort1');
-                        else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_sort1', $sort1);
-        if ($search1 === null) $search1 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_search1');
-                          else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_search1', $search1);
+        $page1 = $this->get('request_stack')->getMasterRequest()->get('page1');
+        $sort1 = $this->get('request_stack')->getMasterRequest()->get('sort1');
+        $search1 = $this->get('request_stack')->getMasterRequest()->get('search1');
+        if ($page1 === null) $page1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_page1');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_page1', $page1);
+        if ($sort1 === null) $sort1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_sort1');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_sort1', $sort1);
+        if ($search1 === null) $search1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_search1');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_search1', $search1);
         $page1 = intval($page1);
         $sort1 = intval($sort1);
         $search1 = trim($search1);
@@ -152,7 +152,7 @@ class TaxonomyController extends Controller
 // *******************************************    
     public function taxonomyCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_tab', 0);
         if (($this->getUser()->checkAccess('taxonomy_new') == 0) && ($pagetype == 0))
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -165,7 +165,7 @@ class TaxonomyController extends Controller
         $em = $this->getDoctrine()->getEntityManager();
         
         $taxonomyobjects = array();
-        $taxonomyobject = $this->getRequest()->get('object');
+        $taxonomyobject = $this->get('request_stack')->getMasterRequest()->get('object');
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if ((strpos($item,'object.') === 0) && ($this->container->get($item)->getTaxonomyType() == true)) $taxonomyobjects[$item] = $this->container->get($item)->getDescription();
 
@@ -180,16 +180,16 @@ class TaxonomyController extends Controller
         $activetab = 0;
         $tabs = array();
         $errors = false;
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
-            $taxpost = $this->getRequest()->get('tax');
+            $taxpost = $this->get('request_stack')->getMasterRequest()->get('tax');
             if (isset($taxpost['title'])) $tax['title'] = $taxpost['title'];
             if (isset($taxpost['object'])) $tax['object'] = $taxpost['object'];
             unset($taxpost);
             if (!preg_match("/^.{3,}$/ui", $tax['title'])) {$errors = true; $taxerror['title'] = 'Заголовок должен содержать более 3 символов';}
             if (!isset($taxonomyobjects[$tax['object']])) {$errors = true; $taxerror['object'] = 'Объект не найден';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
-            $categoriespost = $this->getRequest()->get('categories');
+            $categoriespost = $this->get('request_stack')->getMasterRequest()->get('categories');
             if (is_array($categoriespost))
             {
                 foreach ($categoriespost as $cat)
@@ -209,7 +209,7 @@ class TaxonomyController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                 $i++;
@@ -274,7 +274,7 @@ class TaxonomyController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyCreate', $taxent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyCreate', $taxent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -292,7 +292,7 @@ class TaxonomyController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'taxonomyCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -323,9 +323,9 @@ class TaxonomyController extends Controller
     
     public function taxonomyEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_tab', 0);
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $taxent = $this->getDoctrine()->getRepository('BasicCmsBundle:Taxonomies')->findOneBy(array('id'=>$id,'parent'=>null));
         if (empty($taxent))
         {
@@ -362,7 +362,7 @@ class TaxonomyController extends Controller
         $activetab = 0;
         $tabs = array();
         $errors = false;
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
             if ($this->getUser()->checkAccess('taxonomy_edit') == 0)
             {
@@ -373,7 +373,7 @@ class TaxonomyController extends Controller
                     'paths'=>array()
                 ));
             }
-            $categoriespost = $this->getRequest()->get('categories');
+            $categoriespost = $this->get('request_stack')->getMasterRequest()->get('categories');
             if (is_array($categoriespost))
             {
                 $categories = array();
@@ -397,7 +397,7 @@ class TaxonomyController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                 $i++;
@@ -434,7 +434,7 @@ class TaxonomyController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyEdit', $id, 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyEdit', $id, 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -452,7 +452,7 @@ class TaxonomyController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'taxonomyEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -468,7 +468,7 @@ class TaxonomyController extends Controller
     public function taxonomyEditAjaxDeleteAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $taxent = $this->getDoctrine()->getRepository('BasicCmsBundle:Taxonomies')->find($id);
         if (empty($taxent)) return new Response(json_encode(array('result'=>'error','message'=>'Категория не найдена')));
         if ($this->getUser()->checkAccess('taxonomy_edit') == 0) return new Response(json_encode(array('result'=>'error','message'=>'Доступ запрещён')));
@@ -501,7 +501,7 @@ class TaxonomyController extends Controller
         {
             foreach ($deltaxes as $deltax)
             {
-                if ($deltax['avatar'] != '') @unlink('..'.$deltax['avatar']);
+                if ($deltax['avatar'] != '') @unlink('.'.$deltax['avatar']);
                 if ($deltax['description'] != '') $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $deltax['description']);
             }
         }
@@ -511,7 +511,7 @@ class TaxonomyController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
         {
             $serv = $this->container->get($item);
-            $serv->getAdminController($this->getRequest(), 'taxonomyEditDelete', $id, 'save');
+            $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyEditDelete', $id, 'save');
         }       
         return new Response(json_encode(array('result'=>'OK','message'=>'')));
     }
@@ -519,8 +519,8 @@ class TaxonomyController extends Controller
     public function taxonomyEditAjaxAddAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
-        $name = $this->getRequest()->get('name');
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
+        $name = $this->get('request_stack')->getMasterRequest()->get('name');
         $taxent = $this->getDoctrine()->getRepository('BasicCmsBundle:Taxonomies')->findOneBy(array('id'=>$id,'parent'=>null));
         if (empty($taxent)) return new Response(json_encode(array('result'=>'error','message'=>'Категория не найдена')));
         if ($this->getUser()->checkAccess('taxonomy_edit') == 0) return new Response(json_encode(array('result'=>'error','message'=>'Доступ запрещён')));
@@ -608,7 +608,7 @@ class TaxonomyController extends Controller
     public function taxonomyEditAjaxSaveAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $taxent = $this->getDoctrine()->getRepository('BasicCmsBundle:Taxonomies')->findOneBy(array('id'=>$id,'parent'=>null));
         if (empty($taxent)) return new Response(json_encode(array('result'=>'error','message'=>'Группа категорий не найдена')));
         if ($this->getUser()->checkAccess('taxonomy_edit') == 0) return new Response(json_encode(array('result'=>'error','message'=>'Доступ запрещён')));
@@ -618,9 +618,9 @@ class TaxonomyController extends Controller
                                   'ORDER BY t.ordering')->setParameter('id', $id);
         $tree = $query->getResult();
         $errors = false;
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
-            $categoriespost = $this->getRequest()->get('categories');
+            $categoriespost = $this->get('request_stack')->getMasterRequest()->get('categories');
             if (is_array($categoriespost))
             {
                 $categories = array();
@@ -643,7 +643,7 @@ class TaxonomyController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 $i++;
             }     
@@ -676,7 +676,7 @@ class TaxonomyController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyEdit', $id, 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyEdit', $id, 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -695,7 +695,7 @@ class TaxonomyController extends Controller
     public function taxonomyAjaxAvatarAction() 
     {
         /*$userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         $source = "";
         if (@getimagesize($tmpfile)) 
@@ -713,17 +713,17 @@ class TaxonomyController extends Controller
             }
             if ($source) 
             {
-                $basepath = '../images/taxonomy/';
+                $basepath = 'images/taxonomy/';
                 $name = $this->getUser()->getId().'_'.md5(time()).'.jpg';
                 if (imagejpeg($source, $basepath . $name)) return new Response(json_encode(array('file' => '/images/taxonomy/'.$name, 'error' => '')));
             }
             unset($source);*
-            $basepath = '../images/taxonomy/';
+            $basepath = 'images/taxonomy/';
             $name = $this->getUser()->getId().'_'.md5(time()).'.jpg';
             if (move_uploaded_file($tmpfile, $basepath . $name)) return new Response(json_encode(array('file' => '/images/taxonomy/'.$name, 'error' => '')));
         } else return new Response(json_encode(array('file' => '', 'error' => 'Неправильный формат файла')));*/
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -736,7 +736,7 @@ class TaxonomyController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/taxonomy/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -752,7 +752,7 @@ class TaxonomyController extends Controller
     public function taxonomyCatEditAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $taxonomyent = $this->getDoctrine()->getRepository('BasicCmsBundle:Taxonomies')->find($id);
         if (empty($taxonomyent))
         {
@@ -941,7 +941,7 @@ class TaxonomyController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('taxonomy_edit') == 0)
             {
@@ -952,9 +952,9 @@ class TaxonomyController extends Controller
                     'paths'=>array()
                 ));
             }
-            $changeCategoryChilds = intval($this->getRequest()->get('changecategorychilds'));
+            $changeCategoryChilds = intval($this->get('request_stack')->getMasterRequest()->get('changecategorychilds'));
             // Проверка основных данных
-            $posttax = $this->getRequest()->get('tax');
+            $posttax = $this->get('request_stack')->getMasterRequest()->get('tax');
             if (isset($posttax['title'])) $tax['title'] = $posttax['title'];
             if (isset($posttax['description'])) $tax['description'] = $posttax['description'];
             if (isset($posttax['avatar'])) $tax['avatar'] = $posttax['avatar'];
@@ -964,12 +964,12 @@ class TaxonomyController extends Controller
             if (isset($posttax['metakey'])) $tax['metakey'] = $posttax['metakey'];
             unset($posttax);
             if (!preg_match("/^.{3,}$/ui", $tax['title'])) {$errors = true; $taxerror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($tax['avatar'] != '') && (!file_exists('..'.$tax['avatar']))) {$errors = true; $taxerror['avatar'] = 'Файл не найден';}
+            if (($tax['avatar'] != '') && (!file_exists('.'.$tax['avatar']))) {$errors = true; $taxerror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $tax['metadescr'])) {$errors = true; $taxerror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $tax['metakey'])) {$errors = true; $taxerror['metakey'] = 'Использованы недопустимые символы';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['childsUrl'])) $page['childsUrl'] = trim($postpage['childsUrl']);
@@ -1012,7 +1012,7 @@ class TaxonomyController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $posttaxloc = $this->getRequest()->get('taxloc');
+            $posttaxloc = $this->get('request_stack')->getMasterRequest()->get('taxloc');
             foreach ($locales as $locale)
             {
                 if (isset($posttaxloc[$locale['shortName']]['title'])) $taxloc[$locale['shortName']]['title'] = $posttaxloc[$locale['shortName']]['title'];
@@ -1026,7 +1026,7 @@ class TaxonomyController extends Controller
             unset($posttaxloc);
             if (($errors == true) && ($activetab == 0)) $activetab = 3;
             // Валидация данныx о выводе
-            $postpageparams = $this->getRequest()->get('pageparams');
+            $postpageparams = $this->get('request_stack')->getMasterRequest()->get('pageparams');
             if (is_array($postpageparams))
             {
                 if (isset($postpageparams['includeCategories'])) $pageparams['includeCategories'] = intval($postpageparams['includeCategories']); else $pageparams['includeCategories'] = 0;
@@ -1047,7 +1047,7 @@ class TaxonomyController extends Controller
             if ((!preg_match("/^\d+$/ui", $pageparams['countValue'])) || ($pageparams['countValue'] < 1) || ($pageparams['countValue'] > 1000)) {$errors = true; $pageparamserror['countValue'] = 'Должно быть указано число от 1 до 1000';}
             if ((!preg_match("/^\d+$/ui", $pageparams['pageValue'])) || ($pageparams['pageValue'] < 0)) {$errors = true; $pageparamserror['pageValue'] = 'Должно быть указано положительное число';}
             // Валидация фильтров
-            $postfilterparams = $this->getRequest()->get('filterparams');
+            $postfilterparams = $this->get('request_stack')->getMasterRequest()->get('filterparams');
             $filterparams = array();
             if (is_array($postfilterparams))
             {
@@ -1093,7 +1093,7 @@ class TaxonomyController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyCatEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyCatEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -1101,7 +1101,7 @@ class TaxonomyController extends Controller
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                if (($taxonomyent->getAvatar() != '') && ($taxonomyent->getAvatar() != $tax['avatar'])) @unlink('..'.$taxonomyent->getAvatar());
+                if (($taxonomyent->getAvatar() != '') && ($taxonomyent->getAvatar() != $tax['avatar'])) @unlink('.'.$taxonomyent->getAvatar());
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($tax['avatar']);
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($tax['description'], $taxonomyent->getDescription());
                 $taxonomyent->setTitle($tax['title']);
@@ -1181,7 +1181,7 @@ class TaxonomyController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyCatEdit', $taxonomyent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyCatEdit', $taxonomyent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -1248,7 +1248,7 @@ class TaxonomyController extends Controller
                             foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                             {
                                 $serv = $this->container->get($item);
-                                $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyCatEdit', $taxonomychildent->getId(), 'saveChilds');
+                                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyCatEdit', $taxonomychildent->getId(), 'saveChilds');
                                 if ($localerror == true) $errors = true;
                                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                                 $i++;
@@ -1275,7 +1275,7 @@ class TaxonomyController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'taxonomyCatEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyCatEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -1308,7 +1308,7 @@ class TaxonomyController extends Controller
 // *******************************************    
     public function taxonomyShowCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_tab', 1);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_tab', 1);
         $em = $this->getDoctrine()->getEntityManager();
         if ($this->getUser()->checkAccess('taxonomy_newshow') == 0)
         {
@@ -1321,7 +1321,7 @@ class TaxonomyController extends Controller
         }
         // Предварительный выбор объекта классификации
         $taxonomyobjects = array();
-        $taxonomyobject = $this->getRequest()->get('object');
+        $taxonomyobject = $this->get('request_stack')->getMasterRequest()->get('object');
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if ((strpos($item,'object.') === 0) && ($this->container->get($item)->getTaxonomyType() == true)) $taxonomyobjects[$item] = $this->container->get($item)->getDescription();
         if (!isset($taxonomyobjects[$taxonomyobject]))
@@ -1432,10 +1432,10 @@ class TaxonomyController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $posttax = $this->getRequest()->get('tax');
+            $posttax = $this->get('request_stack')->getMasterRequest()->get('tax');
             if (isset($posttax['title'])) $tax['title'] = $posttax['title'];
             if (isset($posttax['description'])) $tax['description'] = $posttax['description'];
             if (isset($posttax['avatar'])) $tax['avatar'] = $posttax['avatar'];
@@ -1444,12 +1444,12 @@ class TaxonomyController extends Controller
             if (isset($posttax['metakey'])) $tax['metakey'] = $posttax['metakey'];
             unset($posttax);
             if (!preg_match("/^.{3,}$/ui", $tax['title'])) {$errors = true; $taxerror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($tax['avatar'] != '') && (!file_exists('..'.$tax['avatar']))) {$errors = true; $taxerror['avatar'] = 'Файл не найден';}
+            if (($tax['avatar'] != '') && (!file_exists('.'.$tax['avatar']))) {$errors = true; $taxerror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $tax['metadescr'])) {$errors = true; $taxerror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $tax['metakey'])) {$errors = true; $taxerror['metakey'] = 'Использованы недопустимые символы';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -1486,7 +1486,7 @@ class TaxonomyController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $posttaxloc = $this->getRequest()->get('taxloc');
+            $posttaxloc = $this->get('request_stack')->getMasterRequest()->get('taxloc');
             foreach ($locales as $locale)
             {
                 if (isset($posttaxloc[$locale['shortName']]['title'])) $taxloc[$locale['shortName']]['title'] = $posttaxloc[$locale['shortName']]['title'];
@@ -1500,7 +1500,7 @@ class TaxonomyController extends Controller
             unset($posttaxloc);
             if (($errors == true) && ($activetab == 0)) $activetab = 3;
             // Валидация данныx о выводе
-            $postpageparams = $this->getRequest()->get('pageparams');
+            $postpageparams = $this->get('request_stack')->getMasterRequest()->get('pageparams');
             if (is_array($postpageparams))
             {
                 if (isset($postpageparams['sortField'])) $pageparams['sortField'] = $postpageparams['sortField'];
@@ -1518,7 +1518,7 @@ class TaxonomyController extends Controller
             if ((!preg_match("/^\d+$/ui", $pageparams['countValue'])) || ($pageparams['countValue'] < 1) || ($pageparams['countValue'] > 1000)) {$errors = true; $pageparamserror['countValue'] = 'Должно быть указано число от 1 до 1000';}
             if ((!preg_match("/^\d+$/ui", $pageparams['pageValue'])) || ($pageparams['pageValue'] < 0)) {$errors = true; $pageparamserror['pageValue'] = 'Должно быть указано положительное число';}
             // Валидация фильтров
-            $postfilterparams = $this->getRequest()->get('filterparams');
+            $postfilterparams = $this->get('request_stack')->getMasterRequest()->get('filterparams');
             $filterparams = array();
             if (is_array($postfilterparams))
             {
@@ -1558,7 +1558,7 @@ class TaxonomyController extends Controller
                 }
             }
             $selcategories = array();
-            $postselcategories = $this->getRequest()->get('selcategories');
+            $postselcategories = $this->get('request_stack')->getMasterRequest()->get('selcategories');
             if (is_array($postselcategories)) 
             {
                 foreach ($categories as $cat) if (in_array($cat['id'], $postselcategories)) $selcategories[] = $cat['id'];
@@ -1570,7 +1570,7 @@ class TaxonomyController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyShowCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyShowCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -1639,7 +1639,7 @@ class TaxonomyController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyShowCreate', $showent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyShowCreate', $showent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -1655,7 +1655,7 @@ class TaxonomyController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'taxonomyShowCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyShowCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -1688,7 +1688,7 @@ class TaxonomyController extends Controller
 // *******************************************    
     public function taxonomyShowEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_tab', 1);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_tab', 1);
         $em = $this->getDoctrine()->getEntityManager();
         if ($this->getUser()->checkAccess('taxonomy_viewshow') == 0)
         {
@@ -1699,7 +1699,7 @@ class TaxonomyController extends Controller
                 'paths'=>array()
             ));
         }
-        $id = $this->getRequest()->get('id');
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
         $showent = $this->getDoctrine()->getRepository('BasicCmsBundle:TaxonomyShows')->find($id);
         if (empty($showent))
         {
@@ -1883,7 +1883,7 @@ class TaxonomyController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('taxonomy_editshow') == 0)
             {
@@ -1895,7 +1895,7 @@ class TaxonomyController extends Controller
                 ));
             }
             // Проверка основных данных
-            $posttax = $this->getRequest()->get('tax');
+            $posttax = $this->get('request_stack')->getMasterRequest()->get('tax');
             if (isset($posttax['title'])) $tax['title'] = $posttax['title'];
             if (isset($posttax['description'])) $tax['description'] = $posttax['description'];
             if (isset($posttax['avatar'])) $tax['avatar'] = $posttax['avatar'];
@@ -1904,12 +1904,12 @@ class TaxonomyController extends Controller
             if (isset($posttax['metakey'])) $tax['metakey'] = $posttax['metakey'];
             unset($posttax);
             if (!preg_match("/^.{3,}$/ui", $tax['title'])) {$errors = true; $taxerror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($tax['avatar'] != '') && (!file_exists('..'.$tax['avatar']))) {$errors = true; $taxerror['avatar'] = 'Файл не найден';}
+            if (($tax['avatar'] != '') && (!file_exists('.'.$tax['avatar']))) {$errors = true; $taxerror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $tax['metadescr'])) {$errors = true; $taxerror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $tax['metakey'])) {$errors = true; $taxerror['metakey'] = 'Использованы недопустимые символы';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -1947,7 +1947,7 @@ class TaxonomyController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $posttaxloc = $this->getRequest()->get('taxloc');
+            $posttaxloc = $this->get('request_stack')->getMasterRequest()->get('taxloc');
             foreach ($locales as $locale)
             {
                 if (isset($posttaxloc[$locale['shortName']]['title'])) $taxloc[$locale['shortName']]['title'] = $posttaxloc[$locale['shortName']]['title'];
@@ -1961,7 +1961,7 @@ class TaxonomyController extends Controller
             unset($posttaxloc);
             if (($errors == true) && ($activetab == 0)) $activetab = 3;
             // Валидация данныx о выводе
-            $postpageparams = $this->getRequest()->get('pageparams');
+            $postpageparams = $this->get('request_stack')->getMasterRequest()->get('pageparams');
             if (is_array($postpageparams))
             {
                 if (isset($postpageparams['sortField'])) $pageparams['sortField'] = $postpageparams['sortField'];
@@ -1979,7 +1979,7 @@ class TaxonomyController extends Controller
             if ((!preg_match("/^\d+$/ui", $pageparams['countValue'])) || ($pageparams['countValue'] < 1) || ($pageparams['countValue'] > 1000)) {$errors = true; $pageparamserror['countValue'] = 'Должно быть указано число от 1 до 1000';}
             if ((!preg_match("/^\d+$/ui", $pageparams['pageValue'])) || ($pageparams['pageValue'] < 0)) {$errors = true; $pageparamserror['pageValue'] = 'Должно быть указано положительное число';}
             // Валидация фильтров
-            $postfilterparams = $this->getRequest()->get('filterparams');
+            $postfilterparams = $this->get('request_stack')->getMasterRequest()->get('filterparams');
             $filterparams = array();
             if (is_array($postfilterparams))
             {
@@ -2019,7 +2019,7 @@ class TaxonomyController extends Controller
                 }
             }
             $selcategories = array();
-            $postselcategories = $this->getRequest()->get('selcategories');
+            $postselcategories = $this->get('request_stack')->getMasterRequest()->get('selcategories');
             if (is_array($postselcategories)) 
             {
                 foreach ($categories as $cat) if (in_array($cat['id'], $postselcategories)) $selcategories[] = $cat['id'];
@@ -2031,7 +2031,7 @@ class TaxonomyController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyShowEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyShowEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 5;
                 $i++;
@@ -2039,7 +2039,7 @@ class TaxonomyController extends Controller
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                if (($showent->getAvatar() != '') && ($showent->getAvatar() != $tax['avatar'])) @unlink('..'.$showent->getAvatar());
+                if (($showent->getAvatar() != '') && ($showent->getAvatar() != $tax['avatar'])) @unlink('.'.$showent->getAvatar());
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($tax['avatar']);
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($tax['description'], $showent->getDescription());
                 $showent->setTitle($tax['title']);
@@ -2119,7 +2119,7 @@ class TaxonomyController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'taxonomyShowEdit', $showent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyShowEdit', $showent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -2135,7 +2135,7 @@ class TaxonomyController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'taxonomyShowEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyShowEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -2170,10 +2170,10 @@ class TaxonomyController extends Controller
     
     public function taxonomyAjaxAction()
     {
-        $tab = intval($this->getRequest()->get('tab'));
-        $taxonomyobject = $this->getRequest()->get('object');
-        if ($taxonomyobject === null) $taxonomyobject = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_object');
-                                 else $this->getRequest()->getSession()->set('basic_cms_taxonomy_list_object', $taxonomyobject);
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
+        $taxonomyobject = $this->get('request_stack')->getMasterRequest()->get('object');
+        if ($taxonomyobject === null) $taxonomyobject = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_object');
+                                 else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_taxonomy_list_object', $taxonomyobject);
         $taxonomydescription = '';
         $taxonomyobjectsql = '';
         if ($taxonomyobject != '')
@@ -2198,7 +2198,7 @@ class TaxonomyController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'deletetaxonomy')
         {
@@ -2212,7 +2212,7 @@ class TaxonomyController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -2238,7 +2238,7 @@ class TaxonomyController extends Controller
                     {
                         foreach ($deltaxes as $deltax)
                         {
-                            if ($deltax['avatar'] != '') @unlink('..'.$deltax['avatar']);
+                            if ($deltax['avatar'] != '') @unlink('.'.$deltax['avatar']);
                             if ($deltax['description'] != '') $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $deltax['description']);
                         }
                     }
@@ -2247,7 +2247,7 @@ class TaxonomyController extends Controller
                     foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                     {
                         $serv = $this->container->get($item);
-                        $serv->getAdminController($this->getRequest(), 'taxonomyDelete', $key, 'save');
+                        $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyDelete', $key, 'save');
                     }       
                 }
         }
@@ -2263,7 +2263,7 @@ class TaxonomyController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -2287,7 +2287,7 @@ class TaxonomyController extends Controller
                     {
                         foreach ($deltaxes as $deltax)
                         {
-                            if ($deltax['avatar'] != '') @unlink('..'.$deltax['avatar']);
+                            if ($deltax['avatar'] != '') @unlink('.'.$deltax['avatar']);
                             if ($deltax['description'] != '') $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $deltax['description']);
                         }
                     }
@@ -2296,7 +2296,7 @@ class TaxonomyController extends Controller
                     foreach ($cmsservices as $item) if (strpos($item,'addone.taxonomy.') === 0) 
                     {
                         $serv = $this->container->get($item);
-                        $serv->getAdminController($this->getRequest(), 'taxonomyShowDelete', $key, 'save');
+                        $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'taxonomyShowDelete', $key, 'save');
                     }       
                 }
         }
@@ -2311,7 +2311,7 @@ class TaxonomyController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -2336,7 +2336,7 @@ class TaxonomyController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -2355,9 +2355,9 @@ class TaxonomyController extends Controller
         if ($tab == 0)
         {
             // Таб 1
-            $page0 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_page0');
-            $sort0 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_sort0');
-            $search0 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_search0');
+            $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_search0');
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -2403,9 +2403,9 @@ class TaxonomyController extends Controller
         if ($tab == 1)
         {
             // Таб 2
-            $page1 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_page1');
-            $sort1 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_sort1');
-            $search1 = $this->getRequest()->getSession()->get('basic_cms_taxonomy_list_search1');
+            $page1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_page1');
+            $sort1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_sort1');
+            $search1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_taxonomy_list_search1');
             $page1 = intval($page1);
             $sort1 = intval($sort1);
             $search1 = trim($search1);

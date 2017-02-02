@@ -76,6 +76,6 @@ class Request {
             return '1.1';
         }
     }
-
+    
 }
 

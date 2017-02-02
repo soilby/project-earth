@@ -1,0 +1,1616 @@
+body {
+	background: #fff;
+}
+
+html,body {
+	height: 100%;
+	font-family: Verdana;
+	min-width: 1140px;
+}
+
+header, footer, div#contentMainWrap {
+	display: block;
+}
+
+
+header {
+	height: 300px;
+	width: 100%;
+	background: url(/img/headerbk.png) #185359 repeat-x left top;
+}
+
+.headerLogo {
+	padding: 20px 20px 0 20px;
+	width: 300px;
+	text-align: center;
+	color: #fff;
+	font-size: 18px;
+	font-weight: normal;
+	text-shadow: 0 0 5px #000;
+}
+
+div#contentMainWrap {
+
+}
+
+.leftSide {
+	float: left;
+	width: 300px;
+	padding: 20px;
+}
+
+.mainContent {
+	margin-left: 340px;
+	padding: 20px 20px 20px 0;
+}
+
+.blockTitle {
+	color: #185359;
+	border-bottom: 1px solid #CCCCCC;
+    font-size: 18px;
+    margin: 5px 0;
+    padding: 5px;
+}
+
+.mainMenu {
+	list-style: none;
+	padding-left: 10px;
+}
+
+.mainMenu ul {
+    padding-left: 20px;
+}
+
+.mainMenu>li {
+	padding: 5px;
+	border-bottom: 1px solid #ccc;
+	color: #333;
+}
+
+.mainMenu>li a{
+	color: #333;
+	text-decoration: none;
+}
+
+.mainMenu>li.active a{
+	font-weight: bold;
+}
+.mainMenu>li a:hover{
+	text-decoration: underline;
+}
+
+.button {
+	background: #edeaed;
+	background-image: -webkit-linear-gradient(top, #edeaed, #bfbfbf);
+	background-image: -moz-linear-gradient(top, #edeaed, #bfbfbf);
+	background-image: -ms-linear-gradient(top, #edeaed, #bfbfbf);
+	background-image: -o-linear-gradient(top, #edeaed, #bfbfbf);
+	background-image: linear-gradient(to bottom, #edeaed, #bfbfbf);
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0px;
+	color: #000000 !important;
+	padding: 0 20px;
+	line-height: 25px;
+	border: solid #c7c7c7 1px;
+	text-decoration: none !important;
+	display:inline-block;
+	box-sizing: content-box;
+	-moz-box-sizing: content-box;  
+	font-weight: bold;
+	font-size: 12px;
+	font-family: Verdana;
+	text-align: center;
+	margin: 0 5px;
+}
+
+.button:hover {
+	background: #ffffff;
+	background-image: -webkit-linear-gradient(top, #ffffff, #c4c4c4);
+	background-image: -moz-linear-gradient(top, #ffffff, #c4c4c4);
+	background-image: -ms-linear-gradient(top, #ffffff, #c4c4c4);
+	background-image: -o-linear-gradient(top, #ffffff, #c4c4c4);
+	background-image: linear-gradient(to bottom, #ffffff, #c4c4c4);
+	text-decoration: none;
+}
+
+input[type="text"], input[type="password"], textarea {
+	background: #ffffff;
+	background-image: -webkit-linear-gradient(top, #e4e4e4, #ffffff);
+	background-image: -moz-linear-gradient(top, #e4e4e4, #ffffff);
+	background-image: -ms-linear-gradient(top, #e4e4e4, #ffffff);
+	background-image: -o-linear-gradient(top, #e4e4e4, #ffffff);
+	background-image: linear-gradient(to bottom, #e4e4e4, #ffffff);
+	border: solid 1px #c7c7c7;
+	padding: 5px;
+	color: #000;
+}
+
+.loginForm {
+	padding-left: 10px;
+}
+
+.loginForm p{
+	margin:5px 0;
+}
+
+.loginForm .button {
+	width: 240px;
+	margin: 0;
+}
+
+.loginFormLogin input, .loginFormPassword input{
+	padding-left:35px;
+	width: 240px;
+}
+
+.loginFormLogin:before {
+	content: "";
+	display: block;
+	position: absolute;
+	width: 27px;
+	height: 27px;
+	background: #000;
+	z-index: 1;
+	background: url(/img/logininput.png) top left no-repeat;
+	overflow: hidden;
+}
+
+.loginFormPassword:before {
+	content: "";
+	display: block;
+	position: absolute;
+	width: 27px;
+	height: 27px;
+	background: #000;
+	z-index: 1;
+	background: url(/img/logininput.png) bottom left no-repeat;
+	overflow: hidden;
+}
+
+.nowOnSite {
+	padding-left: 10px;
+}
+
+footer {
+	border-top: 1px #ccc solid;
+	padding: 10px;
+}
+
+footer p {
+	text-align: center;
+	color: #aaa;
+	font-style: italic;
+	font-size: 90%;
+}
+
+footer p a {
+	color: #aaa;
+	text-decoration: underline;
+}
+
+footer p a:hover {
+	color: #000;
+}
+
+.mainContent a{
+	color: #00f;
+	text-decoration: underline;
+}
+
+.mainContent a:hover{
+	text-decoration: none;
+}
+
+.parallaxWrap {
+	height: 500px;
+	width: 100%;
+	overflow: hidden;
+	position: relative;
+}
+
+.parallaxLayer {
+	position: absolute;
+	margin-left: 0px;
+	margin-top: 0px;
+	text-align: center;
+	width: 100%;
+}
+
+.mainParallaxText {
+	font-size: 20px;
+	font-weight: bold;
+	text-shadow: 0 0 7px #555;
+	margin-bottom: 330px;
+	margin-top: 40px;
+}
+
+.mainParallaxLogo {
+	margin-top: 70px;
+}
+
+.mainPage {
+	font-size: 20px;
+	font-weight: bold;
+	text-shadow: 0 0 3px #999;
+	margin: 10px 0;
+	/*text-align: center;*/
+}
+
+.breadCrumbs {
+	margin-bottom: 10px;
+	font-size: 11px;
+	font-style: italic;
+}
+
+.breadCrumbs a {
+    color: #000;
+}
+
+.breadCrumbs a:after {
+    display: inline-block;
+    content: "-";
+    padding: 0 5px 0 10px;
+}
+
+.breadCrumbs a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+div#contentMainWrap h1 {
+	font-size: 20px;
+	color: #185359;
+	font-weight: bold;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #ccc;
+}
+
+.catalogCategories>div {
+	display: inline-block;
+}
+
+.catalogCategories>div>a {
+	display: inline-block;
+	vertical-align: top;
+	border: 1px #ccc solid;
+	text-align: center;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+	width: 200px;
+}
+
+.catalogCategories img{
+	max-width: 200px;
+	max-height: 200px;
+}
+
+.catalogCategories>div>a:hover {
+	background: #eee;
+	text-decoration: underline;
+}
+
+.sortWrap {
+	color: #777;
+	line-height: 20px;
+}
+
+.sortWrap a{
+	display: inline-block;
+	color: #777;
+	text-decoration: none;
+	background: #fff;
+	border: 1px #ccc solid;
+	border-radius: 5px;
+	padding: 0 5px;
+	margin: 0 5px;
+}
+
+.sortWrap a.active{
+	color: #fff;
+	background: #999;
+	border: 1px #999 solid;
+}
+
+
+.sortWrap a:hover{
+	text-decoration: underline;
+}
+
+
+.catalogProducts>div {
+	display: inline-block;
+}
+
+.catalogProducts img{
+	max-width: 200px;
+	max-height: 200px;
+}
+.catalogProducts>div>a {
+	display: inline-block;
+	vertical-align: top;
+	border: 1px #ccc solid;
+	text-align: center;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+	width: 200px;
+}
+
+.catalogProducts>div>a:hover {
+	background: #eee;
+}
+
+.catalogProducts>div>a:hover p{
+	text-decoration: underline;
+}
+.catalogProducts>div>a .price{
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.catalogProducts>div>a:hover .price{
+	text-decoration: none;
+}
+
+.paginatorWrap {
+	color: #777;
+	line-height: 20px;
+}
+
+.paginatorWrap a{
+	display: inline-block;
+	color: #777;
+	text-decoration: none;
+	background: #fff;
+	border: 1px #ccc solid;
+	border-radius: 5px;
+	padding: 0 5px;
+	margin: 0 5px;
+	min-width: 20px;
+	text-align:center;
+}
+
+.paginatorWrap a.active{
+	color: #fff;
+	background: #999;
+	border: 1px #999 solid;
+}
+
+
+.paginatorWrap a:hover{
+	text-decoration: underline;
+}
+
+.catalogOneProduct .imageWrap {
+	width: 400px;
+	float: left;
+	text-align: center;
+}
+
+.catalogOneProduct .imageWrap img{
+	max-height: 400px;
+	max-width: 400px;
+}
+
+.catalogOneProduct .infoWrap {
+	min-height: 400px;
+	margin-left: 420px;
+}
+.catalogOneProduct .infoWrap p{
+	line-height: 40px;
+	border-bottom: 1px #ccc solid;
+	padding-left: 5px;
+}
+
+.catalogOneProduct .infoWrap p strong{
+	font-weight: bold;
+}
+
+.knowledgeCategories>div {
+	display: inline-block;
+}
+
+.knowledgeCategories>div>a {
+	display: inline-block;
+	vertical-align: top;
+	border: 1px #ccc solid;
+	text-align: center;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+	width: 200px;
+}
+
+.knowledgeCategories img{
+	max-width: 200px;
+	max-height: 200px;
+}
+
+.knowledgeCategories>div>a:hover {
+	background: #eee;
+	text-decoration: underline;
+}
+
+.knowledgeItems>div {
+	display: block;
+}
+
+.knowledgeItems img{
+	max-width: 200px;
+	max-height: 200px;
+}
+.knowledgeItems>div>a {
+	display: block;
+	border: 1px #ccc solid;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+	min-height: 200px;
+}
+
+.knowledgeItems>div>a p{
+	margin-left: 220px;
+}
+
+.knowledgeItems>div>a:hover {
+	background: #eee;
+}
+
+.knowledgeItems>div>a:hover p{
+	text-decoration: underline;
+}
+.knowledgeItems>div>a .description{
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.knowledgeItems>div>a:hover .description{
+	text-decoration: none;
+}
+
+
+.knowledgeItems .imageWrap {
+	width: 200px;
+	float:left;
+}
+
+.knowledgeOneItem {
+	line-height: 200%;
+}
+
+.villageDescription {
+	line-height: 200%;
+}
+
+.villageItems>div {
+	display: inline-block;
+}
+
+.villageItems>div>a {
+	display: inline-block;
+	vertical-align: top;
+	border: 1px #ccc solid;
+	text-align: center;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+	width: 200px;
+}
+
+.villageItems img{
+	max-width: 200px;
+	max-height: 200px;
+}
+
+.villageItems>div>a:hover {
+	background: #eee;
+	text-decoration: underline;
+}
+
+.villageOneItem {
+	line-height: 200%;
+}
+
+.profileTable  {
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.profileTable td{
+	vertical-align: middle;
+	padding-bottom: 10px;
+}
+
+.profileTable .avatarWrap {
+	margin: 5px;
+	width: 250px;
+	text-align: center;
+}
+
+.profileTable .avatarWrap img{
+	max-width: 200px;
+	max-height: 200px;
+	padding-bottom: 5px;
+}
+.profileTable input[type="text"], .profileTable input[type="password"], .profileTable textarea {
+	width: 250px;
+}
+
+.profileTable p.error {
+	font-size: 11px;
+	color: #f00;
+	font-style: italic;
+}
+
+.profileTable .valueCol {
+	width: 250px;
+}
+
+.tableTitle {
+	height: 39px;
+	line-height: 39px;
+	background: url(/img/forumtitlebk.png) repeat-x;
+	font-size: 15px;
+	font-weight: bold;
+	color: #fff;
+	padding: 0 15px;
+}
+
+.forumCatTable tr{
+	border-bottom: solid 1px #ccc;
+}
+
+.forumCatTable tr:last-child{
+	border-bottom: none;
+}
+
+.forumCatTable tr td {
+	padding: 5px;
+}
+
+
+.forumColNewFlag {
+	width: 40px;
+}
+.forumColTitle {
+
+}
+.forumColLastMsg {
+	width: 30ex;
+}
+.forumColInfo {
+	width: 25ex;
+}
+
+.forumNewFlagOn {
+	display: inline-block;
+	overflow: hidden;
+	width: 20px;
+	height: 20px;
+	margin: 5px;
+	background: url(/img/forumnew.png) no-repeat right top;
+}
+
+.forumNewFlagOff {
+	display: inline-block;
+	overflow: hidden;
+	width: 20px;
+	height: 20px;
+	margin: 5px;
+	background: url(/img/forumnew.png) no-repeat left top;
+}
+
+.forumTitle {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.forumTitle a {
+	color: #185359;
+	text-decoration: none;
+}
+
+.forumTitle a.important:before {
+	display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: url(/img/forumimportant.png) no-repeat;
+        padding-right: 3px;
+        content: "";
+        vertical-align: top;          
+}
+
+.forumTitle a:hover {
+	text-decoration: underline;
+}
+
+.forumDescription {
+	color: #777;
+	font-size: 11px;
+	font-style: italic;
+}
+
+.forumColLastMsg {
+	color: #777;
+	font-size: 11px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.forumColLastMsg a{
+	color: #777;
+	text-decoration: none;
+}
+
+.forumColLastMsg a:hover{
+	text-decoration: underline;
+}
+
+.forumColInfo {
+	text-align: center;
+	vertical-align: middle;
+	color: #333;
+	font-weight: normal;
+	font-size: 10px;
+        color: #777;
+}
+
+.forumColInfo span{
+        font-size: 18px;
+        font-weight: bold;
+        color: #185359;
+}
+
+.forumColAuthor {
+	width: 150px;
+}
+
+.forumColAuthor .button {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.forumColMessage {
+
+}
+
+.forumColAuthor {
+	text-align: center;
+}
+
+.forumColAuthor strong{
+	display: block;
+	font-size: 12px;
+	font-weight: bold;
+	color: #000;
+}
+.forumColAuthor em{
+	display: block;
+	font-size: 11px;
+	color: #aaa;
+	
+}
+
+.forumColAuthor img{
+	display: block;
+	margin: 5px auto;
+	max-width: 100px;
+	max-height: 100px;
+}
+
+.messageInfo {
+	color: #999;
+	font-size: 11px;
+	font-weight: normal;
+	font-style: italic;
+}
+
+.messageInfo a {
+	color: #999;
+	text-decoration: none;
+}
+
+.messageInfo a:hover{
+	text-decoration: underline;
+}
+
+.messageModeration {
+	border-top: solid 1px #ccc;
+	color: #f00;
+	padding-top: 5px;
+	margin-top: 5px;
+}
+
+.forumMsgTable tr{
+	background: #f0f1f2;
+	border-bottom: solid 1px #fff; 
+}
+
+.forumMsgTable tr:nth-child(even){
+	background: #e1e5e8;
+}
+.forumMsgTable tr:last-child{
+	border-bottom: none;
+}
+
+.forumMsgTable tr td {
+	padding: 5px;
+}
+
+.messageAttachments {
+	border-top: solid 1px #ccc;
+	padding-top: 5px;
+	margin-top: 5px;
+}
+
+.messageAttachments a{
+	display: block;
+	color: #000;
+	text-decoration: underline;
+}
+
+.messageAttachments a:hover{
+	text-decoration: none;
+}
+
+.messageAttachments span{
+	display: block;
+	color: #aaa;
+}
+
+.popupContainer {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background:url(/img/popupbk.png) repeat;
+	z-index: 99;
+}
+
+.popupWindowModeration {
+	position: relative;
+	top: 100px;
+	left: 50%;
+	width: 600px;
+	/*height: 345px;*/
+	background: #fff;
+	box-shadow: 0 0 5px #000;
+	/*margin-top: -175px;*/
+	margin-left: -300px;
+	text-align: left;
+}
+
+.popupWindowModeration h4{
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.popupWindowModeration p{
+	padding: 5px 20px;
+}
+
+.popupWindowModeration p a{
+	color: #000;
+	text-decoration: underline;
+}
+
+.popupWindowModeration p a:hover{
+	text-decoration: none;
+}
+
+.popupWindowModeration textarea {
+	padding: 0 4px;
+	border: 1px solid #dcdcdc;
+	width: 550px;
+	height: 100px;
+	resize: none;
+}
+
+.popupWindowModeration .button {
+	width: 150px;
+}
+
+.popupWindowModeration span.error {
+	width: 100%;
+	font-size: 11px;
+	font-style: italic;
+	color: #f00;
+	text-align: right;
+}
+
+.popupWindowModeration input[type="text"] {
+	display: inline-block;
+	height: 28px;
+	margin: 0;
+	padding: 0 4px;
+	border: 1px solid #dcdcdc;
+	width: 200px;
+}
+.popupWindowModeration select{
+	width: 200px;
+}
+
+.popupWindowModeration p>span {
+	width: 350px;
+	display: inline-block;
+}
+
+
+.messageAdd {
+	width: 800px;
+	margin: 10px auto;
+}
+
+.messageAdd p{
+	padding: 5px 20px;
+}
+
+.messageAdd p a{
+	color: #000;
+	text-decoration: underline;
+}
+
+.messageAdd p a:hover{
+	text-decoration: none;
+}
+
+.messageAdd textarea {
+	padding: 0 4px;
+	border: 1px solid #dcdcdc;
+	width: 750px;
+	height: 100px;
+	resize: none;
+}
+
+.messageAdd .button {
+	width: 150px;
+}
+
+.messageAdd span.error {
+	width: 100%;
+	font-size: 11px;
+	font-style: italic;
+	color: #f00;
+	text-align: right;
+}
+
+.forumColMessage blockquote {
+	background: #d1d5d8;
+	padding: 0 10px;
+	margin: 0 10px;
+	border: solid 1px #fff;
+}
+
+.messageAdd p>span{
+	width: 450px;
+	display: inline-block;
+}
+
+.messageAdd input{
+	display: inline-block;
+	height: 28px;
+	margin: 0;
+	padding: 0 4px;
+	border: 1px solid #dcdcdc;
+	width: 300px;
+}
+.messageAdd select{
+	width: 300px;
+}
+
+.searchForm {
+	display: block;
+	height: 22px;
+	margin: 9px 20px 0 0;
+	float:right;
+}
+
+.searchForm input{
+	display: block;
+	height: 20px;
+	float: left;
+	margin: 0;
+	padding: 0 4px;
+	border-top: 1px solid #dcdcdc;
+	border-left: 1px solid #dcdcdc;
+	border-bottom: 1px solid #dcdcdc;
+	border-right: none;
+	width: 200px;
+}
+
+
+.searchForm button {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+	background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+	background-color:#ededed;
+	text-indent:0;
+	border:1px solid #dcdcdc;
+	display:block;
+	color:#000;
+	font-weight:normal;
+	font-style:normal;
+	height:20px;
+	line-height:18px;
+	text-decoration:none;
+	text-align:center;
+	margin: 0;
+	padding: 0 20px;
+	box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	font-family: Verdana;
+	float: left;
+}
+.searchForm button:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+	background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+	background-color:#dfdfdf;
+}
+.searchForm button:active {
+	position:relative;
+	top:1px;
+}
+
+#preloader {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background:url(/img/popupbk.png) repeat;
+	z-index: 100;
+}
+
+#preloader img{
+	top: 50%;
+	left: 50%;
+	width: 128px;
+	height: 128px;
+	margin-left: -64px;
+	margin-top: -64px;
+	display: block;
+	position: relative;
+}
+
+ul li {
+    list-style: disc inside;    
+}
+
+.documentNewForm {
+	width: 800px;
+	margin: 10px auto;
+}
+
+.documentNewForm p{
+	padding: 5px 20px;
+}
+
+.documentNewForm p a{
+	color: #000;
+	text-decoration: underline;
+}
+
+.documentNewForm p a:hover{
+	text-decoration: none;
+}
+
+.documentNewForm input {
+	width: 250px;
+}
+
+.documentNewForm .button {
+	width: 150px;
+        line-height: 23px;
+        vertical-align: top;
+}
+
+.documentNewForm span.error {
+	width: 100%;
+	font-size: 11px;
+	font-style: italic;
+	color: #f00;
+	text-align: right;
+}
+
+.documentNewForm select{
+        display: inline-block;
+        height: 27px;
+        line-height: 27px;
+        margin: 0 0 0 5px;
+        padding: 0;   
+}
+
+.documentEditContent p{
+	padding: 5px 0px;
+}
+
+.documentEditContent p a{
+	color: #000;
+	text-decoration: underline;
+}
+
+.documentEditContent p a:hover{
+	text-decoration: none;
+}
+
+.documentEditContent input[type="text"] {
+	width: 250px;
+        margin-left: 20px;
+        margin-right: 20px;
+}
+
+.documentEditContent .button {
+	width: 150px;
+        line-height: 23px;
+        vertical-align: top;
+}
+
+.documentEditContent span.error {
+	width: 100%;
+	font-size: 11px;
+	font-style: italic;
+	color: #f00;
+	text-align: right;
+}
+
+/*.projectItems>div {
+	display: block;
+}
+
+.projectItems img{
+	max-width: 200px;
+	max-height: 200px;
+}
+.projectItems>div>a {
+	display: block;
+	border: 1px #ccc solid;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+	//min-height: 200px;//
+}
+
+.projectItems>div>a p{
+	margin-left: 0px;
+}
+
+.projectItems>div>a:hover {
+	background: #eee;
+}
+
+.projectItems>div>a:hover p{
+	text-decoration: underline;
+}
+.projectItems>div>a .description{
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.projectItems>div>a:hover .description{
+	text-decoration: none;
+}*/
+
+.projectItems>div {
+	display: block;
+	border: 1px #ccc solid;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+        cursor: pointer;
+}
+
+.projectItems>div a {
+	color: #185359;
+	text-decoration: none;
+}
+
+.projectItems>div p{
+	margin-left: 0px;
+}
+
+.projectItems>div.hover {
+	background: #eee;
+}
+
+.projectItems>div.hover p{
+	text-decoration: underline;
+}
+.projectItems>div .description{
+	font-size: 12px;
+	font-weight: normal;
+        text-decoration: none;
+}
+
+.projectItems>div.hover .description, .projectItems>div.hover .description>p{
+        text-decoration: none;
+}
+
+.projectItems>div .description a:hover{
+	text-decoration: underline;
+}
+
+/*.projectItems .imageWrap {
+	width: 200px;
+	float:left;
+}*/
+
+.topNewsSlider {
+    position: relative;
+}
+
+.topNewsSliderWrap {
+        border: 1px solid #ccc;
+        margin: 0 30px;
+	list-style: none;
+	overflow:hidden;
+}
+
+.topNewsSliderButtonLeft {
+        display: block;
+	width: 30px;
+	height: 30px;
+        top: 50%;
+        margin-top: -15px;
+        left: 0;
+        position: absolute;
+}
+
+.topNewsSliderButtonRight {
+        display: block;
+	width: 30px;
+	height: 30px;
+        top: 50%;
+        margin-top: -15px;
+        right: 0;
+        position: absolute;
+}
+
+
+.topNewsSliderWrap ul{
+	list-style: none;
+}
+
+.topNewsSliderWrap li{
+	list-style: none;
+}
+
+.topNewsSliderPager {
+	text-align:center;
+	height: 20px;
+}
+
+.topNewsSliderPager a{
+	display:inline-block;
+	height: 10px;
+	width: 10px;
+        text-decoration: none;
+        border-radius: 5px;
+        border: solid 1px #ccc;
+        margin-top: 5px;
+}
+
+.topNewsSliderPager a.active{
+        background: #185359;
+        border: solid 1px #185359;
+}
+
+.topNewsSliderPager a:hover{
+        border: solid 1px #185359;
+}
+
+.topNewsSliderButtonLeft a, .topNewsSliderButtonRight a{
+	display:inline-block;
+	height: 30px;
+	width: 30px;
+        text-align: center;
+        line-height: 30px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #ccc;
+        text-decoration: none;
+}
+
+.topNewsSliderButtonLeft a:hover, .topNewsSliderButtonRight a:hover{
+    color: #185359;
+}
+
+.topNewsSliderWrap li p {
+    padding: 0 10px;
+}
+
+.topNewsSliderWrap li .title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.topNewsSliderWrap li .title a{
+    color: #185359;
+    text-decoration: underline;
+}
+.topNewsSliderWrap li .title a:hover{
+    text-decoration: none;
+}
+
+.topNewsSliderWrap li .datetime {
+    color: #ccc;
+    font-size: 11px;
+    font-style: italic;
+}
+
+.topNewsSliderWrap li .description {
+    color: #000;
+    padding-bottom: 10px;
+}
+
+.topNewsSlider h3 {
+    margin: 0 30px;
+}
+
+.mainContent img {
+	max-width: 100%;
+	height: auto !important;
+}
+
+.myfilesItems>div {
+	display: block;
+	border: 1px #ccc solid;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.myfilesItems a {
+        font-size: 12px;
+        font-weight: normal;
+        color: #00f;
+}
+
+.myfilesItems a:hover {
+    text-decoration: underline;
+}
+
+.libraryItems>div {
+	display: block;
+}
+
+.libraryItems>div>a {
+	display: block;
+	border: 1px #ccc solid;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
+	background: #fff;
+	color: #185359;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.libraryItems>div>a p{
+    /*display: inline-block;*/
+}
+
+.libraryItems>div>a:hover {
+	background: #eee;
+}
+
+.libraryItems>div>a:hover p{
+	text-decoration: underline;
+}
+.libraryItems>div>a .description{
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.libraryItems>div>a:hover .description{
+	text-decoration: none;
+}
+
+.tinymceContent p{
+        min-height: 1em;
+}
+
+.tinymceContent p, .tinymceContent h1, .tinymceContent h2, .tinymceContent h3, .tinymceContent h4, .tinymceContent h5, .tinymceContent h6 {
+    margin: 12px 0;
+    /*background: #fff;*/
+}
+
+.tinymceContent ul {
+    margin: 12px 0;
+    list-style: circle outside;
+    padding-left: 40px;
+}
+
+.tinymceContent ol {
+    margin: 12px 0;
+    list-style: decimal outside;
+    padding-left: 40px;
+}
+
+.changeLocale select, .changeLocale div.select {
+	background: #ffffff;
+	background-image: -webkit-linear-gradient(top, #e4e4e4, #ffffff);
+	background-image: -moz-linear-gradient(top, #e4e4e4, #ffffff);
+	background-image: -ms-linear-gradient(top, #e4e4e4, #ffffff);
+	background-image: -o-linear-gradient(top, #e4e4e4, #ffffff);
+	background-image: linear-gradient(to bottom, #e4e4e4, #ffffff);
+	border: solid 1px #c7c7c7;
+        box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        margin: 0 0 0 10px;
+        padding: 5px 10px;
+        width: 260px;
+	color: #000;
+}
+
+.headerRight .blockTitle {
+	color: #fff;
+}
+
+.headerRight {
+	width: 300px;
+	margin: 10px 20px;
+}
+
+.changeLocale div.select {
+    position: relative;
+}
+
+.changeLocale div.select button {
+    border-color: #ccc;
+    border-style: none none none solid;
+    border-width: 0 0 0 1px;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 30px;
+}
+
+.changeLocale div.select button:active {
+    top: 1px;
+    bottom: -1px;    
+}
+
+.changeLocale div.select ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 278px;
+    padding: 0;
+    border: 1px solid #ccc;
+    list-style: none;
+}
+
+.changeLocale div.select ul li {
+    display: block;
+}
+
+.changeLocale div.select ul li>a {
+    display: block;
+    padding: 5px 10px;
+    background: #fff;
+    color: #000;
+}
+
+.changeLocale div.select ul li>a:hover {
+    background: #ddd;
+}
+
+.changeLocale div.select img {
+    vertical-align: baseline;
+    display: inline-block;
+    margin-bottom: -1px;
+    margin-right: 5px;
+}
+
+.changeLocale>ul li{
+    list-style: none;
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.changeLocale>ul a {
+    color: #000;
+}
+
+.headerRight .changeLocale>ul a {
+    color: #fff;
+}
+
+.headerRight .changeLocale>ul a:hover {
+    text-decoration: underline;
+}
+
+.headerRight .changeLocale>ul a>img {
+    padding-right: 5px;
+}
+.forumViedoFlowplayer {
+    display: inline-block;
+    max-width: 300px;
+    max-height: 250px;
+    vertical-align: top;
+    overflow:hidden;
+    background: #000;
+}
+
+.messageAttachmentsMultimedia {
+    margin-bottom:5px;
+}
+
+.messageAttachmentsMultimedia a {
+    display:inline-block;
+    vertical-align: top;
+}
+
+.messageAttachmentsMultimedia a>img {
+    max-width:300px;
+    max-height:250px;
+}
+
+.documentVersions {
+    border: 1px solid #ccc;
+    margin: 30px;
+    padding: 10px;
+}
+
+.documentVersions li.active a{
+    background: #ccc;
+}
+
+
+.documentListForProject .noteLink {
+    color: #777;
+    font-size: 11px;
+    font-style: italic;
+    text-decoration: none;
+}
+
+.documentListForProject .noteLink:hover {
+    color: #000;
+}
+
+.afterButtonNote {
+    color: #777;
+    display: inline-block;
+    font-size: 11px;
+    font-style: italic;
+    padding-right: 30px;
+    vertical-align: top;
+    width: 320px;
+}
+
+.documentListForProject {
+    border-bottom: 1px solid rgba(170, 170, 68, 0.7);
+    display: inline-block;
+    list-style: outside none none;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.documentListForProject li {
+    background: rgba(255, 255, 204, 0.4) none repeat scroll 0 0;
+    border-left: 1px solid rgba(170, 170, 68, 0.7);
+    border-right: 1px solid rgba(170, 170, 68, 0.7);
+    list-style: inside;
+    padding: 3px 10px;   
+}
+
+.documentListForProject li:first-child {
+    background: rgba(255, 255, 204, 0.4) none repeat scroll 0 0;
+    border: 1px solid rgba(170, 170, 68, 0.7);
+    border-radius: 2px 20px 0 0;
+    margin-left: 10px;
+    margin-right: 20px;
+    list-style: none;
+}
+
+.documentListForProject li a{
+    /*color: #000;*/
+    text-decoration: none;
+}
+
+.documentListForProject li a:hover{
+    text-decoration: underline;
+}
+
+.documentContent {
+    background: rgba(255,255,255,0.7);
+}
+
+ins img {
+    outline: 1px solid #ff0;
+    box-shadow: 0 0 5px #ff0;    
+}
+
+del img {
+    opacity: 0.3; 
+}
+
+.documentLangSelect {
+    display: inline-block;
+    line-height: 20px;
+}
+
+.documentLangSelect a {
+    display: inline-block;
+    margin: 0 4px;
+}
+
+.documentLangSelect a.active {
+    
+}
+
+.documentLangSelect a img{
+    
+}
+
+.documentLangSelect a.active img{
+    outline: 2px solid #f00;    
+}
+
+.documentLangSelect a:hover img{
+    box-shadow: 0 0 5px #000;
+}
+
+.projectIsLockedMessage {
+    border: 1px solid #f00;
+    margin-top: 20px;
+    padding: 15px;
+}
+
+.documentListForProjectAddTitle {
+    color: #555;
+    display: block;
+    padding-left: 15px;    
+}

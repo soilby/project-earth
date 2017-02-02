@@ -27,12 +27,12 @@ class TextPageManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Текстовые страницы', $this->container->get('router')->generate('basic_cms_textpage_list'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('textpage_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('textpage_listsite'));
-        $manager->addAdminMenu('Создать новую', $this->container->get('router')->generate('basic_cms_textpage_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('textpage_new'), 'Текстовые страницы');
-        $manager->addAdminMenu('Список страниц', $this->container->get('router')->generate('basic_cms_textpage_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('textpage_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('textpage_listsite'), 'Текстовые страницы');
+        $manager->addAdminMenu('Текстовые страницы', $this->container->get('router')->generate('basic_cms_textpage_list'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('textpage_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('textpage_listsite'));
+        $manager->addAdminMenu('Создать новую', $this->container->get('router')->generate('basic_cms_textpage_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('textpage_new'), 'Текстовые страницы');
+        $manager->addAdminMenu('Список страниц', $this->container->get('router')->generate('basic_cms_textpage_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('textpage_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('textpage_listsite'), 'Текстовые страницы');
         if ($this->container->has('object.taxonomy'))
         {
-            $manager->addAdminMenu('Категории', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.textpage', 9999, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Текстовые страницы');
+            $manager->addAdminMenu('Категории', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.textpage', 9999, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Текстовые страницы');
         }
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.textpage.') === 0) $this->container->get($item)->registerMenu();

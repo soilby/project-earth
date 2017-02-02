@@ -27,7 +27,7 @@ class AttachmentManager
     {
         //$manager = $this->container->get('cms.cmsManager');
         
-        //$manager->addAdminMenu('Профиль пользователя', $this->container->get('router')->generate('addone_profile_parameter_list'), 1, $this->container->get('security.context')->getToken()->getUser()->checkAccess('user_profile'), 'Администрирование');
+        //$manager->addAdminMenu('Профиль пользователя', $this->container->get('router')->generate('addone_profile_parameter_list'), 1, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('user_profile'), 'Администрирование');
     }
     
     public function registerRoles()
@@ -131,7 +131,7 @@ class AttachmentManager
                 $attachs = $query->getResult();
                 if (is_array($attachs)) 
                 {
-                    foreach ($attachs as $attach) @unlink('..'.$attach['attachment']);
+                    foreach ($attachs as $attach) @unlink('.'.$attach['attachment']);
                 }
                 $query = $em->createQuery('DELETE FROM ShopAttachmentBundle:ProductAttachment a WHERE a.productId = :id')->setParameter('id', $actionId);
                 $query->execute();

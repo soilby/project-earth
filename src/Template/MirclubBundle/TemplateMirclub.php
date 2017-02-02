@@ -26,7 +26,7 @@ class TemplateMirclub
     public function registerMenu()
     {
         $manager = $this->container->get('cms.cmsManager');
-        $manager->addAdminMenu('Настройка цветов и фона', $this->container->get('router')->generate('template_mirclub_index'), 70, $this->container->get('security.context')->getToken()->getUser()->checkAccess('template_mirclub'), 'Администрирование');
+        $manager->addAdminMenu('Настройка цветов и фона', $this->container->get('router')->generate('template_mirclub_index'), 70, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('template_mirclub'), 'Администрирование');
     }
     
     public function registerRoles()

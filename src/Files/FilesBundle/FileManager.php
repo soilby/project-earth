@@ -27,12 +27,12 @@ class FileManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('База знаний наследие', $this->container->get('router')->generate('files_files_file_list'), 20, $this->container->get('security.context')->getToken()->getUser()->checkAccess('file_list') || $this->container->get('security.context')->getToken()->getUser()->checkAccess('file_createpage') || $this->container->get('security.context')->getToken()->getUser()->checkAccess('file_editpage'));
-        $manager->addAdminMenu('Создать новый файл', $this->container->get('router')->generate('files_files_file_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('file_new'), 'База знаний наследие');
-        $manager->addAdminMenu('Список файлов', $this->container->get('router')->generate('files_files_file_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('file_list') || $this->container->get('security.context')->getToken()->getUser()->checkAccess('file_createpage') || $this->container->get('security.context')->getToken()->getUser()->checkAccess('file_editpage'), 'База знаний наследие');
+        $manager->addAdminMenu('База знаний наследие', $this->container->get('router')->generate('files_files_file_list'), 20, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('file_list') || $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('file_createpage') || $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('file_editpage'));
+        $manager->addAdminMenu('Создать новый файл', $this->container->get('router')->generate('files_files_file_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('file_new'), 'База знаний наследие');
+        $manager->addAdminMenu('Список файлов', $this->container->get('router')->generate('files_files_file_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('file_list') || $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('file_createpage') || $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('file_editpage'), 'База знаний наследие');
         if ($this->container->has('object.taxonomy'))
         {
-            $manager->addAdminMenu('Категории файлов', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.file', 9999, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'База знаний наследие');
+            $manager->addAdminMenu('Категории файлов', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.file', 9999, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'База знаний наследие');
         }
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.file.') === 0) $this->container->get($item)->registerMenu();
@@ -398,7 +398,7 @@ class FileManager
                              if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) {$errors = true; $result['avatarError'] = 'format';}
                              $basepath = '/images/file/';
                              $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-                             if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                             if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                              {
                                  $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $postfiles['avatar']->getClientOriginalName());
                                  $result['avatar'] = $basepath.$name;
@@ -410,7 +410,7 @@ class FileManager
                          $tmpfile = $postfiles['contentFile']->getPathName();
                          $basepath = '/secured/file/';
                          $name = 'f_'.md5($tmpfile.time()).'.dat';
-                         if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                         if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                          {
                              $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $postfiles['contentFile']->getClientOriginalName());
                              $result['contentFile'] = $basepath.$name;
@@ -422,8 +422,8 @@ class FileManager
                      {
                          if (!preg_match("/^(.{3,})?$/ui", $result['title'][$loc['shortName']])) {$errors = true; $result['titleError'][$loc['shortName']] = 'Preg error';}
                      }
-                     if (($result['avatar'] != '') && (!file_exists('..'.$result['avatar']))) {$errors = true; $result['avatarError'] = 'Not found';}
-                     if (($result['contentFile'] == '') || (!file_exists('..'.$result['contentFile']))) {$errors = true; $result['contentFileError'] = 'Not found';}
+                     if (($result['avatar'] != '') && (!file_exists('.'.$result['avatar']))) {$errors = true; $result['avatarError'] = 'Not found';}
+                     if (($result['contentFile'] == '') || (!file_exists('.'.$result['contentFile']))) {$errors = true; $result['contentFileError'] = 'Not found';}
                      if (!preg_match("/^[0-9A-zА-яЁё \-!#\$\%\&\*\(\)_\+\?\.]{3,}$/ui", $result['fileName'])) {$errors = true; $result['fileNameError'] = 'Preg error';}
                      if ($createpage->getCategoryMode() == 1)
                      {
@@ -465,7 +465,7 @@ class FileManager
                          $fileent->setModifyDate(new \DateTime('now'));
                          $fileent->setOrdering($order);
                          $fileent->setTitle($result['title']['default']);
-                         $fileent->setFileSize(filesize('..'.$result['contentFile']));
+                         $fileent->setFileSize(filesize('.'.$result['contentFile']));
                          $fileent->setDownloadCount(0);
                          $fileent->setTemplate($createpage->getFileTemplate());
                          $em->persist($fileent);
@@ -610,7 +610,7 @@ class FileManager
                              if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) {$errors = true; $result['avatarError'] = 'format';}
                              $basepath = '/images/file/';
                              $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-                             if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                             if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                              {
                                  $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $postfiles['avatar']->getClientOriginalName());
                                  $result['avatar'] = $basepath.$name;
@@ -622,7 +622,7 @@ class FileManager
                          $tmpfile = $postfiles['contentFile']->getPathName();
                          $basepath = '/secured/file/';
                          $name = 'f_'.md5($tmpfile.time()).'.dat';
-                         if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                         if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                          {
                              $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $postfiles['contentFile']->getClientOriginalName());
                              $result['contentFile'] = $basepath.$name;
@@ -634,8 +634,8 @@ class FileManager
                      {
                          if (!preg_match("/^(.{3,})?$/ui", $result['title'][$loc['shortName']])) {$errors = true; $result['titleError'][$loc['shortName']] = 'Preg error';}
                      }
-                     if (($result['avatar'] != '') && (!file_exists('..'.$result['avatar']))) {$errors = true; $result['avatarError'] = 'Not found';}
-                     if (($result['contentFile'] == '') || (!file_exists('..'.$result['contentFile']))) {$errors = true; $result['contentFileError'] = 'Not found';}
+                     if (($result['avatar'] != '') && (!file_exists('.'.$result['avatar']))) {$errors = true; $result['avatarError'] = 'Not found';}
+                     if (($result['contentFile'] == '') || (!file_exists('.'.$result['contentFile']))) {$errors = true; $result['contentFileError'] = 'Not found';}
                      if (!preg_match("/^[0-9A-zА-яЁё \-!#\$\%\&\*\(\)_\+\?\.]{3,}$/ui", $result['fileName'])) {$errors = true; $result['fileNameError'] = 'Preg error';}
                      if ($editpage->getCaptchaEnabled() != 0)
                      {
@@ -660,7 +660,7 @@ class FileManager
                          if ($editpage->getResetFileEnabled() != 0) $fileent->setEnabled(0);
                          $fileent->setModifyDate(new \DateTime('now'));
                          $fileent->setTitle($result['title']['default']);
-                         $fileent->setFileSize(filesize('..'.$result['contentFile']));
+                         $fileent->setFileSize(filesize('.'.$result['contentFile']));
                          $em->flush();
                          $result['editedFile'] = $fileent;
                          $result['editedUrl'] = '';

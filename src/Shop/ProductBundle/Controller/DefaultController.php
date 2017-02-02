@@ -29,24 +29,24 @@ class DefaultController extends Controller
         }
         $em = $this->getDoctrine()->getEntityManager();
         $tab = 0;
-        /*$tab = intval($this->getRequest()->get('tab'));
+        /*$tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         if ($tab < 0) $tab = 0;
         if ($tab > 0) $tab = 0;
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('shop_product_list_tab');
-                      else $this->getRequest()->getSession()->set('shop_product_list_tab', $tab);*/
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_product_list_tab', $tab);*/
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        $taxonomy0 = $this->getRequest()->get('taxonomy0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('shop_product_list_page0');
-                        else $this->getRequest()->getSession()->set('shop_product_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('shop_product_list_sort0');
-                        else $this->getRequest()->getSession()->set('shop_product_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('shop_product_list_search0');
-                          else $this->getRequest()->getSession()->set('shop_product_list_search0', $search0);
-        if ($taxonomy0 === null) $taxonomy0 = $this->getRequest()->getSession()->get('shop_product_list_taxonomy0');
-                          else $this->getRequest()->getSession()->set('shop_product_list_taxonomy0', $taxonomy0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->get('taxonomy0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_product_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_product_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_product_list_search0', $search0);
+        if ($taxonomy0 === null) $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_taxonomy0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_product_list_taxonomy0', $taxonomy0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -126,7 +126,7 @@ class DefaultController extends Controller
     public function productAjaxAvatarAction() 
     {
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -139,7 +139,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/product/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -251,10 +251,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postprod = $this->getRequest()->get('prod');
+            $postprod = $this->get('request_stack')->getMasterRequest()->get('prod');
             if (isset($postprod['article'])) $prod['article'] = $postprod['article'];
             if (isset($postprod['title'])) $prod['title'] = $postprod['title'];
             if (isset($postprod['description'])) $prod['description'] = $postprod['description'];
@@ -276,7 +276,7 @@ class DefaultController extends Controller
             unset($postprod);
             if (!preg_match("/^.{0,255}$/ui", $prod['article'])) {$errors = true; $proderror['article'] = 'Артикул должен содержать до 255 символов';}
             if (!preg_match("/^.{3,255}$/ui", $prod['title'])) {$errors = true; $proderror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($prod['avatar'] != '') && (!file_exists('..'.$prod['avatar']))) {$errors = true; $proderror['avatar'] = 'Файл не найден';}
+            if (($prod['avatar'] != '') && (!file_exists('.'.$prod['avatar']))) {$errors = true; $proderror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $prod['metadescr'])) {$errors = true; $proderror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $prod['metakey'])) {$errors = true; $proderror['metakey'] = 'Использованы недопустимые символы';}
             
@@ -291,7 +291,7 @@ class DefaultController extends Controller
             
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -328,7 +328,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postprodloc = $this->getRequest()->get('prodloc');
+            $postprodloc = $this->get('request_stack')->getMasterRequest()->get('prodloc');
             foreach ($locales as $locale)
             {
                 if (isset($postprodloc[$locale['shortName']]['title'])) $prodloc[$locale['shortName']]['title'] = $postprodloc[$locale['shortName']]['title'];
@@ -347,7 +347,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.product', 0, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.product', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -355,7 +355,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'productCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -433,7 +433,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.product', $productent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.product', $productent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -441,7 +441,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'productCreate', $productent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCreate', $productent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -454,11 +454,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.product', 0, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.product', 0, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'productCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -485,7 +485,7 @@ class DefaultController extends Controller
     public function productEditAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $productent = $this->getDoctrine()->getRepository('ShopProductBundle:Products')->find($id);
         if (empty($productent))
         {
@@ -634,7 +634,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if (($this->getUser()->checkAccess('product_editall') == 0) && ($this->getUser()->getId() != $productent->getCreaterId()))
             {
@@ -655,7 +655,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postprod = $this->getRequest()->get('prod');
+            $postprod = $this->get('request_stack')->getMasterRequest()->get('prod');
             if (isset($postprod['article'])) $prod['article'] = $postprod['article'];
             if (isset($postprod['title'])) $prod['title'] = $postprod['title'];
             if (isset($postprod['description'])) $prod['description'] = $postprod['description'];
@@ -677,7 +677,7 @@ class DefaultController extends Controller
             unset($postprod);
             if (!preg_match("/^.{0,255}$/ui", $prod['article'])) {$errors = true; $proderror['article'] = 'Артикул должен содержать до 255 символов';}
             if (!preg_match("/^.{3,255}$/ui", $prod['title'])) {$errors = true; $proderror['title'] = 'Заголовок должен содержать более 3 символов';}
-            if (($prod['avatar'] != '') && (!file_exists('..'.$prod['avatar']))) {$errors = true; $proderror['avatar'] = 'Файл не найден';}
+            if (($prod['avatar'] != '') && (!file_exists('.'.$prod['avatar']))) {$errors = true; $proderror['avatar'] = 'Файл не найден';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $prod['metadescr'])) {$errors = true; $proderror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $prod['metakey'])) {$errors = true; $proderror['metakey'] = 'Использованы недопустимые символы';}
             
@@ -692,7 +692,7 @@ class DefaultController extends Controller
             
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -730,7 +730,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postprodloc = $this->getRequest()->get('prodloc');
+            $postprodloc = $this->get('request_stack')->getMasterRequest()->get('prodloc');
             foreach ($locales as $locale)
             {
                 if (isset($postprodloc[$locale['shortName']]['title'])) $prodloc[$locale['shortName']]['title'] = $postprodloc[$locale['shortName']]['title'];
@@ -749,7 +749,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.product', $id, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.product', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -757,7 +757,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'productEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -765,7 +765,7 @@ class DefaultController extends Controller
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                if (($productent->getAvatar() != '') && ($productent->getAvatar() != $prod['avatar'])) @unlink('..'.$productent->getAvatar());
+                if (($productent->getAvatar() != '') && ($productent->getAvatar() != $prod['avatar'])) @unlink('.'.$productent->getAvatar());
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($prod['avatar']);
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($prod['description'], $productent->getDescription());
                 $productent->setArticle($prod['article']);
@@ -851,7 +851,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.product', $productent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.product', $productent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -859,7 +859,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'productEdit', $productent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productEdit', $productent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -872,11 +872,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.product', $id, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.product', $id, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'productEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -905,7 +905,7 @@ class DefaultController extends Controller
     
     public function productAjaxAction()
     {
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         if ($this->getUser()->checkAccess('product_list') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -916,7 +916,7 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         $errorsorder = array();
         if ($action == 'delete')
@@ -931,7 +931,7 @@ class DefaultController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -939,7 +939,7 @@ class DefaultController extends Controller
                     $productent = $this->getDoctrine()->getRepository('ShopProductBundle:Products')->find($key);
                     if (!empty($productent))
                     {
-                        if ($productent->getAvatar() != '') @unlink('..'.$productent->getAvatar());
+                        if ($productent->getAvatar() != '') @unlink('.'.$productent->getAvatar());
                         $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $productent->getDescription());
                         $em->remove($productent);
                         $em->flush();
@@ -956,11 +956,11 @@ class DefaultController extends Controller
                         $query->execute();
                         $query = $em->createQuery('DELETE FROM BasicCmsBundle:SeoPage p WHERE p.contentType = \'object.product\' AND p.contentAction = \'view\' AND p.contentId = :id')->setParameter('id', $key);
                         $query->execute();
-                        if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'delete', 'object.product', $key, 'save');
+                        if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'delete', 'object.product', $key, 'save');
                         foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
                         {
                             $serv = $this->container->get($item);
-                            $serv->getAdminController($this->getRequest(), 'productDelete', $key, 'save');
+                            $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productDelete', $key, 'save');
                         }       
                         unset($productent);    
                     }
@@ -977,7 +977,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1002,7 +1002,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1027,7 +1027,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $ordering = $this->getRequest()->get('ordering');
+            $ordering = $this->get('request_stack')->getMasterRequest()->get('ordering');
             $error = false;
             $ids = array();
             foreach ($ordering as $key=>$val) $ids[] = $key;
@@ -1057,10 +1057,10 @@ class DefaultController extends Controller
             }
         }
 
-        $page0 = $this->getRequest()->getSession()->get('shop_product_list_page0');
-        $sort0 = $this->getRequest()->getSession()->get('shop_product_list_sort0');
-        $search0 = $this->getRequest()->getSession()->get('shop_product_list_search0');
-        $taxonomy0 = $this->getRequest()->getSession()->get('shop_product_list_taxonomy0');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_product_list_taxonomy0');
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -1204,10 +1204,10 @@ class DefaultController extends Controller
         $curerror['exchangeIndex'] = '';
         // Валидация
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postcur = $this->getRequest()->get('cur');
+            $postcur = $this->get('request_stack')->getMasterRequest()->get('cur');
             if (isset($postcur['name'])) $cur['name'] = $postcur['name'];
             if (isset($postcur['enabled'])) $cur['enabled'] = intval($postcur['enabled']); else $cur['enabled'] = 0;
             if (isset($postcur['prefix'])) $cur['prefix'] = $postcur['prefix'];
@@ -1265,7 +1265,7 @@ class DefaultController extends Controller
     public function productCurrencyEditAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $currency = $this->getDoctrine()->getRepository('ShopProductBundle:ProductCurrency')->find($id);
         if (empty($currency))
         {
@@ -1309,7 +1309,7 @@ class DefaultController extends Controller
         $curerror['exchangeIndex'] = '';
         // Валидация
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('product_currencyedit') == 0)
             {
@@ -1321,7 +1321,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postcur = $this->getRequest()->get('cur');
+            $postcur = $this->get('request_stack')->getMasterRequest()->get('cur');
             if (isset($postcur['name'])) $cur['name'] = $postcur['name'];
             if (isset($postcur['enabled'])) $cur['enabled'] = intval($postcur['enabled']); else $cur['enabled'] = 0;
             if (isset($postcur['prefix'])) $cur['prefix'] = $postcur['prefix'];
@@ -1378,7 +1378,7 @@ class DefaultController extends Controller
     
     public function productCurrencyAjaxAction()
     {
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         if ($this->getUser()->checkAccess('product_currencyview') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -1389,7 +1389,7 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'delete')
         {
@@ -1402,7 +1402,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1430,7 +1430,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             {
                 $count = 0;
@@ -1554,10 +1554,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postcomp = $this->getRequest()->get('comp');
+            $postcomp = $this->get('request_stack')->getMasterRequest()->get('comp');
             if (isset($postcomp['name']['default'])) $comp['name']['default'] = $postcomp['name']['default'];
             foreach ($locales as $local) if (isset($postcomp['name'][$local['shortName']])) $comp['name'][$local['shortName']] = $postcomp['name'][$local['shortName']];
             if (isset($postcomp['enabled'])) $comp['enabled'] = intval($postcomp['enabled']); else $comp['enabled'] = 0;
@@ -1571,7 +1571,7 @@ class DefaultController extends Controller
             if ((!preg_match("/^\d+$/ui", $comp['productLimit'])) || (floatval($comp['productLimit']) < 2) || (floatval($comp['productLimit']) > 50)) {$errors = true; $comperror['productLimit'] = 'Должно быть указано число от 2 до 50';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -1609,7 +1609,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'productCompareCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCompareCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                 $i++;
@@ -1643,7 +1643,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'productCompareCreate', $compent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCompareCreate', $compent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -1659,7 +1659,7 @@ class DefaultController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'productCompareCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCompareCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -1684,7 +1684,7 @@ class DefaultController extends Controller
     public function productCompareEditAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $compent = $this->getDoctrine()->getRepository('ShopProductBundle:ProductCompare')->find($id);
         if (empty($compent))
         {
@@ -1776,7 +1776,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('product_compareedit') == 0)
             {
@@ -1788,7 +1788,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postcomp = $this->getRequest()->get('comp');
+            $postcomp = $this->get('request_stack')->getMasterRequest()->get('comp');
             if (isset($postcomp['name']['default'])) $comp['name']['default'] = $postcomp['name']['default'];
             foreach ($locales as $local) if (isset($postcomp['name'][$local['shortName']])) $comp['name'][$local['shortName']] = $postcomp['name'][$local['shortName']];
             if (isset($postcomp['enabled'])) $comp['enabled'] = intval($postcomp['enabled']); else $comp['enabled'] = 0;
@@ -1802,7 +1802,7 @@ class DefaultController extends Controller
             if ((!preg_match("/^\d+$/ui", $comp['productLimit'])) || (floatval($comp['productLimit']) < 2) || (floatval($comp['productLimit']) > 50)) {$errors = true; $comperror['productLimit'] = 'Должно быть указано число от 2 до 50';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -1841,7 +1841,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'productCompareEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCompareEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                 $i++;
@@ -1877,7 +1877,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'productCompareEdit', $compent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCompareEdit', $compent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -1893,7 +1893,7 @@ class DefaultController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'productCompareEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCompareEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -1929,7 +1929,7 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'delete')
         {
@@ -1942,7 +1942,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1957,7 +1957,7 @@ class DefaultController extends Controller
                         foreach ($cmsservices as $item) if (strpos($item,'addone.product.') === 0) 
                         {
                             $serv = $this->container->get($item);
-                            $serv->getAdminController($this->getRequest(), 'productCompareDelete', $key, 'save');
+                            $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'productCompareDelete', $key, 'save');
                         }       
                         unset($compent);    
                     }

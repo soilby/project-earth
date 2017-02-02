@@ -194,7 +194,7 @@ class ChatManager
                              $messageent->setAttachment('/secured/chat/'.$fileName);
                              try 
                              {
-                                 $attach->move('../secured/chat', $fileName);
+                                 $attach->move('secured/chat', $fileName);
                              } catch (\Symfony\Component\HttpFoundation\File\Exception\FileException $e)
                              {
                                  $messageent->setAttachment('');
@@ -265,7 +265,7 @@ class ChatManager
                          $chatMessage->setMessage('');
                          if ($chatMessage->getAttachment() != '')
                          {
-                             @unlink('..'.$chatMessage->getAttachment());
+                             @unlink('.'.$chatMessage->getAttachment());
                              $chatMessage->setAttachment('');
                              $chatMessage->setAttachmentFilename('');
                              $chatMessage->setAttachmentMimetype('');

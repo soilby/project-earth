@@ -106,11 +106,11 @@ class DefaultController extends Controller
             ));
         }
 
-        $ids = $this->getRequest()->get('type');
+        $ids = $this->get('request_stack')->getMasterRequest()->get('type');
         if ($ids != null) {
             $ids = explode(',', $ids);
         }
-        $sort = intval($this->getRequest()->get('sort'));
+        $sort = intval($this->get('request_stack')->getMasterRequest()->get('sort'));
         $sortSql = 'o.defaultTitle ASC';
         if ($sort == 1) {
             $sortSql = 'o.defaultTitle DESC';
@@ -119,7 +119,7 @@ class DefaultController extends Controller
         } elseif ($sort == 3) {
             $sortSql = 'o.objectType DESC';
         }
-        $page = intval($this->getRequest()->get('page'));
+        $page = intval($this->get('request_stack')->getMasterRequest()->get('page'));
         
         if ($ids != null) {
             $count = $em->createQuery('SELECT count(o.id) FROM ExtendedKnowledgeBundle:KnowledgeObject o WHERE o.objectType IN (:ids)')->setParameter('ids', $ids)->getSingleScalarResult();
@@ -165,10 +165,10 @@ class DefaultController extends Controller
             ));
         }
 
-        //$id = $this->getRequest()->get('category');
-        $url = trim($this->getRequest()->get('url'));
+        //$id = $this->get('request_stack')->getMasterRequest()->get('category');
+        $url = trim($this->get('request_stack')->getMasterRequest()->get('url'));
 
-        if (strtolower(parse_url($url, PHP_URL_HOST)) != strtolower($this->getRequest()->getHttpHost())) {
+        if (strtolower(parse_url($url, PHP_URL_HOST)) != strtolower($this->get('request_stack')->getMasterRequest()->getHttpHost())) {
             return new JsonResponse(array('error' => 'Неправильное имя сайта'));
         }
         
@@ -187,7 +187,7 @@ class DefaultController extends Controller
         if ($path == 'system/download/mceprojectfile') {
             // Найти файл документа
             $fileFound = false;
-            $projectLink = @unserialize(file_get_contents('../secured/project/'.'.projectlink'));
+            $projectLink = @unserialize(file_get_contents('secured/project/'.'.projectlink'));
             if (!is_array($projectLink)) {
                 $projectLink = array();
             }
@@ -213,7 +213,7 @@ class DefaultController extends Controller
             }
             $objectEnt = new \Extended\KnowledgeBundle\Entity\KnowledgeObject();
             $time = new \DateTime();
-            $time->setTimestamp(filemtime('../secured/project/'.$fileId));
+            $time->setTimestamp(filemtime('secured/project/'.$fileId));
             $objectEnt->setCreateDate($time);
             $objectEnt->setCreaterId($this->getUser()->getId());
             $objectEnt->setObjectId($prijectId);
@@ -312,7 +312,7 @@ class DefaultController extends Controller
             ));
         }
         
-        $id = $this->getRequest()->get('id');
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
         
         $object = $em->createQuery('SELECT o.id, o.title, o.objectType, o.objectId, o.createrId, o.createDate, o.ratingPositive, o.ratingNegative, u.login, u.fullName, u.avatar FROM ExtendedKnowledgeBundle:KnowledgeObject o '.
                                    'LEFT JOIN BasicCmsBundle:Users u WITH u.id = o.createrId WHERE o.id = :id')->setParameter('id', $id)->getSingleResult();
@@ -377,7 +377,7 @@ class DefaultController extends Controller
             ));
         }
         
-        $id = $this->getRequest()->get('id');
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
         
         $objectEnt = $this->getDoctrine()->getRepository('ExtendedKnowledgeBundle:KnowledgeObject')->find($id);
         
@@ -385,7 +385,7 @@ class DefaultController extends Controller
             return new \Symfony\Component\HttpFoundation\Response('');
         }
         
-        $title = $this->getRequest()->get('title');
+        $title = $this->get('request_stack')->getMasterRequest()->get('title');
         
         $object = array();
         $object['titleLocale'] = array();
@@ -393,9 +393,9 @@ class DefaultController extends Controller
         foreach ($locales as $localitem) {
             $object['titleLocale'][$localitem['shortName']] = (isset($title[$localitem['shortName']]) ? $title[$localitem['shortName']] : '');
         }
-        $object['ratingPositive'] = $this->getRequest()->get('ratingPositive');
-        $object['ratingNegative'] = $this->getRequest()->get('ratingNegative');
-        $object['categories'] = $this->getRequest()->get('categories');
+        $object['ratingPositive'] = $this->get('request_stack')->getMasterRequest()->get('ratingPositive');
+        $object['ratingNegative'] = $this->get('request_stack')->getMasterRequest()->get('ratingNegative');
+        $object['categories'] = $this->get('request_stack')->getMasterRequest()->get('categories');
         // Валидация
         $errors = array();
         if (!preg_match('/[\s\S]{3,}/ui', $object['titleLocale']['default'])) {
@@ -459,7 +459,7 @@ class DefaultController extends Controller
             ));
         }
         
-        $id = $this->getRequest()->get('id');
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
         
         $objectEnt = $this->getDoctrine()->getRepository('ExtendedKnowledgeBundle:KnowledgeObject')->find($id);
         

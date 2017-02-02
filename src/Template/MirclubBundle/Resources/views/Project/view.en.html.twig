@@ -3,9 +3,9 @@
 {% endif %}    
 {% if fileView != 0 %}
     {% if fileView == 1 %}
-        {% render 'ExtendedProjectBundle:Front:edit' with {'fileId': fileId, 'locale': currentLocale, 'user': currentUser, 'request': app.request} %}                 
+        {{ render(controller('ExtendedProjectBundle:Front:edit', {'fileId': fileId, 'locale': currentLocale, 'user': currentUser, 'request': app.request})) }}                 
     {% elseif fileView == 2 %}
-        {% render 'ExtendedProjectBundle:Front:viewEmbedded' with {'fileId': fileId, 'locale': fileLocale, 'user': currentUser, 'request': app.request, 'version': fileVersion} %}                 
+        {{ render(controller('ExtendedProjectBundle:Front:viewEmbedded', {'fileId': fileId, 'locale': fileLocale, 'user': currentUser, 'request': app.request, 'version': fileVersion})) }}                 
     {% endif %}
 {% elseif documentView != 0 %}
     {% include 'TemplateMirclubBundle:Project:_viewEditEn.html.twig' %}
@@ -24,7 +24,7 @@
     
     {% include 'TemplateMirclubBundle:Project:_viewDocList.html.twig' %}
     
-    {% render 'ExtendedProjectBundle:Front:list' with {'projectId': id, 'locale': currentLocale, 'user': currentUser} %}
+    {{ render(controller('ExtendedProjectBundle:Front:list', {'projectId': id, 'locale': currentLocale, 'user': currentUser})) }}
 
     {% include 'TemplateMirclubBundle:Project:_viewBlog.html.twig' %}
     

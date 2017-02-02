@@ -88,24 +88,24 @@ class DefaultController extends Controller
         }
         $em = $this->getDoctrine()->getEntityManager();
         $tab = 0;
-        //$tab = $this->getRequest()->get('tab');
-        //if ($tab === null) $tab = $this->getRequest()->getSession()->get('basic_cms_textpage_list_tab');
-        //              else $this->getRequest()->getSession()->set('basic_cms_textpage_list_tab', $tab);
+        //$tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        //if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_textpage_list_tab');
+        //              else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_textpage_list_tab', $tab);
         //if ($tab < 0) $tab = 0;
         //if ($tab > 1) $tab = 1;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        $taxonomy0 = $this->getRequest()->get('taxonomy0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('gallery_gallery_images_list_page0');
-                        else $this->getRequest()->getSession()->set('gallery_gallery_images_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('gallery_gallery_images_list_sort0');
-                        else $this->getRequest()->getSession()->set('gallery_gallery_images_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('gallery_gallery_images_list_search0');
-                          else $this->getRequest()->getSession()->set('gallery_gallery_images_list_search0', $search0);
-        if ($taxonomy0 === null) $taxonomy0 = $this->getRequest()->getSession()->get('gallery_gallery_images_list_taxonomy0');
-                          else $this->getRequest()->getSession()->set('gallery_gallery_images_list_taxonomy0', $taxonomy0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->get('taxonomy0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('gallery_gallery_images_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('gallery_gallery_images_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('gallery_gallery_images_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('gallery_gallery_images_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('gallery_gallery_images_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('gallery_gallery_images_list_search0', $search0);
+        if ($taxonomy0 === null) $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('gallery_gallery_images_list_taxonomy0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('gallery_gallery_images_list_taxonomy0', $taxonomy0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -177,7 +177,7 @@ class DefaultController extends Controller
     public function galleryImagesAjaxImageAction() 
     {
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('foto');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('foto');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -190,7 +190,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/gallery/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -287,10 +287,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postimage = $this->getRequest()->get('image');
+            $postimage = $this->get('request_stack')->getMasterRequest()->get('image');
             if (isset($postimage['title'])) $image['title'] = $postimage['title'];
             if (isset($postimage['description'])) $image['description'] = $postimage['description'];
             if (isset($postimage['isVideo'])) $image['isVideo'] = intval($postimage['isVideo']); else $image['isVideo'] = 0;
@@ -305,7 +305,7 @@ class DefaultController extends Controller
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $image['metakey'])) {$errors = true; $imageerror['metakey'] = 'Использованы недопустимые символы';}
             if ($image['isVideo'] == 0)
             {
-                if (($image['contentFoto'] == '') || (!file_exists('..'.$image['contentFoto']))) {$errors = true; $imageerror['contentFoto'] = 'Файл не найден';}
+                if (($image['contentFoto'] == '') || (!file_exists('.'.$image['contentFoto']))) {$errors = true; $imageerror['contentFoto'] = 'Файл не найден';}
             } else
             {
                 $videoinfo = $this->checkVideoUrl($image['contentVideo']);
@@ -313,7 +313,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -343,7 +343,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postimageloc = $this->getRequest()->get('imageloc');
+            $postimageloc = $this->get('request_stack')->getMasterRequest()->get('imageloc');
             foreach ($locales as $locale)
             {
                 if (isset($postimageloc[$locale['shortName']]['title'])) $imageloc[$locale['shortName']]['title'] = $postimageloc[$locale['shortName']]['title'];
@@ -361,7 +361,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.image', 0, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.image', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -369,7 +369,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.image.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'galleryImagesCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'galleryImagesCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -448,7 +448,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.image', $imageent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.image', $imageent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -456,7 +456,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.image.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'galleryImagesCreate', $imageent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'galleryImagesCreate', $imageent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -469,11 +469,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.image', 0, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.image', 0, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.image.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'galleryImagesCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'galleryImagesCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -499,7 +499,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function galleryImagesEditAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $imageent = $this->getDoctrine()->getRepository('GalleryGalleryBundle:Images')->find($id);
         if (empty($imageent))
         {
@@ -639,7 +639,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if (($this->getUser()->checkAccess('image_editall') == 0) && ($this->getUser()->getId() != $imageent->getCreaterId()))
             {
@@ -660,7 +660,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postimage = $this->getRequest()->get('image');
+            $postimage = $this->get('request_stack')->getMasterRequest()->get('image');
             if (isset($postimage['title'])) $image['title'] = $postimage['title'];
             if (isset($postimage['description'])) $image['description'] = $postimage['description'];
             if (isset($postimage['isVideo'])) $image['isVideo'] = intval($postimage['isVideo']); else $image['isVideo'] = 0;
@@ -675,7 +675,7 @@ class DefaultController extends Controller
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $image['metakey'])) {$errors = true; $imageerror['metakey'] = 'Использованы недопустимые символы';}
             if ($image['isVideo'] == 0)
             {
-                if (($image['contentFoto'] == '') || (!file_exists('..'.$image['contentFoto']))) {$errors = true; $imageerror['contentFoto'] = 'Файл не найден';}
+                if (($image['contentFoto'] == '') || (!file_exists('.'.$image['contentFoto']))) {$errors = true; $imageerror['contentFoto'] = 'Файл не найден';}
             } else
             {
                 $videoinfo = $this->checkVideoUrl($image['contentVideo']);
@@ -683,7 +683,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -714,7 +714,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postimageloc = $this->getRequest()->get('imageloc');
+            $postimageloc = $this->get('request_stack')->getMasterRequest()->get('imageloc');
             foreach ($locales as $locale)
             {
                 if (isset($postimageloc[$locale['shortName']]['title'])) $imageloc[$locale['shortName']]['title'] = $postimageloc[$locale['shortName']]['title'];
@@ -732,7 +732,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.image', $id, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.image', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -740,7 +740,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.image.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'galleryImagesEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'galleryImagesEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -752,13 +752,13 @@ class DefaultController extends Controller
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($image['description'], $imageent->getDescription());
                 if ($image['isVideo'] == 0)
                 {
-                    if (($imageent->getAvatar() != '') && ($imageent->getAvatar() != $image['contentFoto']) && (strpos($imageent->getAvatar(), '/images/') === 0)) @unlink('..'.$imageent->getAvatar());
+                    if (($imageent->getAvatar() != '') && ($imageent->getAvatar() != $image['contentFoto']) && (strpos($imageent->getAvatar(), '/images/') === 0)) @unlink('.'.$imageent->getAvatar());
                     $imageent->setAvatar($image['contentFoto']);
                     $imageent->setContent($image['contentFoto']);
                     $imageent->setIsVideo(0);
                 } else 
                 {
-                    if (($imageent->getAvatar() != '') && (strpos($imageent->getAvatar(), '/images/') === 0)) @unlink('..'.$imageent->getAvatar());
+                    if (($imageent->getAvatar() != '') && (strpos($imageent->getAvatar(), '/images/') === 0)) @unlink('.'.$imageent->getAvatar());
                     $imageent->setAvatar((isset($videoinfo['image']) ? $videoinfo['image'] : ''));
                     $imageent->setContent((isset($videoinfo['video']) ? $videoinfo['video'] : $image['contentVideo']));
                     $imageent->setIsVideo(1);
@@ -835,7 +835,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.image', $imageent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.image', $imageent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -843,7 +843,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.image.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'galleryImagesEdit', $imageent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'galleryImagesEdit', $imageent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -856,11 +856,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.image', $id, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.image', $id, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.image.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'galleryImagesEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'galleryImagesEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -890,7 +890,7 @@ class DefaultController extends Controller
     
     public function galleryImagesAjaxAction()
     {
-        //$tab = intval($this->getRequest()->get('tab'));
+        //$tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         $tab = 0;
         if ($this->getUser()->checkAccess('image_list') == 0)
         {
@@ -902,7 +902,7 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         $errorsorder = array();
         if ($action == 'delete')
@@ -917,7 +917,7 @@ class DefaultController extends Controller
                 ));
             }
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -925,7 +925,7 @@ class DefaultController extends Controller
                     $imageent = $this->getDoctrine()->getRepository('GalleryGalleryBundle:Images')->find($key);
                     if (!empty($imageent))
                     {
-                        if (strpos($imageent->getAvatar(), '/images/') === 0) @unlink('..'.$imageent->getAvatar());
+                        if (strpos($imageent->getAvatar(), '/images/') === 0) @unlink('.'.$imageent->getAvatar());
                         $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $imageent->getDescription());
                         $em->remove($imageent);
                         $em->flush();
@@ -942,11 +942,11 @@ class DefaultController extends Controller
                         $query->execute();
                         $query = $em->createQuery('DELETE FROM BasicCmsBundle:SeoPage p WHERE p.contentType = \'object.image\' AND p.contentAction = \'view\' AND p.contentId = :id')->setParameter('id', $key);
                         $query->execute();
-                        if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'delete', 'object.image', $key, 'save');
+                        if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'delete', 'object.image', $key, 'save');
                         foreach ($cmsservices as $item) if (strpos($item,'addone.image.') === 0) 
                         {
                             $serv = $this->container->get($item);
-                            $serv->getAdminController($this->getRequest(), 'galleryImagesDelete', $key, 'save');
+                            $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'galleryImagesDelete', $key, 'save');
                         }       
                         unset($imageent);    
                     }
@@ -963,7 +963,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -988,7 +988,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1013,7 +1013,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $ordering = $this->getRequest()->get('ordering');
+            $ordering = $this->get('request_stack')->getMasterRequest()->get('ordering');
             $error = false;
             $ids = array();
             foreach ($ordering as $key=>$val) $ids[] = $key;
@@ -1047,10 +1047,10 @@ class DefaultController extends Controller
         //{
         //}
             
-        $page0 = $this->getRequest()->getSession()->get('gallery_gallery_images_list_page0');
-        $sort0 = $this->getRequest()->getSession()->get('gallery_gallery_images_list_sort0');
-        $search0 = $this->getRequest()->getSession()->get('gallery_gallery_images_list_search0');
-        $taxonomy0 = $this->getRequest()->getSession()->get('gallery_gallery_images_list_taxonomy0');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('gallery_gallery_images_list_page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('gallery_gallery_images_list_sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('gallery_gallery_images_list_search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('gallery_gallery_images_list_taxonomy0');
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);

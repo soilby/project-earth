@@ -27,9 +27,9 @@ class ModuleManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Модули', $this->container->get('router')->generate('basic_cms_module_list'), 100, $this->container->get('security.context')->getToken()->getUser()->checkAccess('module_list'));
-        $manager->addAdminMenu('Создать новый', $this->container->get('router')->generate('basic_cms_module_new'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('module_new'), 'Модули');
-        $manager->addAdminMenu('Список модулей', $this->container->get('router')->generate('basic_cms_module_list'), 1, $this->container->get('security.context')->getToken()->getUser()->checkAccess('module_list'), 'Модули');
+        $manager->addAdminMenu('Модули', $this->container->get('router')->generate('basic_cms_module_list'), 100, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('module_list'));
+        $manager->addAdminMenu('Создать новый', $this->container->get('router')->generate('basic_cms_module_new'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('module_new'), 'Модули');
+        $manager->addAdminMenu('Список модулей', $this->container->get('router')->generate('basic_cms_module_list'), 1, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('module_list'), 'Модули');
         
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.module.') === 0) $this->container->get($item)->registerMenu();
@@ -454,7 +454,7 @@ class ModuleManager
                         if (!preg_match("/^[-\s_A-zА-яЁё0-9\'\"\(\)\*\?\:\;\+\=\!\@\#\$\%\^\&\`\~\.\/\\\\,]{0,999}$/ui", $this->container->get('cms.cmsManager')->decodeLocalString($item['name'],$locale['shortName'],false))) {$errors = true; $item['error'] = 'Имя должно содержать до 999 букв';}
                         if (!preg_match("/^[\s\S]{0,65535}$/ui", $this->container->get('cms.cmsManager')->decodeLocalString($item['description'],$locale['shortName'],false))) {$errors = true; $item['error'] = 'Описание должно содержать до 65535 букв';}
                     }
-                    if (!file_exists('..'.$item['image'])) {$errors = true; $item['error'] = 'Изображение не найдено';}
+                    if (!file_exists('.'.$item['image'])) {$errors = true; $item['error'] = 'Изображение не найдено';}
                 }
             }
             if ($actionType == 'validate')
@@ -470,7 +470,7 @@ class ModuleManager
                         {
                             $finded = false;
                             foreach ($parameters['banners'] as $banner) if ($banner['image'] == $oldbanner['image']) $finded = true;
-                            if ($finded == false) @unlink('..'.$oldbanner['image']);
+                            if ($finded == false) @unlink('.'.$oldbanner['image']);
                         }
                 }
                 foreach ($parameters['banners'] as $banner) $this->container->get('cms.cmsManager')->unlockTemporaryFile($banner['image']);
@@ -481,7 +481,7 @@ class ModuleManager
                 if (isset($nullparameters['banners']) && (is_array($nullparameters['banners']))) 
                 {
                     foreach ($nullparameters['banners'] as $oldbanner)
-                        if (isset($oldbanner['image']) && ($oldbanner['image'] != '')) @unlink('..'.$oldbanner['image']);
+                        if (isset($oldbanner['image']) && ($oldbanner['image'] != '')) @unlink('.'.$oldbanner['image']);
                 }
             }
             if ($actionType == 'tab')

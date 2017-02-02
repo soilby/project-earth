@@ -27,7 +27,7 @@
 </div>
 <div class="mainContent">
     <div id="formLogin">    
-        <form action="{{path('basic_cms_check_login')}}" method="POST" name="auth">
+        <form action="{{path('basic_cms_login')}}" method="POST" name="auth">
             {% if (error != null) %}
             <p class="error">Неправильный логин или пароль!</p>
             {% endif %}

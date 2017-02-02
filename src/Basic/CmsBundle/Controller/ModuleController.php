@@ -34,9 +34,9 @@ class ModuleController extends Controller
         $positions = array();
         foreach ($layouts as $layoutkey => $layoutname) $positions[$layoutkey] = $this->get('cms.cmsManager')->getPositionList($layoutkey);
         $em = $this->getDoctrine()->getEntityManager();
-        $page0 = $this->getRequest()->get('page0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_module_list_page0');
-                        else $this->getRequest()->getSession()->set('basic_cms_module_list_page0', $page0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_module_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_module_list_page0', $page0);
         $page0 = intval($page0);
         // Поиск контента
         $query = $em->createQuery('SELECT count(m.id) as modulecount FROM BasicCmsBundle:Modules m');
@@ -79,8 +79,8 @@ class ModuleController extends Controller
             ));
         }
         $moduletypes = array();
-        $moduletype = $this->getRequest()->get('type');
-        $moduleobject = $this->getRequest()->get('object');
+        $moduletype = $this->get('request_stack')->getMasterRequest()->get('type');
+        $moduleobject = $this->get('request_stack')->getMasterRequest()->get('object');
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'object.') === 0) $moduletypes[$item] = $this->container->get($item)->getModuleTypes();
         if (!isset($moduletypes[$moduleobject][$moduletype]))
@@ -138,10 +138,10 @@ class ModuleController extends Controller
         // Валидация
         $activetab = 0;
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postmodule = $this->getRequest()->get('module');
+            $postmodule = $this->get('request_stack')->getMasterRequest()->get('module');
             if (isset($postmodule['name'])) $module['name'] = $postmodule['name'];
             if (isset($postmodule['enabled'])) $module['enabled'] = intval($postmodule['enabled']);
             if (isset($postmodule['layout'])) $module['layout'] = $postmodule['layout'];
@@ -160,7 +160,7 @@ class ModuleController extends Controller
             if ($localecheck == false) $module['locale'] = '';
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о включении
-            $postpages = $this->getRequest()->get('pages');
+            $postpages = $this->get('request_stack')->getMasterRequest()->get('pages');
             if (!is_array($postpages)) $postpages = array();
             $pages['group'] = array();
             if (isset($postpages['group']) && is_array($postpages['group']))
@@ -193,7 +193,7 @@ class ModuleController extends Controller
             {
                 if (in_array($seopage['id'], $postpages)) $pages[] = $seopage['id'];
             }*/
-            $postgroups = $this->getRequest()->get('groups');
+            $postgroups = $this->get('request_stack')->getMasterRequest()->get('groups');
             if (!is_array($postgroups)) $postgroups = array();
             $groups = array();
             foreach ($seogroups as $objectkey=>$typearray)
@@ -313,7 +313,7 @@ class ModuleController extends Controller
                 'paths'=>array()
             ));
         }
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $moduleent = $this->getDoctrine()->getRepository('BasicCmsBundle:Modules')->find($id);
         if (empty($moduleent))
         {
@@ -389,10 +389,10 @@ class ModuleController extends Controller
         // Валидация
         $activetab = 0;
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postmodule = $this->getRequest()->get('module');
+            $postmodule = $this->get('request_stack')->getMasterRequest()->get('module');
             if (isset($postmodule['name'])) $module['name'] = $postmodule['name'];
             if (isset($postmodule['enabled'])) $module['enabled'] = intval($postmodule['enabled']); else $module['enabled'] = 0;
             if (isset($postmodule['layout'])) $module['layout'] = $postmodule['layout'];
@@ -411,7 +411,7 @@ class ModuleController extends Controller
             if ($localecheck == false) $module['locale'] = '';
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о включении
-            $postpages = $this->getRequest()->get('pages');
+            $postpages = $this->get('request_stack')->getMasterRequest()->get('pages');
             if (!is_array($postpages)) $postpages = array();
             $pages['group'] = array();
             if (isset($postpages['group']) && is_array($postpages['group']))
@@ -445,7 +445,7 @@ class ModuleController extends Controller
             {
                 if (in_array($seopage['id'], $postpages)) $pages[] = $seopage['id'];
             }*/
-            $postgroups = $this->getRequest()->get('groups');
+            $postgroups = $this->get('request_stack')->getMasterRequest()->get('groups');
             if (!is_array($postgroups)) $postgroups = array();
             $groups = array();
             foreach ($seogroups as $objectkey=>$typearray)
@@ -584,12 +584,12 @@ class ModuleController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         $errorsorder = array();
         if ($action == 'ordering')
         {
-            $ordering = $this->getRequest()->get('ordering');
+            $ordering = $this->get('request_stack')->getMasterRequest()->get('ordering');
             $error = false;
             $ids = array();
             $moduleents = array();
@@ -636,7 +636,7 @@ class ModuleController extends Controller
         }
         if ($action == 'delete')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -644,7 +644,7 @@ class ModuleController extends Controller
                     $moduleent = $this->getDoctrine()->getRepository('BasicCmsBundle:Modules')->find($key);
                     if (!empty($moduleent))
                     {
-                        if ($this->container->has($moduleent->getObjectName())) $this->container->get($moduleent->getObjectName())->getAdminModuleController($this->getRequest(), $moduleent->getModuleType(), 'delete', @unserialize($moduleent->getParameters()));
+                        if ($this->container->has($moduleent->getObjectName())) $this->container->get($moduleent->getObjectName())->getAdminModuleController($this->get('request_stack')->getMasterRequest(), $moduleent->getModuleType(), 'delete', @unserialize($moduleent->getParameters()));
                         $em->remove($moduleent);
                         $em->flush();
                         unset($moduleent);    
@@ -653,7 +653,7 @@ class ModuleController extends Controller
         }
         if ($action == 'blocked')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -669,7 +669,7 @@ class ModuleController extends Controller
         }
         if ($action == 'unblocked')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -691,7 +691,7 @@ class ModuleController extends Controller
         $positions = array();
         foreach ($layouts as $layoutkey => $layoutname) $positions[$layoutkey] = $this->get('cms.cmsManager')->getPositionList($layoutkey);
         $em = $this->getDoctrine()->getEntityManager();
-        $page0 = $this->getRequest()->getSession()->get('basic_cms_module_list_page0');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_module_list_page0');
         $page0 = intval($page0);
         // Поиск контента
         $query = $em->createQuery('SELECT count(m.id) as modulecount FROM BasicCmsBundle:Modules m');
@@ -728,8 +728,8 @@ class ModuleController extends Controller
     public function moduleAjaxMenuPagesAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $search = trim($this->getRequest()->get('search'));
-        $page = intval($this->getRequest()->get('page'));
+        $search = trim($this->get('request_stack')->getMasterRequest()->get('search'));
+        $page = intval($this->get('request_stack')->getMasterRequest()->get('page'));
         if ($page < 0) $page = 0;
         $query = $em->createQuery('SELECT count(s.id) as pagecount FROM BasicCmsBundle:SeoPage s WHERE s.description LIKE :search OR s.url LIKE :search')
                     ->setParameter('search', '%'.$search.'%');
@@ -753,10 +753,10 @@ class ModuleController extends Controller
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'object.') === 0) $seogroups[$item] = $this->container->get($item)->getContentTypes();
         $em = $this->getDoctrine()->getEntityManager();
-        $search = trim($this->getRequest()->get('search'));
-        $page = intval($this->getRequest()->get('page'));
+        $search = trim($this->get('request_stack')->getMasterRequest()->get('search'));
+        $page = intval($this->get('request_stack')->getMasterRequest()->get('page'));
         $pages = array();
-        $postpages = $this->getRequest()->get('pages');
+        $postpages = $this->get('request_stack')->getMasterRequest()->get('pages');
         if (!is_array($postpages)) $postpages = array();
         $pages['group'] = array();
         if (isset($postpages['group']) && is_array($postpages['group']))
@@ -788,7 +788,7 @@ class ModuleController extends Controller
         $pages['group'][] = 'empty';
         $pages['on'][] = 0;
         $pages['off'][] = 0;
-        $moduleid = $this->getRequest()->get('moduleid');
+        $moduleid = $this->get('request_stack')->getMasterRequest()->get('moduleid');
         if ($page < 0) $page = 0;
         $query = $em->createQuery('SELECT count(s.id) as pagecount FROM BasicCmsBundle:SeoPage s WHERE s.description LIKE :search OR s.url LIKE :search')
                     ->setParameter('search', '%'.$search.'%');
@@ -842,7 +842,7 @@ class ModuleController extends Controller
     public function moduleAjaxBannerAction() 
     {
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('banner');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('banner');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -855,7 +855,7 @@ class ModuleController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/banner/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));

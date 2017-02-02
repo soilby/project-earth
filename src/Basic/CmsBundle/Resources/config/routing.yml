@@ -5,9 +5,6 @@ basic_cms_login:
 basic_cms_logout:
     path:  /system/logout
 
-basic_cms_check_login:
-    path:  /system/login_check
-    
 basic_cms_tinymce_blank:
     path:  /system/tinymce/blank
     defaults: { _controller: BasicCmsBundle:Default:tinyMceBlank }

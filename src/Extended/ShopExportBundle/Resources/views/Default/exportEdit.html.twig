@@ -1,6 +1,6 @@
 {% extends 'BasicCmsBundle:Default:layout.html.twig' %}
 {% block mainmenu %}
-    {% render "BasicCmsBundle:Default:menu" %}
+    {{ render(controller('BasicCmsBundle:Default:menu')) }}
 {% endblock %}
 {% block title %}Редактирование страницы экспорта{% endblock %}
 {% block breadcrumbs %}

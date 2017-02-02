@@ -22,7 +22,7 @@ class ServerController extends Controller
 
         // The lock manager is reponsible for making sure users don't overwrite
         // each others changes.
-        $lockBackend = new OriginalDAV\Locks\Backend\File('../secured/projectfiles/locks');
+        $lockBackend = new OriginalDAV\Locks\Backend\File('secured/projectfiles/locks');
         $lockPlugin = new OriginalDAV\Locks\Plugin($lockBackend);
         $server->addPlugin($lockPlugin);
 

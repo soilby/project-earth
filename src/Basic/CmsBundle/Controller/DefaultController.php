@@ -55,13 +55,13 @@ class DefaultController extends Controller
         $color = $this->container->getParameter('captcha_color');
         $noise = $this->container->getParameter('captcha_noise');
         $target = '';
-        if ($this->getRequest()->get('sizex') !== null) $sizex = $this->getRequest()->get('sizex');
+        if ($this->get('request_stack')->getMasterRequest()->get('sizex') !== null) $sizex = $this->get('request_stack')->getMasterRequest()->get('sizex');
         if ($sizex < 10) $sizex = 10;
-        if ($this->getRequest()->get('sizey') !== null) $sizey = $this->getRequest()->get('sizey');
+        if ($this->get('request_stack')->getMasterRequest()->get('sizey') !== null) $sizey = $this->get('request_stack')->getMasterRequest()->get('sizey');
         if ($sizey < 10) $sizey = 10;
-        if ($this->getRequest()->get('backcolor') !== null) $backcolor = $this->getRequest()->get('backcolor');
-        if ($this->getRequest()->get('color') !== null) $color = $this->getRequest()->get('color');
-        if ($this->getRequest()->get('target') !== null) $target = $this->getRequest()->get('target');
+        if ($this->get('request_stack')->getMasterRequest()->get('backcolor') !== null) $backcolor = $this->get('request_stack')->getMasterRequest()->get('backcolor');
+        if ($this->get('request_stack')->getMasterRequest()->get('color') !== null) $color = $this->get('request_stack')->getMasterRequest()->get('color');
+        if ($this->get('request_stack')->getMasterRequest()->get('target') !== null) $target = $this->get('request_stack')->getMasterRequest()->get('target');
         if ($captchaType == 'grid')
         {
             // Генерируем текст и другие случайные величины
@@ -78,8 +78,8 @@ class DefaultController extends Controller
             $textimage = imagecreate (100, 30);
             $black = imagecolorallocate ($textimage, 0, 0, 0);
             $white = imagecolorallocate ($textimage, 255, 255, 255);
-            $box = imagettfbbox (20, 0, "../admincss/captcha.ttf", $text);
-            imagettftext ($textimage, 20, 0, 50 - abs($box[4] - $box[0]) / 2, 15 + abs($box[5] - $box[1]) / 2, $white, "../admincss/captcha.ttf", $text);
+            $box = imagettfbbox (20, 0, "admincss/captcha.ttf", $text);
+            imagettftext ($textimage, 20, 0, 50 - abs($box[4] - $box[0]) / 2, 15 + abs($box[5] - $box[1]) / 2, $white, "admincss/captcha.ttf", $text);
             $captcha = imagecreate ($sizex, $sizey);
             list($r, $g, $b) = $this->colorHexToRgb($backcolor);
             if ($r === null) {$r = 0; $g = 0; $b = 0;}
@@ -198,7 +198,7 @@ class DefaultController extends Controller
                 $x = rand($x, $x + 4);
                 $y = $sizey - (($sizey - 14) / 2 );
                 $angle = rand(-15, 15);
-                imagettftext ($captcha, 14, $angle, $x, $y, $front, "../admincss/comic.ttf", $letter);
+                imagettftext ($captcha, 14, $angle, $x, $y, $front, "admincss/comic.ttf", $letter);
             }
             if ($noise == true)
             {
@@ -231,7 +231,7 @@ class DefaultController extends Controller
                 $x = rand($x, $x + 4);
                 $y = $sizey - (($sizey - 14) / 2 );
                 $angle = rand(-25, 25);
-                imagettftext ($captcha, 14, $angle, $x, $y, $front, "../admincss/comic.ttf", $letter);
+                imagettftext ($captcha, 14, $angle, $x, $y, $front, "admincss/comic.ttf", $letter);
             }
             if ($noise == true)
             {
@@ -247,7 +247,7 @@ class DefaultController extends Controller
         }
         if ($target != '')
         {
-            $this->getRequest()->getSession()->set('front_captcha_'.$target, $text);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('front_captcha_'.$target, $text);
         }
         ob_start();
         imagepng($captcha);
@@ -271,11 +271,10 @@ class DefaultController extends Controller
         while (time() < $time) {
             
         }
-        if ($this->get('request_stack')->getCurrentRequest()->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = false;
-        } else {
-            $error = $this->get('request_stack')->getCurrentRequest()->getSession()->get(SecurityContext::AUTHENTICATION_ERROR);
-        }
+        
+        $authenticationUtils = $this->get('security.authentication_utils');
+        $error = $authenticationUtils->getLastAuthenticationError();
+        
         return $this->render('BasicCmsBundle:Default:login.html.twig', array('error' => $error));
     }
     
@@ -299,23 +298,23 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('basic_cms_user_list_tab');
-                      else $this->getRequest()->getSession()->set('basic_cms_user_list_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_user_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 4) $tab = 4;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_user_list_page0');
-                        else $this->getRequest()->getSession()->set('basic_cms_user_list_page0', $page0);
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_user_list_page0');
-                        else $this->getRequest()->getSession()->set('basic_cms_user_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('basic_cms_user_list_sort0');
-                        else $this->getRequest()->getSession()->set('basic_cms_user_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('basic_cms_user_list_search0');
-                          else $this->getRequest()->getSession()->set('basic_cms_user_list_search0', $search0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_user_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_page0', $page0);
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_user_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_user_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_user_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_search0', $search0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -390,7 +389,7 @@ class DefaultController extends Controller
     {
         /*
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         $source = "";
         if (@getimagesize($tmpfile)) 
@@ -400,7 +399,7 @@ class DefaultController extends Controller
             if ($params[1] < 10) return new Response(json_encode(array('file' => '', 'error' => 'Разрешение файла меньше 10x10')));
             if ($params[0] > 6000) return new Response(json_encode(array('file' => '', 'error' => 'Разрешение файла больше 6000x6000')));
             if ($params[1] > 6000) return new Response(json_encode(array('file' => '', 'error' => 'Разрешение файла больше 6000x6000')));
-            $basepath = '../images/user/';
+            $basepath = 'images/user/';
             $name = $this->getUser()->getId().'_'.md5(time()).'.jpg';
             if (move_uploaded_file($tmpfile, $basepath . $name)) 
             {
@@ -410,7 +409,7 @@ class DefaultController extends Controller
          * 
          */
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -423,7 +422,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/user/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -437,7 +436,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function userCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 0);
         if ($this->getUser()->checkAccess('user_new') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -510,10 +509,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postuser = $this->getRequest()->get('user');
+            $postuser = $this->get('request_stack')->getMasterRequest()->get('user');
             if (isset($postuser['login'])) $user['login'] = $postuser['login'];
             if (isset($postuser['avatar'])) $user['avatar'] = $postuser['avatar'];
             if (isset($postuser['password'])) $user['password'] = $postuser['password'];
@@ -553,10 +552,10 @@ class DefaultController extends Controller
             $checkrole = $query->getResult();
             if (!isset($checkrole[0]['rolecount']) || ($checkrole[0]['rolecount'] == 0)) {$errors = true; $usererror['role'] = 'Роль не найдена';}
             unset($checkrole);
-            if (($user['avatar'] != '') && (!file_exists('..'.$user['avatar']))) {$errors = true; $usererror['avatar'] = 'Файл не найден';}
+            if (($user['avatar'] != '') && (!file_exists('.'.$user['avatar']))) {$errors = true; $usererror['avatar'] = 'Файл не найден';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -591,7 +590,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.user.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'userCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'userCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                 $i++;
@@ -638,7 +637,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.user.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'userCreate', $userent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'userCreate', $userent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -654,7 +653,7 @@ class DefaultController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.user.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'userCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'userCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -678,9 +677,9 @@ class DefaultController extends Controller
 // *******************************************    
     public function userEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 0);
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         if (($this->getUser()->checkAccess('user_viewall') == 0) && ($this->getUser()->getId() != $id))
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -797,7 +796,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if (($this->getUser()->checkAccess('user_editall') == 0) && ($this->getUser()->getId() != $id))
             {
@@ -818,7 +817,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postuser = $this->getRequest()->get('user');
+            $postuser = $this->get('request_stack')->getMasterRequest()->get('user');
             if (isset($postuser['login'])) $user['login'] = $postuser['login'];
             if (isset($postuser['avatar'])) $user['avatar'] = $postuser['avatar'];
             if (isset($postuser['password'])) $user['password'] = $postuser['password'];
@@ -858,10 +857,10 @@ class DefaultController extends Controller
             $checkrole = $query->getResult();
             if (!isset($checkrole[0]['rolecount']) || ($checkrole[0]['rolecount'] == 0)) {$errors = true; $usererror['role'] = 'Роль не найдена';}
             unset($checkrole);
-            if (($user['avatar'] != '') && (!file_exists('..'.$user['avatar']))) {$errors = true; $usererror['avatar'] = 'Файл не найден';}
+            if (($user['avatar'] != '') && (!file_exists('.'.$user['avatar']))) {$errors = true; $usererror['avatar'] = 'Файл не найден';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -904,7 +903,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.user.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'userEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'userEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                 $i++;
@@ -912,7 +911,7 @@ class DefaultController extends Controller
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                if (($userent->getAvatar() != '') && ($userent->getAvatar() != $user['avatar'])) @unlink('..'.$userent->getAvatar());
+                if (($userent->getAvatar() != '') && ($userent->getAvatar() != $user['avatar'])) @unlink('.'.$userent->getAvatar());
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($user['avatar']);
                 $userent->setLogin($user['login']);
                 if ($user['password'] != '')
@@ -962,7 +961,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.user.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'userEdit', $id, 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'userEdit', $id, 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 3;
                     $i++;
@@ -978,7 +977,7 @@ class DefaultController extends Controller
         foreach ($cmsservices as $item) if (strpos($item,'addone.user.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'userEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'userEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -1013,9 +1012,9 @@ class DefaultController extends Controller
                 'paths'=>array()
             ));
         }
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($tab == 0)
         {
@@ -1031,7 +1030,7 @@ class DefaultController extends Controller
                     ));
                 }
                 $cmsservices = $this->container->getServiceIds();
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1041,7 +1040,7 @@ class DefaultController extends Controller
                         {
                             if ($userent->getId() != $this->getUser()->getId())
                             {
-                                if ($userent->getAvatar() != '') @unlink('..'.$userent->getAvatar());
+                                if ($userent->getAvatar() != '') @unlink('.'.$userent->getAvatar());
                                 $em->remove($userent);
                                 $em->flush();
                                 $query = $em->createQuery('DELETE FROM BasicCmsBundle:SeoPage p WHERE p.contentType = \'object.user\' AND p.contentAction = \'view\' AND p.contentId = :id')->setParameter('id', $key);
@@ -1049,7 +1048,7 @@ class DefaultController extends Controller
                                 foreach ($cmsservices as $item) if (strpos($item,'addone.user.') === 0) 
                                 {
                                     $serv = $this->container->get($item);
-                                    $serv->getAdminController($this->getRequest(), 'userDelete', $key, 'save');
+                                    $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'userDelete', $key, 'save');
                                 }       
                             } else $errors[$key] = 'Запрещено удалять себя';
                             unset($userent);    
@@ -1067,7 +1066,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1095,7 +1094,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1123,7 +1122,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1150,7 +1149,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1175,7 +1174,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1200,7 +1199,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 {
                     $authcount = 0;
@@ -1234,7 +1233,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1261,7 +1260,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1286,7 +1285,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1314,7 +1313,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1341,7 +1340,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1366,7 +1365,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1395,7 +1394,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1422,7 +1421,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1447,7 +1446,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1465,9 +1464,9 @@ class DefaultController extends Controller
         
         if ($tab == 0)
         {
-            $page0 = $this->getRequest()->getSession()->get('basic_cms_user_list_page0');
-            $sort0 = $this->getRequest()->getSession()->get('basic_cms_user_list_sort0');
-            $search0 = $this->getRequest()->getSession()->get('basic_cms_user_list_search0');
+            $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_user_list_page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_user_list_sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_user_list_search0');
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -1578,15 +1577,15 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        $page0 = $this->getRequest()->get('page0');
-        //$page1 = intval($this->getRequest()->get('page1'));
-        //$page2 = intval($this->getRequest()->get('page2'));
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        //$page1 = intval($this->get('request_stack')->getMasterRequest()->get('page1'));
+        //$page2 = intval($this->get('request_stack')->getMasterRequest()->get('page2'));
         
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_role_list_page0');
-                        else $this->getRequest()->getSession()->set('basic_cms_user_role_page0', $page0);
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('basic_cms_role_list_tab');
-                        else $this->getRequest()->getSession()->set('basic_cms_role_list_tab', $tab);
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_role_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_role_page0', $page0);
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_role_list_tab');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_role_list_tab', $tab);
         $tab = intval($tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 1) $tab = 1;
@@ -1626,7 +1625,7 @@ class DefaultController extends Controller
     
     public function roleCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_role_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_role_list_tab', 0);
         if ($this->getUser()->checkAccess('role_list') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -1643,10 +1642,10 @@ class DefaultController extends Controller
         $rolenameerror = '';
         $premiserror = '';
         $premon = array();
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
-            $postrolename = $this->getRequest()->get('rolename');
-            $postpremon = $this->getRequest()->get('premon');
+            $postrolename = $this->get('request_stack')->getMasterRequest()->get('rolename');
+            $postpremon = $this->get('request_stack')->getMasterRequest()->get('premon');
             if ($postrolename !== null) $rolename = $postrolename;
             if (is_array($postpremon)) $premon = $postpremon;
             // Валидация
@@ -1695,7 +1694,7 @@ class DefaultController extends Controller
     
     public function roleEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_role_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_role_list_tab', 0);
         if ($this->getUser()->checkAccess('role_view') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -1708,7 +1707,7 @@ class DefaultController extends Controller
         $em = $this->getDoctrine()->getEntityManager();
         $premis = $this->get('cms.cmsManager')->getRoleList();
         $premisobjects = $this->get('cms.cmsManager')->getRoleListByObjects();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $roleent = $this->getDoctrine()->getRepository('BasicCmsBundle:Roles')->find($id);
         if (empty($roleent))
         {
@@ -1725,7 +1724,7 @@ class DefaultController extends Controller
         $premarray = explode(' ', trim($roleent->getAccess()));
         $premon = array();
         foreach ($premarray as $val) $premon[$val] = 1;
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
             if ($this->getUser()->checkAccess('role_edit') == 0)
             {
@@ -1736,8 +1735,8 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $postrolename = $this->getRequest()->get('rolename');
-            $postpremon = $this->getRequest()->get('premon');
+            $postrolename = $this->get('request_stack')->getMasterRequest()->get('rolename');
+            $postpremon = $this->get('request_stack')->getMasterRequest()->get('premon');
             if ($postrolename !== null) $rolename = $postrolename;
             if (is_array($postpremon)) $premon = $postpremon;
             // Валидация
@@ -1795,7 +1794,7 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'delete')
         {
@@ -1808,7 +1807,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1828,9 +1827,9 @@ class DefaultController extends Controller
                 }
         }
         
-        $page0 = $this->getRequest()->getSession()->get('basic_cms_role_list_page0');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_role_list_page0');
         $page0 = intval($page0);
-        $tab = $this->getRequest()->getSession()->get('basic_cms_role_list_tab');
+        $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_role_list_tab');
         $tab = intval($tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 1) $tab = 1;
@@ -1868,7 +1867,7 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'change')
         {
@@ -1881,7 +1880,7 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $change = $this->getRequest()->get('change');
+            $change = $this->get('request_stack')->getMasterRequest()->get('change');
             
             if (isset($change['from'])) $from = $change['from']; else $from = 0;
             if (isset($change['to'])) $to = $change['to']; else $to = 0;
@@ -1900,7 +1899,7 @@ class DefaultController extends Controller
                 } else $errors['to'] = 'Новая роль не найдена';
             } else $errors['from'] = 'Старая роль не найдена';
         }
-        $tab = $this->getRequest()->getSession()->get('basic_cms_role_list_tab');
+        $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_role_list_tab');
         $tab = intval($tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 1) $tab = 1;
@@ -2079,7 +2078,7 @@ class DefaultController extends Controller
     public function tinyMceUploadAction()
     {
         if ($this->getUser() == null) return $this->render('BasicCmsBundle:Default:tinyMceBlank.html.twig', array());
-        $file = $this->getRequest()->files->get('userfile');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('userfile');
         $tmpfile = $file->getPathName(); 
         $source = "";
         $error = '';
@@ -2100,7 +2099,7 @@ class DefaultController extends Controller
                  {  
                       $basepath = '/images/editor/';
                       $name = $this->getUser()->getId().'_'.md5(time()).'.jpg';
-                      if (imagejpeg ($source, '..'.$basepath.$name))
+                      if (imagejpeg ($source, '.'.$basepath.$name))
                       {
                           $result = array();
                           $result['result'] = "Файл загружен";
@@ -2119,7 +2118,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) $error = 'Формат файла не поддерживается';
             if ($error == '')
             {
-                $basepath = '../images/editor/';
+                $basepath = 'images/editor/';
                 $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
                 if (move_uploaded_file($tmpfile, $basepath . $name)) 
                 {
@@ -2155,9 +2154,9 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $page0 = $this->getRequest()->get('page0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_sitemap_page0');
-                        else $this->getRequest()->getSession()->set('basic_cms_sitemap_page0', $page0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_sitemap_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_sitemap_page0', $page0);
         $page0 = intval($page0);
         
         // Поиск контента для 1 таба (пользователи)
@@ -2219,10 +2218,10 @@ class DefaultController extends Controller
         
         // Валидация
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postpath = $this->getRequest()->get('path');
+            $postpath = $this->get('request_stack')->getMasterRequest()->get('path');
             if (isset($postpath['pageid'])) $path['pageid'] = $postpath['pageid'];
             if (is_array($postpath['path']))
             {
@@ -2273,8 +2272,8 @@ class DefaultController extends Controller
     public function ajaxGetPagesAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $search = trim($this->getRequest()->get('search'));
-        $page = intval($this->getRequest()->get('page'));
+        $search = trim($this->get('request_stack')->getMasterRequest()->get('search'));
+        $page = intval($this->get('request_stack')->getMasterRequest()->get('page'));
         if ($page < 0) $page = 0;
         $query = $em->createQuery('SELECT count(p.id) as pagecount FROM BasicCmsBundle:SeoPage p WHERE p.description LIKE :search OR p.url LIKE :search')
                     ->setParameter('search', '%'.$search.'%');
@@ -2294,7 +2293,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function pathEditAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $pathent = $this->getDoctrine()->getRepository('BasicCmsBundle:BreadCrumbPaths')->find($id);
         if (empty($pathent))
         {
@@ -2341,11 +2340,11 @@ class DefaultController extends Controller
         }
         // Валидация
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             $path['path'] = array();
             // Проверка основных данных
-            $postpath = $this->getRequest()->get('path');
+            $postpath = $this->get('request_stack')->getMasterRequest()->get('path');
             if (isset($postpath['pageid'])) $path['pageid'] = $postpath['pageid'];
             if (is_array($postpath['path']))
             {
@@ -2408,11 +2407,11 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'delete')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -2427,7 +2426,7 @@ class DefaultController extends Controller
                     }
                 }
         }
-        $page0 = $this->getRequest()->getSession()->get('basic_cms_sitemap_page0');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_sitemap_page0');
         $page0 = intval($page0);
         // Поиск контента для 1 таба (пользователи)
         $query = $em->createQuery('SELECT count(b.id) as bccount FROM BasicCmsBundle:BreadCrumbPaths b');
@@ -2473,15 +2472,15 @@ class DefaultController extends Controller
         $query = $em->createQuery('SELECT l.shortName FROM BasicCmsBundle:Locales l');
         $locales = $query->getResult();
         if (!is_array($locales)) $locales = array();
-        $id = trim($this->getRequest()->get('id'));
+        $id = trim($this->get('request_stack')->getMasterRequest()->get('id'));
         // Если ID = 0 очистить tmp файл
         if ($id == 0) 
         {
-            $file = @fopen('../sitemap.tmp', "w"); 
+            $file = @fopen('sitemap.tmp', "w"); 
             fwrite($file,
                 '<?xml version="1.0" encoding="UTF-8"?>'."\r\n".
                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\r\n");
-        } else $file = @fopen('../sitemap.tmp', "a");
+        } else $file = @fopen('sitemap.tmp', "a");
         if ($file === false) return new Response(json_encode(array('result'=>'Ошибка открытия файла')));
         //Найти страницы 100 штук
         $query = $em->createQuery('SELECT p.id, p.locale, p.url, p.contentType, p.contentAction, p.contentId, p.access FROM BasicCmsBundle:SeoPage p WHERE p.id > :id')->setParameter('id',$id)->setMaxResults(100);
@@ -2500,11 +2499,11 @@ class DefaultController extends Controller
                     $urls = array();
                     if ($page['locale'] == '')
                     {
-                        $urls[] = 'http://'.$this->getRequest()->getHttpHost().'/'.($page['url'] != 'index.html' ? $page['url'] : '');
-                        foreach ($locales as $locale) $urls[] = 'http://'.$this->getRequest()->getHttpHost().'/'.$locale['shortName'].'/'.$page['url'];
+                        $urls[] = 'http://'.$this->get('request_stack')->getMasterRequest()->getHttpHost().'/'.($page['url'] != 'index.html' ? $page['url'] : '');
+                        foreach ($locales as $locale) $urls[] = 'http://'.$this->get('request_stack')->getMasterRequest()->getHttpHost().'/'.$locale['shortName'].'/'.$page['url'];
                     } else
                     {
-                        foreach ($locales as $locale) if ($item['locale'] == $locales['shortName']) $urls[] = 'http://'.$this->getRequest()->getHttpHost().'/'.$locale['shortName'].'/'.$page['url'];
+                        foreach ($locales as $locale) if ($item['locale'] == $locales['shortName']) $urls[] = 'http://'.$this->get('request_stack')->getMasterRequest()->getHttpHost().'/'.$locale['shortName'].'/'.$page['url'];
                     }
                     if (count($urls) > 0)
                     {
@@ -2515,7 +2514,7 @@ class DefaultController extends Controller
                             if (isset($objectinfo['avatar']) && ($objectinfo['avatar'] != ''))
                             {
                                 $info = $info.'<image:image>'."\r\n".
-                                              '<image:loc>http://'.$this->getRequest()->getHttpHost().$objectinfo['avatar'].'</image:loc>'."\r\n".
+                                              '<image:loc>http://'.$this->get('request_stack')->getMasterRequest()->getHttpHost().$objectinfo['avatar'].'</image:loc>'."\r\n".
                                               '</image:image>'."\r\n";
                             }
                             if (isset($objectinfo['modifyDate']) && ($objectinfo['modifyDate'] != null))
@@ -2539,16 +2538,16 @@ class DefaultController extends Controller
             fwrite($file, '</urlset>'."\r\n");
             fclose($file);
             // переместить файл в sitemap.xml
-            @unlink('../sitemap.xml');
-            rename('../sitemap.tmp', '../sitemap.xml');
+            @unlink('sitemap.xml');
+            rename('sitemap.tmp', 'sitemap.xml');
             // записать robots.txt
-            $filer = @fopen('../robots.txt', "w"); 
+            $filer = @fopen('robots.txt', "w"); 
             fwrite($filer,
                     'User-agent: *'."\r\n".
                     'Disallow: /admin/'."\r\n".
                     'Disallow: /system/'."\r\n".
-                    'Host: '.$this->getRequest()->getHttpHost()."\r\n".
-                    'Sitemap: http://'.$this->getRequest()->getHttpHost().'/sitemap.xml'."\r\n");
+                    'Host: '.$this->get('request_stack')->getMasterRequest()->getHttpHost()."\r\n".
+                    'Sitemap: http://'.$this->get('request_stack')->getMasterRequest()->getHttpHost().'/sitemap.xml'."\r\n");
             fclose($filer);
             $status = 'Fine';
         }
@@ -2613,10 +2612,10 @@ class DefaultController extends Controller
 
         // Валидация
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postlocale = $this->getRequest()->get('locale');
+            $postlocale = $this->get('request_stack')->getMasterRequest()->get('locale');
             if (isset($postlocale['shortName'])) $locale['shortName'] = $postlocale['shortName'];
             if (isset($postlocale['fullName'])) $locale['fullName'] = $postlocale['fullName'];
             unset($postlocale);
@@ -2655,7 +2654,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function localeEditAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $locent = $this->getDoctrine()->getRepository('BasicCmsBundle:Locales')->find($id);
         if (empty($locent))
         {
@@ -2686,10 +2685,10 @@ class DefaultController extends Controller
 
         // Валидация
         $errors = false;
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postlocale = $this->getRequest()->get('locale');
+            $postlocale = $this->get('request_stack')->getMasterRequest()->get('locale');
             if (isset($postlocale['shortName'])) $locale['shortName'] = $postlocale['shortName'];
             if (isset($postlocale['fullName'])) $locale['fullName'] = $postlocale['fullName'];
             unset($postlocale);
@@ -2738,11 +2737,11 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'delete')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -2804,7 +2803,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('error_edit') == 0)
             {
@@ -2816,7 +2815,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['template'])) $page['template'] = $postpage['template'];
             if (isset($postpage['layout'])) $page['layout'] = $postpage['layout'];
@@ -2853,7 +2852,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function userAuthpageCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 1);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 1);
         if ($this->getUser()->checkAccess('user_authpage') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -2914,10 +2913,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postauthpage = $this->getRequest()->get('authpage');
+            $postauthpage = $this->get('request_stack')->getMasterRequest()->get('authpage');
             if (isset($postauthpage['title']['default'])) $authpage['title']['default'] = $postauthpage['title']['default'];
             foreach ($locales as $locale) if (isset($postauthpage['title'][$locale['shortName']])) $authpage['title'][$locale['shortName']] = $postauthpage['title'][$locale['shortName']];
             if (isset($postauthpage['enabled'])) $authpage['enabled'] = intval($postauthpage['enabled']); else $authpage['enabled'] = 0;
@@ -2928,7 +2927,7 @@ class DefaultController extends Controller
             if (!preg_match("/^.{0,255}$/ui", $authpage['redirectPath'])) {$errors = true; $authpageerror['redirectPath'] = 'Путь должен содержать до 255 символов';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -3012,7 +3011,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function userAuthpageEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 1);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 1);
         if ($this->getUser()->checkAccess('user_authpage') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -3022,7 +3021,7 @@ class DefaultController extends Controller
                 'paths'=>array()
             ));
         }
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $authpageent = $this->getDoctrine()->getRepository('BasicCmsBundle:UserAuthPages')->find($id);
         if (empty($authpageent))
         {
@@ -3109,10 +3108,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postauthpage = $this->getRequest()->get('authpage');
+            $postauthpage = $this->get('request_stack')->getMasterRequest()->get('authpage');
             if (isset($postauthpage['title']['default'])) $authpage['title']['default'] = $postauthpage['title']['default'];
             foreach ($locales as $locale) if (isset($postauthpage['title'][$locale['shortName']])) $authpage['title'][$locale['shortName']] = $postauthpage['title'][$locale['shortName']];
             if (isset($postauthpage['enabled'])) $authpage['enabled'] = intval($postauthpage['enabled']); else $authpage['enabled'] = 0;
@@ -3123,7 +3122,7 @@ class DefaultController extends Controller
             if (!preg_match("/^.{0,255}$/ui", $authpage['redirectPath'])) {$errors = true; $authpageerror['redirectPath'] = 'Путь должен содержать до 255 символов';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -3205,7 +3204,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function userPasswordpageCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 2);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 2);
         if ($this->getUser()->checkAccess('user_passwordpage') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -3281,10 +3280,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postpasspage = $this->getRequest()->get('passpage');
+            $postpasspage = $this->get('request_stack')->getMasterRequest()->get('passpage');
             if (isset($postpasspage['title']['default'])) $passpage['title']['default'] = $postpasspage['title']['default'];
             if (isset($postpasspage['letterText']['default'])) $passpage['letterText']['default'] = $postpasspage['letterText']['default'];
             foreach ($locales as $locale) 
@@ -3307,7 +3306,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -3389,8 +3388,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function userPasswordpageEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 2);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 2);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $passpageent = $this->getDoctrine()->getRepository('BasicCmsBundle:UserPasswordPages')->find($id);
         if (empty($passpageent))
         {
@@ -3503,10 +3502,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postpasspage = $this->getRequest()->get('passpage');
+            $postpasspage = $this->get('request_stack')->getMasterRequest()->get('passpage');
             if (isset($postpasspage['title']['default'])) $passpage['title']['default'] = $postpasspage['title']['default'];
             if (isset($postpasspage['letterText']['default'])) $passpage['letterText']['default'] = $postpasspage['letterText']['default'];
             foreach ($locales as $locale) 
@@ -3529,7 +3528,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -3614,7 +3613,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function userRegisterpageCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 3);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 3);
         if ($this->getUser()->checkAccess('user_registerpage') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -3715,10 +3714,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postregpage = $this->getRequest()->get('regpage');
+            $postregpage = $this->get('request_stack')->getMasterRequest()->get('regpage');
             if (isset($postregpage['title']['default'])) $regpage['title']['default'] = $postregpage['title']['default'];
             if (isset($postregpage['letterText']['default'])) $regpage['letterText']['default'] = $postregpage['letterText']['default'];
             foreach ($locales as $locale) 
@@ -3757,7 +3756,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -3867,8 +3866,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function userRegisterpageEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 3);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 3);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $regpageent = $this->getDoctrine()->getRepository('BasicCmsBundle:UserRegisterPages')->find($id);
         if (empty($regpageent))
         {
@@ -4013,10 +4012,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postregpage = $this->getRequest()->get('regpage');
+            $postregpage = $this->get('request_stack')->getMasterRequest()->get('regpage');
             if (isset($postregpage['title']['default'])) $regpage['title']['default'] = $postregpage['title']['default'];
             if (isset($postregpage['letterText']['default'])) $regpage['letterText']['default'] = $postregpage['letterText']['default'];
             foreach ($locales as $locale) 
@@ -4055,7 +4054,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -4167,7 +4166,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function userProfilepageCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 4);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 4);
         if ($this->getUser()->checkAccess('user_profilepage') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -4231,10 +4230,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postprofpage = $this->getRequest()->get('profpage');
+            $postprofpage = $this->get('request_stack')->getMasterRequest()->get('profpage');
             if (isset($postprofpage['title']['default'])) $profpage['title']['default'] = $postprofpage['title']['default'];
             foreach ($locales as $locale) if (isset($postprofpage['title'][$locale['shortName']])) $profpage['title'][$locale['shortName']] = $postprofpage['title'][$locale['shortName']];
             if (isset($postprofpage['enabled'])) $profpage['enabled'] = intval($postprofpage['enabled']); else $profpage['enabled'] = 0;
@@ -4245,7 +4244,7 @@ class DefaultController extends Controller
             foreach ($locales as $locale) if (!preg_match("/^(.{3,})?$/ui", $profpage['title'][$locale['shortName']])) {$errors = true; $profpageerror['title'][$locale['shortName']] = 'Заголовок должен содержать более 3 символов или оставьте поле пустым';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -4326,8 +4325,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function userProfilepageEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_user_list_tab', 4);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_user_list_tab', 4);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $profpageent = $this->getDoctrine()->getRepository('BasicCmsBundle:UserProfilePages')->find($id);
         if (empty($profpageent))
         {
@@ -4427,10 +4426,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postprofpage = $this->getRequest()->get('profpage');
+            $postprofpage = $this->get('request_stack')->getMasterRequest()->get('profpage');
             if (isset($postprofpage['title']['default'])) $profpage['title']['default'] = $postprofpage['title']['default'];
             foreach ($locales as $locale) if (isset($postprofpage['title'][$locale['shortName']])) $profpage['title'][$locale['shortName']] = $postprofpage['title'][$locale['shortName']];
             if (isset($postprofpage['enabled'])) $profpage['enabled'] = intval($postprofpage['enabled']); else $profpage['enabled'] = 0;
@@ -4441,7 +4440,7 @@ class DefaultController extends Controller
             foreach ($locales as $locale) if (!preg_match("/^(.{3,})?$/ui", $profpage['title'][$locale['shortName']])) {$errors = true; $profpageerror['title'][$locale['shortName']] = 'Заголовок должен содержать более 3 символов или оставьте поле пустым';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -4525,7 +4524,7 @@ class DefaultController extends Controller
 
     public function userFrontAjaxAvatarAction() 
     {
-/*        $file = $this->getRequest()->files->get('avatar');
+/*        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         $source = "";
         if (@getimagesize($tmpfile)) 
@@ -4535,12 +4534,12 @@ class DefaultController extends Controller
             if ($params[1] < 10) return new Response(json_encode(array('file' => '', 'error' => 'Разрешение файла меньше 10x10')));
             if ($params[0] > 6000) return new Response(json_encode(array('file' => '', 'error' => 'Разрешение файла больше 6000x6000')));
             if ($params[1] > 6000) return new Response(json_encode(array('file' => '', 'error' => 'Разрешение файла больше 6000x6000')));
-            $basepath = '../images/user/';
+            $basepath = 'images/user/';
             $name = 'f_'.md5($tmpfile.time()).'.jpg';
             if (move_uploaded_file($tmpfile, $basepath . $name)) return new Response(json_encode(array('file' => '/images/user/'.$name, 'error' => '')));
         } else return new Response(json_encode(array('file' => '', 'error' => 'Неправильный формат файла')));
 */        
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -4553,7 +4552,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'format')));
             $basepath = '/images/user/';
             $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -4568,23 +4567,23 @@ class DefaultController extends Controller
     
     public function statisticsAction()
     {
-        $id = $this->getRequest()->get('id');
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
         if ($id === null)
         {
             $em = $this->getDoctrine()->getEntityManager();
             $tab = 0;
             // Таб 1
-            $page0 = $this->getRequest()->get('page0');
-            $sort0 = $this->getRequest()->get('sort0');
-            $search0 = $this->getRequest()->get('search0');
-            if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_statistics_page0');
-                            else $this->getRequest()->getSession()->set('basic_cms_statistics_page0', $page0);
-            if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_statistics_page0');
-                            else $this->getRequest()->getSession()->set('basic_cms_statistics_page0', $page0);
-            if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('basic_cms_statistics_sort0');
-                            else $this->getRequest()->getSession()->set('basic_cms_statistics_sort0', $sort0);
-            if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('basic_cms_statistics_search0');
-                              else $this->getRequest()->getSession()->set('basic_cms_statistics_search0', $search0);
+            $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+            if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_statistics_page0');
+                            else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_statistics_page0', $page0);
+            if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_statistics_page0');
+                            else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_statistics_page0', $page0);
+            if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_statistics_sort0');
+                            else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_statistics_sort0', $sort0);
+            if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_statistics_search0');
+                              else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_statistics_search0', $search0);
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -4997,9 +4996,9 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('basic_cms_sitemap_pageslist_tab');
-                      else $this->getRequest()->getSession()->set('basic_cms_sitemap_pageslist_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_sitemap_pageslist_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_sitemap_pageslist_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 0) $tab = 0;
         // Таб 1
@@ -5019,7 +5018,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function siteMapSearchpageCreateAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_sitemap_pageslist_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_sitemap_pageslist_tab', 0);
         if ($this->getUser()->checkAccess('site_searchpagenew') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -5094,10 +5093,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postsearchpage = $this->getRequest()->get('searchpage');
+            $postsearchpage = $this->get('request_stack')->getMasterRequest()->get('searchpage');
             if (isset($postsearchpage['title']['default'])) $searchpage['title']['default'] = $postsearchpage['title']['default'];
             foreach ($locales as $locale) if (isset($postsearchpage['title'][$locale['shortName']])) $searchpage['title'][$locale['shortName']] = $postsearchpage['title'][$locale['shortName']];
             if (isset($postsearchpage['enabled'])) $searchpage['enabled'] = intval($postsearchpage['enabled']); else $searchpage['enabled'] = 0;
@@ -5116,7 +5115,7 @@ class DefaultController extends Controller
             if ((!preg_match("/^\d+$/ui", $searchpage['countInPage'])) || ($searchpage['countInPage'] < 1) || ($searchpage['countInPage'] > 1000)) {$errors = true; $searchpageerror['countInPage'] = 'Должно быть указано число от 1 до 1000';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -5199,8 +5198,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function siteMapSearchpageEditAction()
     {
-        $this->getRequest()->getSession()->set('basic_cms_sitemap_pageslist_tab', 0);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_sitemap_pageslist_tab', 0);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $searchpageent = $this->getDoctrine()->getRepository('BasicCmsBundle:SearchPages')->find($id);
         if (empty($searchpageent))
         {
@@ -5312,10 +5311,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postsearchpage = $this->getRequest()->get('searchpage');
+            $postsearchpage = $this->get('request_stack')->getMasterRequest()->get('searchpage');
             if (isset($postsearchpage['title']['default'])) $searchpage['title']['default'] = $postsearchpage['title']['default'];
             foreach ($locales as $locale) if (isset($postsearchpage['title'][$locale['shortName']])) $searchpage['title'][$locale['shortName']] = $postsearchpage['title'][$locale['shortName']];
             if (isset($postsearchpage['enabled'])) $searchpage['enabled'] = intval($postsearchpage['enabled']); else $searchpage['enabled'] = 0;
@@ -5334,7 +5333,7 @@ class DefaultController extends Controller
             if ((!preg_match("/^\d+$/ui", $searchpage['countInPage'])) || ($searchpage['countInPage'] < 1) || ($searchpage['countInPage'] > 1000)) {$errors = true; $searchpageerror['countInPage'] = 'Должно быть указано число от 1 до 1000';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -5431,10 +5430,10 @@ class DefaultController extends Controller
                 'paths'=>array()
             ));
         }
-//        $tab = intval($this->getRequest()->get('tab'));
+//        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         $tab = 0;
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($tab == 0)
         {
@@ -5449,7 +5448,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -5476,7 +5475,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -5501,7 +5500,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -5542,7 +5541,7 @@ class DefaultController extends Controller
     {
         $help = array();
         $cmsservices = $this->container->getServiceIds();
-        $helppage = $this->getRequest()->get('page');
+        $helppage = $this->get('request_stack')->getMasterRequest()->get('page');
         $helpcontent = '';
         foreach ($cmsservices as $item) if (strpos($item,'object.') === 0) 
         {
@@ -5565,28 +5564,28 @@ class DefaultController extends Controller
     public function logsListAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('basic_cms_logs_tab');
-                      else $this->getRequest()->getSession()->set('basic_cms_logs_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_logs_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 1) $tab = 1;
         if (($tab == 1) && ($this->getUser()->checkAccess('site_logfront') == 0)) $tab = 0;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        $filter0 = $this->getRequest()->get('filter0');
-        $object0 = $this->getRequest()->get('object0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('basic_cms_logs_page0');
-                        else $this->getRequest()->getSession()->set('basic_cms_logs_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('basic_cms_logs_sort0');
-                        else $this->getRequest()->getSession()->set('basic_cms_logs_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('basic_cms_logs_search0');
-                          else $this->getRequest()->getSession()->set('basic_cms_logs_search0', $search0);
-        if ($filter0 === null) $filter0 = $this->getRequest()->getSession()->get('basic_cms_logs_filter0');
-                          else $this->getRequest()->getSession()->set('basic_cms_logs_filter0', $filter0);
-        if ($object0 === null) $object0 = $this->getRequest()->getSession()->get('basic_cms_logs_object0');
-                          else $this->getRequest()->getSession()->set('basic_cms_logs_object0', $object0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        $filter0 = $this->get('request_stack')->getMasterRequest()->get('filter0');
+        $object0 = $this->get('request_stack')->getMasterRequest()->get('object0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_logs_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_logs_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_logs_search0', $search0);
+        if ($filter0 === null) $filter0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_filter0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_logs_filter0', $filter0);
+        if ($object0 === null) $object0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_object0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('basic_cms_logs_object0', $object0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -5683,16 +5682,16 @@ class DefaultController extends Controller
     
     public function logsAjaxAction()
     {
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($tab == 0)
         {
             if ($action == 'viewed')
             {
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -5709,11 +5708,11 @@ class DefaultController extends Controller
                     }
             }
             // Таб 1
-            $page0 = $this->getRequest()->getSession()->get('basic_cms_logs_page0');
-            $sort0 = $this->getRequest()->getSession()->get('basic_cms_logs_sort0');
-            $search0 = $this->getRequest()->getSession()->get('basic_cms_logs_search0');
-            $filter0 = $this->getRequest()->getSession()->get('basic_cms_logs_filter0');
-            $object0 = $this->getRequest()->getSession()->get('basic_cms_logs_object0');
+            $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_search0');
+            $filter0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_filter0');
+            $object0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('basic_cms_logs_object0');
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -5787,7 +5786,7 @@ class DefaultController extends Controller
             $actions1 = array();
             if ($action == 'delete')
             {
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 $subscribe1 = $this->get('cms.cmsManager')->getConfigValue('object.user.logsubscribe');
                 if (!is_array($subscribe1)) $subscribe1 = array();
                 if ($check != null)
@@ -5800,8 +5799,8 @@ class DefaultController extends Controller
             }
             if ($action == 'create')
             {
-                $email1 = $this->getRequest()->get('email');
-                $postactions1 = $this->getRequest()->get('actions');
+                $email1 = $this->get('request_stack')->getMasterRequest()->get('email');
+                $postactions1 = $this->get('request_stack')->getMasterRequest()->get('actions');
                 if (!is_array($postactions1)) $postactions1 = array();
                 $checkerror = false;
                 if (!preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,24})$/ui", $email1)) {$checkerror = true; $errors['email'] = 'Неправильный формат адреса электронной почты';}
@@ -5875,7 +5874,7 @@ class DefaultController extends Controller
     public function logsViewAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $logent = $this->getDoctrine()->getRepository('BasicCmsBundle:LogFront')->find($id);
         if (empty($logent))
         {

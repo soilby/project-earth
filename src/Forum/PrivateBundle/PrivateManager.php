@@ -27,7 +27,7 @@ class PrivateManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Личные сообщения', $this->container->get('router')->generate('forum_private_private_list'), 100, $this->container->get('security.context')->getToken()->getUser()->checkAccess('forum_private'), 'Форум');
+        $manager->addAdminMenu('Личные сообщения', $this->container->get('router')->generate('forum_private_private_list'), 100, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('forum_private'), 'Форум');
     }
     
     public function registerRoles()
@@ -169,7 +169,7 @@ class PrivateManager
                              {
                                  foreach ($pattachments as $pattach)
                                  {
-                                     if ($pattach['id'] == $attid) $params['postAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                                     if ($pattach['id'] == $attid) $params['postAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                                  }
                              }
                              unset($pattachments);
@@ -209,7 +209,7 @@ class PrivateManager
                      if (!is_array($params['messages'][0]['attachments'])) $params['messages'][0]['attachments'] = array();
                      foreach ($params['messages'][0]['attachments'] as &$attach)
                      {
-                         $attach['fileSize'] = @filesize('..'.$attach['contentFile']);
+                         $attach['fileSize'] = @filesize('.'.$attach['contentFile']);
                      }
                      unset($attach);
                      $params['count'] = 1;
@@ -257,7 +257,7 @@ class PrivateManager
                      if (!is_array($attachments)) $attachments = array();
                      foreach ($attachments as &$attach)
                      {
-                         $attach['fileSize'] = @filesize('..'.$attach['contentFile']);
+                         $attach['fileSize'] = @filesize('.'.$attach['contentFile']);
                      }
                      unset($attach);
                      foreach ($attachments as $attach)
@@ -302,7 +302,7 @@ class PrivateManager
                                  {
                                      foreach ($pattachments as $pattach)
                                      {
-                                         if ($pattach['id'] == $attid) $message['editAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                                         if ($pattach['id'] == $attid) $message['editAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                                      }
                                  }
                                  unset($pattachments);
@@ -352,7 +352,7 @@ class PrivateManager
                              {
                                  foreach ($pattachments as $pattach)
                                  {
-                                     if ($pattach['id'] == $attid) $params['postAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                                     if ($pattach['id'] == $attid) $params['postAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                                  }
                              }
                              unset($pattachments);
@@ -503,7 +503,7 @@ class PrivateManager
                                      {
                                          foreach ($removedfiles as $removedfile)
                                          {
-                                             @unlink('..'.$removedfile['contentFile']);
+                                             @unlink('.'.$removedfile['contentFile']);
                                          }
                                      }
                                  }
@@ -619,7 +619,7 @@ class PrivateManager
                              $removeids = array();
                              foreach ($files as $file)
                              {
-                                 @unlink('..'.$file['contentFile']);
+                                 @unlink('.'.$file['contentFile']);
                                  $removeids[] = $file['id'];
                              }
                              if (count($removeids) > 0)
@@ -632,7 +632,7 @@ class PrivateManager
                          foreach ($postfiles['attachments'] as $file) if ($file != null)
                          {
                              $tmpfile = $file->getPathName();
-                             $basepath = '../secured/forumprivate/';
+                             $basepath = 'secured/forumprivate/';
                              $name = 'f_'.md5($tmpfile.time()).'.dat';
                              if (move_uploaded_file($tmpfile, $basepath . $name)) 
                              {
@@ -737,7 +737,7 @@ class PrivateManager
                              $removeids = array();
                              foreach ($files as $file)
                              {
-                                 @unlink('..'.$file['contentFile']);
+                                 @unlink('.'.$file['contentFile']);
                                  $removeids[] = $file['id'];
                              }
                              if (count($removeids) > 0)
@@ -762,7 +762,7 @@ class PrivateManager
                          foreach ($postfiles['attachments'] as $file) if ($file != null)
                          {
                              $tmpfile = $file->getPathName();
-                             $basepath = '../secured/forumprivate/';
+                             $basepath = 'secured/forumprivate/';
                              $name = 'f_'.md5($tmpfile.time()).'.dat';
                              if (move_uploaded_file($tmpfile, $basepath . $name)) 
                              {

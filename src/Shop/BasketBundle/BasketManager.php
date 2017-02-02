@@ -27,8 +27,8 @@ class BasketManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Просмотр заказов', $this->container->get('router')->generate('shop_basket_orderlist'), 90, $this->container->get('security.context')->getToken()->getUser()->checkAccess('basket_orderlist'), 'Магазин');
-        $manager->addAdminMenu('Настройки корзины', $this->container->get('router')->generate('shop_basket_list'), 100, $this->container->get('security.context')->getToken()->getUser()->checkAccess('basket_configview'), 'Магазин');
+        $manager->addAdminMenu('Просмотр заказов', $this->container->get('router')->generate('shop_basket_orderlist'), 90, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('basket_orderlist'), 'Магазин');
+        $manager->addAdminMenu('Настройки корзины', $this->container->get('router')->generate('shop_basket_list'), 100, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('basket_configview'), 'Магазин');
     }
     
     public function registerRoles()

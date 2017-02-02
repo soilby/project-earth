@@ -27,22 +27,22 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('shop_basket_orderlist_tab');
-                      else $this->getRequest()->getSession()->set('shop_basket_orderlist_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_orderlist_tab', $tab);
         $tab = intval($tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 1) $tab = 1;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('shop_basket_orderlist_page0');
-                        else $this->getRequest()->getSession()->set('shop_basket_orderlist_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('shop_basket_orderlist_sort0');
-                        else $this->getRequest()->getSession()->set('shop_basket_orderlist_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('shop_basket_orderlist_search0');
-                          else $this->getRequest()->getSession()->set('shop_basket_orderlist_search0', $search0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_orderlist_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_orderlist_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_orderlist_search0', $search0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -70,12 +70,12 @@ class DefaultController extends Controller
                                   'WHERE (u.fullName is null) OR (u.fullName like :search) '.$sortsql)->setParameter('search', '%'.$search0.'%')->setFirstResult($start)->setMaxResults(20);
         $orders0 = $query->getResult();
         // Таб 2
-        $page1 = $this->getRequest()->get('page1');
-        $sort1 = $this->getRequest()->get('sort1');
-        if ($page1 === null) $page1 = $this->getRequest()->getSession()->get('shop_basket_orderlist_page1');
-                        else $this->getRequest()->getSession()->set('shop_basket_orderlist_page1', $page1);
-        if ($sort1 === null) $sort1 = $this->getRequest()->getSession()->get('shop_basket_orderlist_sort1');
-                        else $this->getRequest()->getSession()->set('shop_basket_orderlist_sort1', $sort1);
+        $page1 = $this->get('request_stack')->getMasterRequest()->get('page1');
+        $sort1 = $this->get('request_stack')->getMasterRequest()->get('sort1');
+        if ($page1 === null) $page1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_page1');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_orderlist_page1', $page1);
+        if ($sort1 === null) $sort1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_sort1');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_orderlist_sort1', $sort1);
         $page1 = intval($page1);
         $sort1 = intval($sort1);
         $currency = $em->getRepository('ShopProductBundle:ProductCurrency')->findOneBy(array('main' => 1));
@@ -148,7 +148,7 @@ class DefaultController extends Controller
     public function orderAjaxStatusAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $order = $this->getDoctrine()->getRepository('ShopBasketBundle:ProductOrders')->find($id);
         if (empty($order))
         {
@@ -162,7 +162,7 @@ class DefaultController extends Controller
         {
             return new Response(json_encode(array('result'=>'Заказ еще не оплачен')));
         }
-        $status = intval($this->getRequest()->get('status'));
+        $status = intval($this->get('request_stack')->getMasterRequest()->get('status'));
         if ($status < 0) $status = 0;
         if ($status > 3) $status = 3;
         $order->setStatus($status);
@@ -179,16 +179,16 @@ class DefaultController extends Controller
     
     public function orderViewAction()
     {
-        $tab = $this->getRequest()->get('tab');
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
         if ($tab !== null)
         {
             $tab = intval($tab);
             if ($tab < 0) $tab = 0;
             if ($tab > 1) $tab = 1;
-            $this->getRequest()->getSession()->set('shop_basket_orderlist_tab', $tab);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_orderlist_tab', $tab);
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $orderent = $this->getDoctrine()->getRepository('ShopBasketBundle:ProductOrders')->find($id);
         if (empty($orderent))
         {
@@ -319,12 +319,12 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if (($action == 'status0') || ($action == 'status1') || ($action == 'status2') || ($action == 'status3'))
         {
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -355,13 +355,13 @@ class DefaultController extends Controller
                     unset($orderent);
                 }
         }
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         // Таб 1
         if ($tab == 0)
         {
-            $page0 = $this->getRequest()->getSession()->get('shop_basket_orderlist_page0');
-            $sort0 = $this->getRequest()->getSession()->get('shop_basket_orderlist_sort0');
-            $search0 = $this->getRequest()->getSession()->get('shop_basket_orderlist_search0');
+            $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_search0');
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -414,8 +414,8 @@ class DefaultController extends Controller
         if ($tab == 1)
         {
             // Таб 2
-            $page1 = $this->getRequest()->getSession()->get('shop_basket_orderlist_page1');
-            $sort1 = $this->getRequest()->getSession()->get('shop_basket_orderlist_sort1');
+            $page1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_page1');
+            $sort1 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_orderlist_sort1');
             $page1 = intval($page1);
             $sort1 = intval($sort1);
             // Поиск контента для 2 таба (письма)
@@ -480,9 +480,9 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('shop_basket_list_tab');
-                      else $this->getRequest()->getSession()->set('shop_basket_list_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_basket_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_list_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 3) $tab = 3;
         // Таб 1 (страницы корзины)
@@ -528,7 +528,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function fieldCreateAction()
     {
-        $this->getRequest()->getSession()->set('shop_basket_list_tab', 3);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_list_tab', 3);
         if ($this->getUser()->checkAccess('bakset_configedit') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -581,10 +581,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postfield = $this->getRequest()->get('field');
+            $postfield = $this->get('request_stack')->getMasterRequest()->get('field');
             if (isset($postfield['techName'])) $field['techName'] = $postfield['techName'];
             if (isset($postfield['name']['default'])) $field['name']['default'] = $postfield['name']['default'];
             if (isset($postfield['paramRegExp']['default'])) $field['paramRegExp']['default'] = $postfield['paramRegExp']['default'];
@@ -681,9 +681,9 @@ class DefaultController extends Controller
 // *******************************************    
     public function fieldEditAction()
     {
-        $this->getRequest()->getSession()->set('shop_basket_list_tab', 3);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_list_tab', 3);
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $fieldent = $this->getDoctrine()->getRepository('ShopBasketBundle:ProductBasketFields')->find($id);
         if (empty($fieldent))
         {
@@ -746,7 +746,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('bakset_configedit') == 0)
             {
@@ -758,7 +758,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postfield = $this->getRequest()->get('field');
+            $postfield = $this->get('request_stack')->getMasterRequest()->get('field');
             if (isset($postfield['techName'])) $field['techName'] = $postfield['techName'];
             if (isset($postfield['name']['default'])) $field['name']['default'] = $postfield['name']['default'];
             if (isset($postfield['paramRegExp']['default'])) $field['paramRegExp']['default'] = $postfield['paramRegExp']['default'];
@@ -861,12 +861,12 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         $errorsorder = array();
         if ($action == 'delete')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -882,7 +882,7 @@ class DefaultController extends Controller
         }
         if ($action == 'blocked')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -898,7 +898,7 @@ class DefaultController extends Controller
         }
         if ($action == 'unblocked')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -914,7 +914,7 @@ class DefaultController extends Controller
         }
         if ($action == 'ordering')
         {
-            $ordering = $this->getRequest()->get('ordering');
+            $ordering = $this->get('request_stack')->getMasterRequest()->get('ordering');
             $error = false;
             $ids = array();
             foreach ($ordering as $key=>$val) $ids[] = $key;
@@ -964,8 +964,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function shipmentEditAction()
     {
-        $this->getRequest()->getSession()->set('shop_basket_list_tab', 2);
-        $id = $this->getRequest()->get('id');
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_list_tab', 2);
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
         if (!$this->container->has('plugin.basket.shipment.'.$id))
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -987,7 +987,7 @@ class DefaultController extends Controller
         $cmsservice = $this->container->get('plugin.basket.shipment.'.$id);
         $errors = false;
         $tab = '';
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('basket_configedit') == 0)
             {
@@ -998,11 +998,11 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $errors = $cmsservice->getAdminController($this->getRequest(), 'validate');
+            $errors = $cmsservice->getAdminController($this->get('request_stack')->getMasterRequest(), 'validate');
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                $cmsservice->getAdminController($this->getRequest(), 'save');
+                $cmsservice->getAdminController($this->get('request_stack')->getMasterRequest(), 'save');
                 return $this->render('BasicCmsBundle:Default:message.html.twig', array(
                     'title'=>'Редактирование способа доставки',
                     'message'=>'Настройки способа доставки сохранены',
@@ -1010,7 +1010,7 @@ class DefaultController extends Controller
                 ));
             }
         }
-        $tab = $cmsservice->getAdminController($this->getRequest(), 'tab');
+        $tab = $cmsservice->getAdminController($this->get('request_stack')->getMasterRequest(), 'tab');
         return $this->render('ShopBasketBundle:Default:shipmentEdit.html.twig', array(
             'tab' => $tab,
             'id' => $id
@@ -1033,11 +1033,11 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'on')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1051,7 +1051,7 @@ class DefaultController extends Controller
         }
         if ($action == 'off')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1083,8 +1083,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function paymentEditAction()
     {
-        $this->getRequest()->getSession()->set('shop_basket_list_tab', 1);
-        $id = $this->getRequest()->get('id');
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_list_tab', 1);
+        $id = $this->get('request_stack')->getMasterRequest()->get('id');
         if (!$this->container->has('plugin.basket.payment.'.$id))
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -1106,7 +1106,7 @@ class DefaultController extends Controller
         $cmsservice = $this->container->get('plugin.basket.payment.'.$id);
         $errors = false;
         $tab = '';
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if ($this->getUser()->checkAccess('basket_configedit') == 0)
             {
@@ -1117,11 +1117,11 @@ class DefaultController extends Controller
                     'paths'=>array()
                 ));
             }
-            $errors = $cmsservice->getAdminController($this->getRequest(), 'validate');
+            $errors = $cmsservice->getAdminController($this->get('request_stack')->getMasterRequest(), 'validate');
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                $cmsservice->getAdminController($this->getRequest(), 'save');
+                $cmsservice->getAdminController($this->get('request_stack')->getMasterRequest(), 'save');
                 return $this->render('BasicCmsBundle:Default:message.html.twig', array(
                     'title'=>'Редактирование способа оплаты',
                     'message'=>'Настройки способа оплаты сохранены',
@@ -1129,7 +1129,7 @@ class DefaultController extends Controller
                 ));
             }
         }
-        $tab = $cmsservice->getAdminController($this->getRequest(), 'tab');
+        $tab = $cmsservice->getAdminController($this->get('request_stack')->getMasterRequest(), 'tab');
         return $this->render('ShopBasketBundle:Default:paymentEdit.html.twig', array(
             'tab' => $tab,
             'id' => $id
@@ -1152,11 +1152,11 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'on')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1170,7 +1170,7 @@ class DefaultController extends Controller
         }
         if ($action == 'off')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1202,7 +1202,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function basketCreateAction()
     {
-        $this->getRequest()->getSession()->set('shop_basket_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_list_tab', 0);
         if ($this->getUser()->checkAccess('bakset_configedit') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -1288,10 +1288,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postbasket = $this->getRequest()->get('basket');
+            $postbasket = $this->get('request_stack')->getMasterRequest()->get('basket');
             if (isset($postbasket['enabled'])) $basket['enabled'] = intval($postbasket['enabled']); else $basket['enabled'] = 0;
             if (isset($postbasket['sendEmail'])) $basket['sendEmail'] = intval($postbasket['sendEmail']); else $basket['sendEmail'] = 0;
             if (isset($postbasket['email'])) $basket['email'] = $postbasket['email'];
@@ -1327,7 +1327,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -1409,9 +1409,9 @@ class DefaultController extends Controller
 // *******************************************    
     public function basketEditAction()
     {
-        $this->getRequest()->getSession()->set('shop_basket_list_tab', 0);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_basket_list_tab', 0);
         $em = $this->getDoctrine()->getEntityManager();
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $basketent = $this->getDoctrine()->getRepository('ShopBasketBundle:ProductBaskets')->find($id);
         if (empty($basketent))
         {
@@ -1529,10 +1529,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postbasket = $this->getRequest()->get('basket');
+            $postbasket = $this->get('request_stack')->getMasterRequest()->get('basket');
             if (isset($postbasket['enabled'])) $basket['enabled'] = intval($postbasket['enabled']); else $basket['enabled'] = 0;
             if (isset($postbasket['sendEmail'])) $basket['sendEmail'] = intval($postbasket['sendEmail']); else $basket['sendEmail'] = 0;
             if (isset($postbasket['email'])) $basket['email'] = $postbasket['email'];
@@ -1568,7 +1568,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -1664,12 +1664,12 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         if ($action == 'delete')
         {
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1688,7 +1688,7 @@ class DefaultController extends Controller
         if ($action == 'blocked')
         {
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -1705,7 +1705,7 @@ class DefaultController extends Controller
         if ($action == 'unblocked')
         {
             $cmsservices = $this->container->getServiceIds();
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)

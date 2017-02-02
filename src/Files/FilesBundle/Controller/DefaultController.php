@@ -29,9 +29,9 @@ class DefaultController extends Controller
         }
         $em = $this->getDoctrine()->getEntityManager();
         $tab = 0;
-        $tab = $this->getRequest()->get('tab');
-        if ($tab === null) $tab = $this->getRequest()->getSession()->get('files_files_file_list_tab');
-                      else $this->getRequest()->getSession()->set('files_files_file_list_tab', $tab);
+        $tab = $this->get('request_stack')->getMasterRequest()->get('tab');
+        if ($tab === null) $tab = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_tab');
+                      else $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_tab', $tab);
         if ($tab < 0) $tab = 0;
         if ($tab > 2) $tab = 2;
         if (($tab == 2) && ($this->getUser()->checkAccess('file_editpage') == 0)) $tab = 1;
@@ -39,18 +39,18 @@ class DefaultController extends Controller
         if (($tab == 0) && ($this->getUser()->checkAccess('file_list') == 0)) $tab = 1;
         if (($tab == 1) && ($this->getUser()->checkAccess('file_createpage') == 0)) $tab = 2;
         // Таб 1
-        $page0 = $this->getRequest()->get('page0');
-        $sort0 = $this->getRequest()->get('sort0');
-        $search0 = $this->getRequest()->get('search0');
-        $taxonomy0 = $this->getRequest()->get('taxonomy0');
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('files_files_file_list_page0');
-                        else $this->getRequest()->getSession()->set('files_files_file_list_page0', $page0);
-        if ($sort0 === null) $sort0 = $this->getRequest()->getSession()->get('files_files_file_list_sort0');
-                        else $this->getRequest()->getSession()->set('files_files_file_list_sort0', $sort0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('files_files_file_list_search0');
-                          else $this->getRequest()->getSession()->set('files_files_file_list_search0', $search0);
-        if ($taxonomy0 === null) $taxonomy0 = $this->getRequest()->getSession()->get('files_files_file_list_taxonomy0');
-                          else $this->getRequest()->getSession()->set('files_files_file_list_taxonomy0', $taxonomy0);
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $sort0 = $this->get('request_stack')->getMasterRequest()->get('sort0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
+        $taxonomy0 = $this->get('request_stack')->getMasterRequest()->get('taxonomy0');
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_page0', $page0);
+        if ($sort0 === null) $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_sort0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_sort0', $sort0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_search0', $search0);
+        if ($taxonomy0 === null) $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_taxonomy0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_taxonomy0', $taxonomy0);
         $page0 = intval($page0);
         $sort0 = intval($sort0);
         $search0 = trim($search0);
@@ -134,7 +134,7 @@ class DefaultController extends Controller
     public function filesFileAjaxAvatarAction() 
     {
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -147,7 +147,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'Формат файла не поддерживается')));
             $basepath = '/images/file/';
             $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -159,14 +159,14 @@ class DefaultController extends Controller
     public function filesFileAjaxFileAction() 
     {
         $userId = $this->getUser()->getId();
-        $file = $this->getRequest()->files->get('file');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('file');
         $tmpfile = $file->getPathName();
         $basepath = '/secured/file/';
         $name = $this->getUser()->getId().'_'.md5($tmpfile.time()).'.dat';
-        if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+        if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
         {
             $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
-            return new Response(json_encode(array('file' => $basepath.$name, 'filename' => $file->getClientOriginalName(), 'filesize' => number_format(filesize('..'.$basepath.$name) / 1024, 0, ',', ' '), 'error' => '')));
+            return new Response(json_encode(array('file' => $basepath.$name, 'filename' => $file->getClientOriginalName(), 'filesize' => number_format(filesize('.'.$basepath.$name) / 1024, 0, ',', ' '), 'error' => '')));
         }
         else return new Response(json_encode(array('file' => '', 'filename' => '', 'filesize' => '', 'error' => 'Ошибка загрузки файла')));
     }
@@ -261,10 +261,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postfile = $this->getRequest()->get('file');
+            $postfile = $this->get('request_stack')->getMasterRequest()->get('file');
             if (isset($postfile['title'])) $file['title'] = $postfile['title'];
             if (isset($postfile['description'])) $file['description'] = $postfile['description'];
             if (isset($postfile['avatar'])) $file['avatar'] = $postfile['avatar'];
@@ -278,13 +278,13 @@ class DefaultController extends Controller
             if (!preg_match("/^.{3,}$/ui", $file['title'])) {$errors = true; $fileerror['title'] = 'Заголовок должен содержать более 3 символов';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $file['metadescr'])) {$errors = true; $fileerror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $file['metakey'])) {$errors = true; $fileerror['metakey'] = 'Использованы недопустимые символы';}
-            if (($file['avatar'] != '') && (!file_exists('..'.$file['avatar']))) {$errors = true; $fileerror['avatar'] = 'Файл не найден';}
-            if (($file['contentFile'] == '') || (!file_exists('..'.$file['contentFile']))) {$errors = true; $fileerror['contentFile'] = 'Файл не найден'; $file['fileSize'] = '';}
-            else $file['fileSize'] = filesize('..'.$file['contentFile']);
+            if (($file['avatar'] != '') && (!file_exists('.'.$file['avatar']))) {$errors = true; $fileerror['avatar'] = 'Файл не найден';}
+            if (($file['contentFile'] == '') || (!file_exists('.'.$file['contentFile']))) {$errors = true; $fileerror['contentFile'] = 'Файл не найден'; $file['fileSize'] = '';}
+            else $file['fileSize'] = filesize('.'.$file['contentFile']);
             if (!preg_match("/^[0-9A-zА-яЁё \-!#\$\%\&\*\(\)_\+\?\.]{3,}$/ui", $file['fileName'])) {$errors = true; $fileerror['fileName'] = 'Имя файла должно содержать более 3 символов';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -314,7 +314,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postfileloc = $this->getRequest()->get('fileloc');
+            $postfileloc = $this->get('request_stack')->getMasterRequest()->get('fileloc');
             foreach ($locales as $locale)
             {
                 if (isset($postfileloc[$locale['shortName']]['title'])) $fileloc[$locale['shortName']]['title'] = $postfileloc[$locale['shortName']]['title'];
@@ -332,7 +332,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.file', 0, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.file', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -340,7 +340,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.file.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'filesFileCreate', 0, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'filesFileCreate', 0, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -416,7 +416,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.file', $fileent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.file', $fileent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -424,7 +424,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.file.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'filesFileCreate', $fileent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'filesFileCreate', $fileent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -437,11 +437,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'create', 'object.file', 0, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'create', 'object.file', 0, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.file.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'filesFileCreate', 0, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'filesFileCreate', 0, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -467,7 +467,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function filesFileEditAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $fileent = $this->getDoctrine()->getRepository('FilesFilesBundle:Files')->find($id);
         if (empty($fileent))
         {
@@ -506,7 +506,7 @@ class DefaultController extends Controller
         $file['description'] = $fileent->getDescription();
         $file['avatar'] = $fileent->getAvatar();
         $file['fileName'] = $fileent->getFileName();
-        $file['fileSize'] = @filesize('..'.$fileent->getContentFile());
+        $file['fileSize'] = @filesize('.'.$fileent->getContentFile());
         $file['contentFile'] = $fileent->getContentFile();
         $file['onlyAutorized'] = $fileent->getOnlyAutorized();
         $file['enabled'] = $fileent->getEnabled();
@@ -610,7 +610,7 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             if (($this->getUser()->checkAccess('file_editall') == 0) && ($this->getUser()->getId() != $fileent->getCreaterId()))
             {
@@ -631,7 +631,7 @@ class DefaultController extends Controller
                 ));
             }
             // Проверка основных данных
-            $postfile = $this->getRequest()->get('file');
+            $postfile = $this->get('request_stack')->getMasterRequest()->get('file');
             if (isset($postfile['title'])) $file['title'] = $postfile['title'];
             if (isset($postfile['description'])) $file['description'] = $postfile['description'];
             if (isset($postfile['avatar'])) $file['avatar'] = $postfile['avatar'];
@@ -645,13 +645,13 @@ class DefaultController extends Controller
             if (!preg_match("/^.{3,}$/ui", $file['title'])) {$errors = true; $fileerror['title'] = 'Заголовок должен содержать более 3 символов';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $file['metadescr'])) {$errors = true; $fileerror['metadescr'] = 'Использованы недопустимые символы';}
             if (!preg_match("/^[0-9A-zА-яЁё\s\,\.\-\`\!\@\#\$\%\^\&\*\(\)\_\+\=\?\/\\\:\;]*$/ui", $file['metakey'])) {$errors = true; $fileerror['metakey'] = 'Использованы недопустимые символы';}
-            if (($file['avatar'] != '') && (!file_exists('..'.$file['avatar']))) {$errors = true; $fileerror['avatar'] = 'Файл не найден';}
-            if (($file['contentFile'] == '') || (!file_exists('..'.$file['contentFile']))) {$errors = true; $fileerror['contentFile'] = 'Файл не найден'; $file['fileSize'] = '';}
-            else $file['fileSize'] = filesize('..'.$file['contentFile']);
+            if (($file['avatar'] != '') && (!file_exists('.'.$file['avatar']))) {$errors = true; $fileerror['avatar'] = 'Файл не найден';}
+            if (($file['contentFile'] == '') || (!file_exists('.'.$file['contentFile']))) {$errors = true; $fileerror['contentFile'] = 'Файл не найден'; $file['fileSize'] = '';}
+            else $file['fileSize'] = filesize('.'.$file['contentFile']);
             if (!preg_match("/^[0-9A-zА-яЁё \-!#\$\%\&\*\(\)_\+\?\.]{3,}$/ui", $file['fileName'])) {$errors = true; $fileerror['fileName'] = 'Имя файла должно содержать более 3 символов';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['enable'])) $page['enable'] = intval($postpage['enable']); else $page['enable'] = 0;
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
@@ -682,7 +682,7 @@ class DefaultController extends Controller
             }
             if (($errors == true) && ($activetab == 0)) $activetab = 2;
             // Валидация локлизации
-            $postfileloc = $this->getRequest()->get('fileloc');
+            $postfileloc = $this->get('request_stack')->getMasterRequest()->get('fileloc');
             foreach ($locales as $locale)
             {
                 if (isset($postfileloc[$locale['shortName']]['title'])) $fileloc[$locale['shortName']]['title'] = $postfileloc[$locale['shortName']]['title'];
@@ -700,7 +700,7 @@ class DefaultController extends Controller
             $i = 0;
             if ($this->container->has('object.taxonomy')) 
             {
-                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.file', $id, 'validate');
+                $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.file', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -708,7 +708,7 @@ class DefaultController extends Controller
             foreach ($cmsservices as $item) if (strpos($item,'addone.file.') === 0) 
             {
                 $serv = $this->container->get($item);
-                $localerror = $serv->getAdminController($this->getRequest(), 'filesFileEdit', $id, 'validate');
+                $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'filesFileEdit', $id, 'validate');
                 if ($localerror == true) $errors = true;
                 if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                 $i++;
@@ -716,8 +716,8 @@ class DefaultController extends Controller
             // Если нет ошибок - сохранение
             if ($errors == false)
             {
-                if (($fileent->getAvatar() != '') && ($fileent->getAvatar() != $file['avatar'])) @unlink('..'.$fileent->getAvatar());
-                if (($fileent->getContentFile() != '') && ($fileent->getContentFile() != $file['contentFile'])) @unlink('..'.$fileent->getContentFile());
+                if (($fileent->getAvatar() != '') && ($fileent->getAvatar() != $file['avatar'])) @unlink('.'.$fileent->getAvatar());
+                if (($fileent->getContentFile() != '') && ($fileent->getContentFile() != $file['contentFile'])) @unlink('.'.$fileent->getContentFile());
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($file['avatar']);
                 $this->container->get('cms.cmsManager')->unlockTemporaryFile($file['contentFile']);
                 $this->container->get('cms.cmsManager')->unlockTemporaryEditor($file['description'], $fileent->getDescription());
@@ -799,7 +799,7 @@ class DefaultController extends Controller
                 $i = 0;
                 if ($this->container->has('object.taxonomy')) 
                 {
-                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.file', $fileent->getId(), 'save');
+                    $localerror = $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.file', $fileent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -807,7 +807,7 @@ class DefaultController extends Controller
                 foreach ($cmsservices as $item) if (strpos($item,'addone.file.') === 0) 
                 {
                     $serv = $this->container->get($item);
-                    $localerror = $serv->getAdminController($this->getRequest(), 'filesFileEdit', $fileent->getId(), 'save');
+                    $localerror = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'filesFileEdit', $fileent->getId(), 'save');
                     if ($localerror == true) $errors = true;
                     if (($errors == true) && ($activetab == 0)) $activetab = $i + 4;
                     $i++;
@@ -820,11 +820,11 @@ class DefaultController extends Controller
             }
         }
         $cmsservices = $this->container->getServiceIds();
-        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'edit', 'object.file', $id, 'tab'));
+        if ($this->container->has('object.taxonomy')) $tabs[] =  array('name'=>'Категории классификации','content'=>$this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'edit', 'object.file', $id, 'tab'));
         foreach ($cmsservices as $item) if (strpos($item,'addone.file.') === 0) 
         {
             $serv = $this->container->get($item);
-            $content = $serv->getAdminController($this->getRequest(), 'filesFileEdit', $id, 'tab');
+            $content = $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'filesFileEdit', $id, 'tab');
             $tabs[] = array('name'=>$serv->getDescription(),'content'=>$content);
         }       
         if ($activetab == 0) $activetab = 1;
@@ -853,9 +853,9 @@ class DefaultController extends Controller
     
     public function filesFileAjaxAction()
     {
-        $tab = intval($this->getRequest()->get('tab'));
+        $tab = intval($this->get('request_stack')->getMasterRequest()->get('tab'));
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         $errors = array();
         $errorsorder = array();
         if ($tab == 0)
@@ -881,7 +881,7 @@ class DefaultController extends Controller
                     ));
                 }
                 $cmsservices = $this->container->getServiceIds();
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -889,8 +889,8 @@ class DefaultController extends Controller
                         $fileent = $this->getDoctrine()->getRepository('FilesFilesBundle:Files')->find($key);
                         if (!empty($fileent))
                         {
-                            if ($fileent->getAvatar() != '') @unlink('..'.$fileent->getAvatar());
-                            if ($fileent->getContentFile() != '') @unlink('..'.$fileent->getContentFile());
+                            if ($fileent->getAvatar() != '') @unlink('.'.$fileent->getAvatar());
+                            if ($fileent->getContentFile() != '') @unlink('.'.$fileent->getContentFile());
                             $this->container->get('cms.cmsManager')->unlockTemporaryEditor('', $fileent->getDescription());
                             $em->remove($fileent);
                             $em->flush();
@@ -907,11 +907,11 @@ class DefaultController extends Controller
                             $query->execute();
                             $query = $em->createQuery('DELETE FROM BasicCmsBundle:SeoPage p WHERE p.contentType = \'object.file\' AND p.contentAction = \'view\' AND p.contentId = :id')->setParameter('id', $key);
                             $query->execute();
-                            if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->getRequest(), 'delete', 'object.file', $key, 'save');
+                            if ($this->container->has('object.taxonomy')) $this->container->get('object.taxonomy')->getTaxonomyController($this->get('request_stack')->getMasterRequest(), 'delete', 'object.file', $key, 'save');
                             foreach ($cmsservices as $item) if (strpos($item,'addone.file.') === 0) 
                             {
                                 $serv = $this->container->get($item);
-                                $serv->getAdminController($this->getRequest(), 'filesFileDelete', $key, 'save');
+                                $serv->getAdminController($this->get('request_stack')->getMasterRequest(), 'filesFileDelete', $key, 'save');
                             }       
                             unset($fileent);    
                         }
@@ -928,7 +928,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -953,7 +953,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -978,7 +978,7 @@ class DefaultController extends Controller
                         'paths'=>array()
                     ));
                 }
-                $ordering = $this->getRequest()->get('ordering');
+                $ordering = $this->get('request_stack')->getMasterRequest()->get('ordering');
                 $error = false;
                 $ids = array();
                 foreach ($ordering as $key=>$val) $ids[] = $key;
@@ -1007,10 +1007,10 @@ class DefaultController extends Controller
                     $em->flush();
                 }
             }
-            $page0 = $this->getRequest()->getSession()->get('files_files_file_list_page0');
-            $sort0 = $this->getRequest()->getSession()->get('files_files_file_list_sort0');
-            $search0 = $this->getRequest()->getSession()->get('files_files_file_list_search0');
-            $taxonomy0 = $this->getRequest()->getSession()->get('files_files_file_list_taxonomy0');
+            $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_page0');
+            $sort0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_sort0');
+            $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_search0');
+            $taxonomy0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('files_files_file_list_taxonomy0');
             $page0 = intval($page0);
             $sort0 = intval($sort0);
             $search0 = trim($search0);
@@ -1092,7 +1092,7 @@ class DefaultController extends Controller
             if ($action == 'deletepage')
             {
                 $cmsservices = $this->container->getServiceIds();
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1108,7 +1108,7 @@ class DefaultController extends Controller
             }
             if ($action == 'blockedpage')
             {
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1124,7 +1124,7 @@ class DefaultController extends Controller
             }
             if ($action == 'unblockedpage')
             {
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1162,7 +1162,7 @@ class DefaultController extends Controller
             if ($action == 'deletepage')
             {
                 $cmsservices = $this->container->getServiceIds();
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1178,7 +1178,7 @@ class DefaultController extends Controller
             }
             if ($action == 'blockedpage')
             {
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1194,7 +1194,7 @@ class DefaultController extends Controller
             }
             if ($action == 'unblockedpage')
             {
-                $check = $this->getRequest()->get('check');
+                $check = $this->get('request_stack')->getMasterRequest()->get('check');
                 if ($check != null)
                 foreach ($check as $key=>$val)
                     if ($val == 1)
@@ -1226,19 +1226,19 @@ class DefaultController extends Controller
     
     public function frontFileDownloadAction() 
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $fileent = $this->getDoctrine()->getRepository('FilesFilesBundle:Files')->find($id);
         if (empty($fileent)) return new Response('File not found', 404);
         // Проверить доступ к файлу
         if ($fileent->getOnlyAutorized() != 0)
         {
-            $userid = $this->getRequest()->getSession()->get('front_system_autorized');
+            $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
             $userEntity = null;
             if ($userid != null) $userEntity = $this->getDoctrine()->getRepository('BasicCmsBundle:Users')->find($userid);
             if (empty($userEntity))
             {
-                $userid = $this->getRequest()->cookies->get('front_autorization_keytwo');
-                $userpass = $this->getRequest()->cookies->get('front_autorization_keyone');
+                $userid = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keytwo');
+                $userpass = $this->get('request_stack')->getMasterRequest()->cookies->get('front_autorization_keyone');
                 $query = $this->getDoctrine()->getEntityManager()->createQuery('SELECT u FROM BasicCmsBundle:Users u WHERE MD5(CONCAT(u.id,\'Embedded.CMS\')) = :userid AND MD5(CONCAT(u.password, u.salt)) = :userpass')->setParameter('userid', $userid)->setParameter('userpass', $userpass);
                 $userEntity = $query->getResult();
                 if ((count($userEntity) == 1) && (isset($userEntity[0])) && (!empty($userEntity[0]))) $userEntity = $userEntity[0];
@@ -1246,14 +1246,14 @@ class DefaultController extends Controller
             if (empty($userEntity)) return new Response('Access denied', 403);
             if ($userEntity->getBlocked() != 2) return new Response('Access denied', 403);
         }
-        if ($this->getRequest()->getSession()->get('front_system_download_file') != $id) 
+        if ($this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_download_file') != $id) 
         {
             $fileent->setDownloadCount($fileent->getDownloadCount() + 1);
             $this->getDoctrine()->getEntityManager()->flush();
-            $this->getRequest()->getSession()->set('front_system_download_file', $id);
+            $this->get('request_stack')->getMasterRequest()->getSession()->set('front_system_download_file', $id);
         }
         // Выдать файл
-        $filePath = '..'.$fileent->getContentFile();
+        $filePath = '.'.$fileent->getContentFile();
         $newFileName = $fileent->getFileName();
         if (is_file($filePath)) 
         {
@@ -1320,12 +1320,12 @@ class DefaultController extends Controller
             return new Response('File not found', 404);
         }
         die;
-        /*if (($this->container->get('security.context')->isGranted('ROLE_ADMIN')) || 
-            ($this->container->get('security.context')->isGranted('ROLE_RISK')) ||
-            ($this->container->get('security.context')->isGranted('ROLE_OPERATOR')))
+        /*if (($this->container->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) || 
+            ($this->container->get('security.authorization_checker')->isGranted('ROLE_RISK')) ||
+            ($this->container->get('security.authorization_checker')->isGranted('ROLE_OPERATOR')))
         {
-            $filename = '../secured/'.$type.'/'.$file;
-            $newfilename = $this->getRequest()->get('name');
+            $filename = 'secured/'.$type.'/'.$file;
+            $newfilename = $this->get('request_stack')->getMasterRequest()->get('name');
             if ($newfilename == null) $newfilename = $filename;
             if (!file_exists($filename)) return new Response('');
             $resp = new Response();
@@ -1349,7 +1349,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function filesCreatepageCreateAction()
     {
-        $this->getRequest()->getSession()->set('files_files_file_list_tab', 1);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_tab', 1);
         if ($this->getUser()->checkAccess('file_createpage') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -1444,10 +1444,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postcreatepage = $this->getRequest()->get('createpage');
+            $postcreatepage = $this->get('request_stack')->getMasterRequest()->get('createpage');
             if (isset($postcreatepage['title']['default'])) $createpage['title']['default'] = $postcreatepage['title']['default'];
             foreach ($locales as $locale) if (isset($postcreatepage['title'][$locale['shortName']])) $createpage['title'][$locale['shortName']] = $postcreatepage['title'][$locale['shortName']];
             if (isset($postcreatepage['enabled'])) $createpage['enabled'] = intval($postcreatepage['enabled']); else $createpage['enabled'] = 0;
@@ -1472,7 +1472,7 @@ class DefaultController extends Controller
             foreach ($locales as $locale) if (!preg_match("/^(.{3,})?$/ui", $createpage['title'][$locale['shortName']])) {$errors = true; $createpageerror['title'][$locale['shortName']] = 'Заголовок должен содержать более 3 символов или оставьте поле пустым';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -1587,8 +1587,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function filesCreatepageEditAction()
     {
-        $this->getRequest()->getSession()->set('files_files_file_list_tab', 1);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_tab', 1);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $createpageent = $this->getDoctrine()->getRepository('FilesFilesBundle:FileCreatePages')->find($id);
         if (empty($createpageent))
         {
@@ -1727,10 +1727,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $postcreatepage = $this->getRequest()->get('createpage');
+            $postcreatepage = $this->get('request_stack')->getMasterRequest()->get('createpage');
             if (isset($postcreatepage['title']['default'])) $createpage['title']['default'] = $postcreatepage['title']['default'];
             foreach ($locales as $locale) if (isset($postcreatepage['title'][$locale['shortName']])) $createpage['title'][$locale['shortName']] = $postcreatepage['title'][$locale['shortName']];
             if (isset($postcreatepage['enabled'])) $createpage['enabled'] = intval($postcreatepage['enabled']); else $createpage['enabled'] = 0;
@@ -1754,7 +1754,7 @@ class DefaultController extends Controller
             foreach ($locales as $locale) if (!preg_match("/^(.{3,})?$/ui", $createpage['title'][$locale['shortName']])) {$errors = true; $createpageerror['title'][$locale['shortName']] = 'Заголовок должен содержать более 3 символов или оставьте поле пустым';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -1868,7 +1868,7 @@ class DefaultController extends Controller
     
     public function filesFrontAjaxAvatarAction() 
     {
-        $file = $this->getRequest()->files->get('avatar');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('avatar');
         $tmpfile = $file->getPathName();
         if (@getimagesize($tmpfile)) 
         {
@@ -1881,7 +1881,7 @@ class DefaultController extends Controller
             if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == ''))  return new Response(json_encode(array('file' => '', 'error' => 'format')));
             $basepath = '/images/file/';
             $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-            if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+            if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
             {
                 $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
                 return new Response(json_encode(array('file' => $basepath.$name, 'error' => '')));
@@ -1892,14 +1892,14 @@ class DefaultController extends Controller
     
     public function filesFrontAjaxContentFileAction() 
     {
-        $file = $this->getRequest()->files->get('file');
+        $file = $this->get('request_stack')->getMasterRequest()->files->get('file');
         $tmpfile = $file->getPathName();
         $basepath = '/secured/file/';
         $name = 'f_'.md5($tmpfile.time()).'.dat';
-        if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+        if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
         {
             $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $file->getClientOriginalName());
-            return new Response(json_encode(array('file' => $basepath.$name, 'error' => '', 'filename' => $file->getClientOriginalName(), 'filesize' => filesize('..'.$basepath.$name))));
+            return new Response(json_encode(array('file' => $basepath.$name, 'error' => '', 'filename' => $file->getClientOriginalName(), 'filesize' => filesize('.'.$basepath.$name))));
         }
         return new Response(json_encode(array('file' => '', 'error' => 'format', 'filename' => '', 'filesize' => 0)));
     }
@@ -1909,7 +1909,7 @@ class DefaultController extends Controller
 // *******************************************    
     public function filesEditpageCreateAction()
     {
-        $this->getRequest()->getSession()->set('files_files_file_list_tab', 2);
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_tab', 2);
         if ($this->getUser()->checkAccess('file_editpage') == 0)
         {
             return $this->render('BasicCmsBundle:Default:message.html.twig', array(
@@ -1979,10 +1979,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $posteditpage = $this->getRequest()->get('editpage');
+            $posteditpage = $this->get('request_stack')->getMasterRequest()->get('editpage');
             if (isset($posteditpage['title']['default'])) $editpage['title']['default'] = $posteditpage['title']['default'];
             foreach ($locales as $locale) if (isset($posteditpage['title'][$locale['shortName']])) $editpage['title'][$locale['shortName']] = $posteditpage['title'][$locale['shortName']];
             if (isset($posteditpage['enabled'])) $editpage['enabled'] = intval($posteditpage['enabled']); else $editpage['enabled'] = 0;
@@ -1995,7 +1995,7 @@ class DefaultController extends Controller
             foreach ($locales as $locale) if (!preg_match("/^(.{3,})?$/ui", $editpage['title'][$locale['shortName']])) {$errors = true; $editpageerror['title'][$locale['shortName']] = 'Заголовок должен содержать более 3 символов или оставьте поле пустым';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];
@@ -2077,8 +2077,8 @@ class DefaultController extends Controller
 // *******************************************    
     public function filesEditpageEditAction()
     {
-        $this->getRequest()->getSession()->set('files_files_file_list_tab', 2);
-        $id = intval($this->getRequest()->get('id'));
+        $this->get('request_stack')->getMasterRequest()->getSession()->set('files_files_file_list_tab', 2);
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $editpageent = $this->getDoctrine()->getRepository('FilesFilesBundle:FileEditPages')->find($id);
         if (empty($editpageent))
         {
@@ -2182,10 +2182,10 @@ class DefaultController extends Controller
         $activetab = 0;
         $errors = false;
         $tabs = array();
-        if ($this->getRequest()->getMethod() == "POST")
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == "POST")
         {
             // Проверка основных данных
-            $posteditpage = $this->getRequest()->get('editpage');
+            $posteditpage = $this->get('request_stack')->getMasterRequest()->get('editpage');
             if (isset($posteditpage['title']['default'])) $editpage['title']['default'] = $posteditpage['title']['default'];
             foreach ($locales as $locale) if (isset($posteditpage['title'][$locale['shortName']])) $editpage['title'][$locale['shortName']] = $posteditpage['title'][$locale['shortName']];
             if (isset($posteditpage['enabled'])) $editpage['enabled'] = intval($posteditpage['enabled']); else $editpage['enabled'] = 0;
@@ -2198,7 +2198,7 @@ class DefaultController extends Controller
             foreach ($locales as $locale) if (!preg_match("/^(.{3,})?$/ui", $editpage['title'][$locale['shortName']])) {$errors = true; $editpageerror['title'][$locale['shortName']] = 'Заголовок должен содержать более 3 символов или оставьте поле пустым';}
             if (($errors == true) && ($activetab == 0)) $activetab = 1;
             // Проверка данных о странице
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['url'])) $page['url'] = trim($postpage['url']);
             if (isset($postpage['modules']) && is_array($postpage['modules'])) $page['modules'] = $postpage['modules']; else $page['modules'] = array();
             if (isset($postpage['locale'])) $page['locale'] = $postpage['locale'];

@@ -40,8 +40,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
     public function getQuotaInfo() 
     {
         return array(
-            disk_total_space('../'.Node::FOLDER)-disk_free_space('../'.Node::FOLDER),
-            disk_free_space('../'.Node::FOLDER)
+            disk_total_space(''.Node::FOLDER)-disk_free_space(''.Node::FOLDER),
+            disk_free_space(''.Node::FOLDER)
         );
     }
 

@@ -18,13 +18,13 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $page0 = $this->getRequest()->get('page0');
-        $search0 = $this->getRequest()->get('search0');
+        $page0 = $this->get('request_stack')->getMasterRequest()->get('page0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->get('search0');
         
-        if ($page0 === null) $page0 = $this->getRequest()->getSession()->get('shop_parameter_list_page0');
-                        else $this->getRequest()->getSession()->set('shop_parameter_list_page0', $page0);
-        if ($search0 === null) $search0 = $this->getRequest()->getSession()->get('shop_parameter_list_search0');
-                          else $this->getRequest()->getSession()->set('shop_parameter_list_search0', $search0);
+        if ($page0 === null) $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_parameter_list_page0');
+                        else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_parameter_list_page0', $page0);
+        if ($search0 === null) $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_parameter_list_search0');
+                          else $this->get('request_stack')->getMasterRequest()->getSession()->set('shop_parameter_list_search0', $search0);
         $page0 = intval($page0);
         $search0 = trim($search0);
                           
@@ -81,10 +81,10 @@ class DefaultController extends Controller
         $paramerror['regularExp'] = '';
         $paramerror['items'] = '';
         // Валидация
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
             $errors = false;
-            $postparam = $this->getRequest()->get('param');
+            $postparam = $this->get('request_stack')->getMasterRequest()->get('param');
             if (isset($postparam['type'])) $param['type'] = $postparam['type'];
             if (isset($postparam['name'])) $param['name'] = $postparam['name'];
             if (isset($postparam['description']['default'])) $param['description']['default'] = $postparam['description']['default'];
@@ -155,7 +155,7 @@ class DefaultController extends Controller
         $query = $em->createQuery('SELECT l.shortName, l.fullName FROM BasicCmsBundle:Locales l');
         $locales = $query->getResult();
         
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $parament = $this->getDoctrine()->getRepository('ShopParameterBundle:ProductParameters')->find($id);
         if (empty($parament))
         {
@@ -184,10 +184,10 @@ class DefaultController extends Controller
         $paramerror['regularExp'] = '';
         $paramerror['items'] = '';
         // Валидация
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
             $errors = false;
-            $postparam = $this->getRequest()->get('param');
+            $postparam = $this->get('request_stack')->getMasterRequest()->get('param');
             if (isset($postparam['type'])) $param['type'] = $postparam['type'];
             if (isset($postparam['name'])) $param['name'] = $postparam['name'];
             if (isset($postparam['description']['default'])) $param['description']['default'] = $postparam['description']['default'];
@@ -252,11 +252,11 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         
         if ($action == 'delete')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -272,7 +272,7 @@ class DefaultController extends Controller
         
         if ($action == 'ordering')
         {
-            $ordering = $this->getRequest()->get('ordering');
+            $ordering = $this->get('request_stack')->getMasterRequest()->get('ordering');
             $errors = false;
             $errortext = array();
             $ids = array();
@@ -294,8 +294,8 @@ class DefaultController extends Controller
             // изменить порядок
             if ($errors == true)
             {
-                $page0 = $this->getRequest()->getSession()->get('shop_parameter_list_page0');
-                $search0 = $this->getRequest()->getSession()->get('shop_parameter_list_search0');
+                $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_parameter_list_page0');
+                $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_parameter_list_search0');
 
                 $query = $em->createQuery('SELECT count(p.id) as paramcount FROM ShopParameterBundle:ProductParameters p '.
                                           'WHERE p.name like :search OR p.description like :search')->setParameter('search', '%'.$search0.'%');
@@ -332,8 +332,8 @@ class DefaultController extends Controller
             $em->flush();
         }
         
-        $page0 = $this->getRequest()->getSession()->get('shop_parameter_list_page0');
-        $search0 = $this->getRequest()->getSession()->get('shop_parameter_list_search0');
+        $page0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_parameter_list_page0');
+        $search0 = $this->get('request_stack')->getMasterRequest()->getSession()->get('shop_parameter_list_search0');
         $page0 = intval($page0);
         $search0 = trim($search0);
         

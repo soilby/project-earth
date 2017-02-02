@@ -47,6 +47,9 @@ if ((file_exists($cachefilename)) && (filemtime('..'.$url) < filemtime($cachefil
         die;
     }
 }
+if (!is_dir('imageresize')) {
+    mkdir('imageresize');
+}
 // Очищаем от старых файлов
 $dir = opendir('imageresize');
 while ($filename = readdir($dir))

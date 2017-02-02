@@ -27,12 +27,12 @@ class ForumManager
     {
         $manager = $this->container->get('cms.cmsManager');
         
-        $manager->addAdminMenu('Форум', $this->container->get('router')->generate('forum_forum_topic_list'), 30, $this->container->get('security.context')->getToken()->getUser()->checkAccess('forum_list'));
-        $manager->addAdminMenu('Создать новый форум', $this->container->get('router')->generate('forum_forum_topic_create'), 0, $this->container->get('security.context')->getToken()->getUser()->checkAccess('forum_new'), 'Форум');
-        $manager->addAdminMenu('Список форумов', $this->container->get('router')->generate('forum_forum_topic_list'), 10, $this->container->get('security.context')->getToken()->getUser()->checkAccess('forum_list'), 'Форум');
+        $manager->addAdminMenu('Форум', $this->container->get('router')->generate('forum_forum_topic_list'), 30, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('forum_list'));
+        $manager->addAdminMenu('Создать новый форум', $this->container->get('router')->generate('forum_forum_topic_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('forum_new'), 'Форум');
+        $manager->addAdminMenu('Список форумов', $this->container->get('router')->generate('forum_forum_topic_list'), 10, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('forum_list'), 'Форум');
         if ($this->container->has('object.taxonomy'))
         {
-            $manager->addAdminMenu('Категории форума', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.forum', 9999, $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.context')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Форум');
+            $manager->addAdminMenu('Категории форума', $this->container->get('router')->generate('basic_cms_taxonomy_list').'?object=object.forum', 9999, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_list') | $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_listshow'), 'Форум');
         }
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.forum.') === 0) $this->container->get($item)->registerMenu();
@@ -186,7 +186,7 @@ class ForumManager
              if (!is_array($attachments)) $attachments = array();
              foreach ($attachments as &$attach)
              {
-                 $attach['fileSize'] = @filesize('..'.$attach['contentFile']);
+                 $attach['fileSize'] = @filesize('.'.$attach['contentFile']);
                  $attach['permissions'] = array();
                  $attach['permissions']['download'] = 0;
                  if (($attach['isImage'] != 0) && ($params['permissions']['image'] != 0)) $attach['permissions']['download'] = 1;
@@ -243,7 +243,7 @@ class ForumManager
                          {
                              foreach ($pattachments as $pattach)
                              {
-                                 if ($pattach['id'] == $attid) $params['postAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                                 if ($pattach['id'] == $attid) $params['postAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                              }
                          }
                          unset($pattachments);
@@ -273,7 +273,7 @@ class ForumManager
                          {
                              foreach ($pattachments as $pattach)
                              {
-                                 if ($pattach['id'] == $attid) $params['editAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                                 if ($pattach['id'] == $attid) $params['editAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                              }
                          }
                          unset($pattachments);
@@ -320,7 +320,7 @@ class ForumManager
                              {
                                  foreach ($pattachments as $pattach)
                                  {
-                                     if ($pattach['id'] == $attid) $message['editAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                                     if ($pattach['id'] == $attid) $message['editAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                                  }
                              }
                              unset($pattachments);
@@ -415,7 +415,7 @@ class ForumManager
                      {
                          foreach ($pattachments as $pattach)
                          {
-                             if ($pattach['id'] == $attid) $params['forumAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                             if ($pattach['id'] == $attid) $params['forumAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                          }
                      }
                      unset($pattachments);
@@ -518,7 +518,7 @@ class ForumManager
                              $removeids = array();
                              foreach ($files as $file)
                              {
-                                 @unlink('..'.$file['contentFile']);
+                                 @unlink('.'.$file['contentFile']);
                                  $removeids[] = $file['id'];
                              }
                              if (count($removeids) > 0)
@@ -531,7 +531,7 @@ class ForumManager
                          foreach ($postfiles['attachments'] as $file) if ($file != null)
                          {
                              $tmpfile = $file->getPathName();
-                             $basepath = '../secured/forum/';
+                             $basepath = 'secured/forum/';
                              $name = 'f_'.md5($tmpfile.time()).'.dat';
                              if (move_uploaded_file($tmpfile, $basepath . $name)) 
                              {
@@ -630,7 +630,7 @@ class ForumManager
                          $removeids = array();
                          foreach ($files as $file)
                          {
-                             @unlink('..'.$file['contentFile']);
+                             @unlink('.'.$file['contentFile']);
                              $removeids[] = $file['id'];
                          }
                          if (count($removeids) > 0)
@@ -663,7 +663,7 @@ class ForumManager
                          foreach ($postfiles['attachments'] as $file) if ($file != null)
                          {
                              $tmpfile = $file->getPathName();
-                             $basepath = '../secured/forum/';
+                             $basepath = 'secured/forum/';
                              $name = 'f_'.md5($tmpfile.time()).'.dat';
                              if (move_uploaded_file($tmpfile, $basepath . $name)) 
                              {
@@ -921,7 +921,7 @@ class ForumManager
                              if ($params[1] < 10) {$errors = true; $result['avatarError'] = 'size';} 
                              if ($params[0] > 6000) {$errors = true; $result['avatarError'] = 'size';}
                              if ($params[1] > 6000) {$errors = true; $result['avatarError'] = 'size';}
-                             $basepath = '../images/forum/';
+                             $basepath = 'images/forum/';
                              $name = 'f_'.md5($tmpfile.time()).'.jpg';
                              if (move_uploaded_file($tmpfile, $basepath . $name)) $result['avatar'] = '/images/forum/'.$name;
                          } else {$errors = true; $result['avatarError'] = 'format';}*/
@@ -936,7 +936,7 @@ class ForumManager
                              if (!isset($imageTypeArray[$params[2]]) || ($imageTypeArray[$params[2]] == '')) {$errors = true; $result['avatarError'] = 'format';}
                              $basepath = '/images/forum/';
                              $name = 'f_'.md5($tmpfile.time()).'.'.$imageTypeArray[$params[2]];
-                             if (move_uploaded_file($tmpfile, '..'.$basepath.$name)) 
+                             if (move_uploaded_file($tmpfile, '.'.$basepath.$name)) 
                              {
                                  $this->container->get('cms.cmsManager')->registerTemporaryFile($basepath.$name, $postfiles['avatar']->getClientOriginalName());
                                  $result['avatar'] = $basepath.$name;
@@ -952,7 +952,7 @@ class ForumManager
                              $removeids = array();
                              foreach ($files as $file)
                              {
-                                 @unlink('..'.$file['contentFile']);
+                                 @unlink('.'.$file['contentFile']);
                                  $removeids[] = $file['id'];
                              }
                              if (count($removeids) > 0)
@@ -965,7 +965,7 @@ class ForumManager
                          foreach ($postfiles['attachments'] as $file) if ($file != null)
                          {
                              $tmpfile = $file->getPathName();
-                             $basepath = '../secured/forum/';
+                             $basepath = 'secured/forum/';
                              $name = 'f_'.md5($tmpfile.time()).'.dat';
                              if (move_uploaded_file($tmpfile, $basepath . $name)) 
                              {
@@ -985,7 +985,7 @@ class ForumManager
                      }
                      // Валидация
                      if (!preg_match("/^.{3,}$/ui", $result['title'])) {$errors = true; $result['titleError'] = 'Preg error';}
-                     if (($result['avatar'] != '') && (!file_exists('..'.$result['avatar']))) {$errors = true; $result['avatarError'] = 'Not found';}
+                     if (($result['avatar'] != '') && (!file_exists('.'.$result['avatar']))) {$errors = true; $result['avatarError'] = 'Not found';}
                      if (!preg_match("/^[\s\S]{10,}$/ui", $result['content'])) {$errors = true; $result['contentError'] = 'Preg error';}
                      if ($createpage->getCategoryMode() == 1)
                      {
@@ -1183,7 +1183,7 @@ class ForumManager
                              $removeids = array();
                              foreach ($files as $file)
                              {
-                                 @unlink('..'.$file['contentFile']);
+                                 @unlink('.'.$file['contentFile']);
                                  $removeids[] = $file['id'];
                              }
                              if (count($removeids) > 0)
@@ -1196,7 +1196,7 @@ class ForumManager
                          foreach ($postfiles['attachments'] as $file) if ($file != null)
                          {
                              $tmpfile = $file->getPathName();
-                             $basepath = '../secured/forum/';
+                             $basepath = 'secured/forum/';
                              $name = 'f_'.md5($tmpfile.time()).'.dat';
                              if (move_uploaded_file($tmpfile, $basepath . $name)) 
                              {
@@ -1304,7 +1304,7 @@ class ForumManager
                          $removeids = array();
                          foreach ($files as $file)
                          {
-                             @unlink('..'.$file['contentFile']);
+                             @unlink('.'.$file['contentFile']);
                              $removeids[] = $file['id'];
                          }
                          if (count($removeids) > 0)
@@ -1337,7 +1337,7 @@ class ForumManager
                          foreach ($postfiles['attachments'] as $file) if ($file != null)
                          {
                              $tmpfile = $file->getPathName();
-                             $basepath = '../secured/forum/';
+                             $basepath = 'secured/forum/';
                              $name = 'f_'.md5($tmpfile.time()).'.dat';
                              if (move_uploaded_file($tmpfile, $basepath . $name)) 
                              {
@@ -1572,7 +1572,7 @@ class ForumManager
                  if (!is_array($attachments)) $attachments = array();
                  foreach ($attachments as &$attach)
                  {
-                     $attach['fileSize'] = @filesize('..'.$attach['contentFile']);
+                     $attach['fileSize'] = @filesize('.'.$attach['contentFile']);
                      $attach['permissions'] = array();
                      $attach['permissions']['download'] = 0;
                      if (($attach['isImage'] != 0) && ($params['permissions']['image'] != 0)) $attach['permissions']['download'] = 1;
@@ -1621,7 +1621,7 @@ class ForumManager
                              {
                                  foreach ($pattachments as $pattach)
                                  {
-                                     if ($pattach['id'] == $attid) $params['postAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                                     if ($pattach['id'] == $attid) $params['postAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                                  }
                              }
                              unset($pattachments);
@@ -1653,7 +1653,7 @@ class ForumManager
                                  {
                                      foreach ($pattachments as $pattach)
                                      {
-                                         if ($pattach['id'] == $attid) $message['editAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('..'.$pattach['contentFile'])));
+                                         if ($pattach['id'] == $attid) $message['editAttachments'][] = array_merge ($pattach, array('fileSize' => @filesize('.'.$pattach['contentFile'])));
                                      }
                                  }
                                  unset($pattachments);

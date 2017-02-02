@@ -29,7 +29,7 @@ class DefaultController extends Controller
         $exportpages = $query->getResult();
         return $this->render('ExtendedShopExportBundle:Default:exportList.html.twig', array(
             'exportpages' => $exportpages,
-            'host' => $this->getRequest()->getHttpHost()
+            'host' => $this->get('request_stack')->getMasterRequest()->getHttpHost()
             ));
     }
     
@@ -69,10 +69,10 @@ class DefaultController extends Controller
             $this->taxonomyGetTree($tree, null, 0, $categories);
         }
         // Валидация
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
             $errors = false;
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['fileName'])) $page['fileName'] = $postpage['fileName'];
             if (isset($postpage['onlyOnStock'])) $page['onlyOnStock'] = intval($postpage['onlyOnStock']); else $page['onlyOnStock'] = 0;
             if (isset($postpage['currency'])) $page['currency'] = $postpage['currency'];
@@ -118,7 +118,7 @@ class DefaultController extends Controller
     
     public function exportOneEditAction()
     {
-        $id = intval($this->getRequest()->get('id'));
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $pageent = $this->getDoctrine()->getRepository('ExtendedShopExportBundle:ProductExportPages')->find($id);
         if (empty($pageent))
         {
@@ -163,10 +163,10 @@ class DefaultController extends Controller
             $this->taxonomyGetTree($tree, null, 0, $categories);
         }
         // Валидация
-        if ($this->getRequest()->getMethod() == 'POST')
+        if ($this->get('request_stack')->getMasterRequest()->getMethod() == 'POST')
         {
             $errors = false;
-            $postpage = $this->getRequest()->get('page');
+            $postpage = $this->get('request_stack')->getMasterRequest()->get('page');
             if (isset($postpage['fileName'])) $page['fileName'] = $postpage['fileName'];
             if (isset($postpage['onlyOnStock'])) $page['onlyOnStock'] = intval($postpage['onlyOnStock']); else $page['onlyOnStock'] = 0;
             if (isset($postpage['currency'])) $page['currency'] = $postpage['currency'];
@@ -233,11 +233,11 @@ class DefaultController extends Controller
             ));
         }
         $em = $this->getDoctrine()->getEntityManager();
-        $action = $this->getRequest()->get('action');
+        $action = $this->get('request_stack')->getMasterRequest()->get('action');
         
         if ($action == 'delete')
         {
-            $check = $this->getRequest()->get('check');
+            $check = $this->get('request_stack')->getMasterRequest()->get('check');
             if ($check != null)
             foreach ($check as $key=>$val)
                 if ($val == 1)
@@ -253,18 +253,18 @@ class DefaultController extends Controller
         $exportpages = $query->getResult();
         return $this->render('ExtendedShopExportBundle:Default:exportListTab1.html.twig', array(
             'exportpages' => $exportpages,
-            'host' => $this->getRequest()->getHttpHost()
+            'host' => $this->get('request_stack')->getMasterRequest()->getHttpHost()
             ));
     }
     
     public function exportOneGenerateAction()
     {
         $em = $this->container->get('doctrine')->getEntityManager();
-        $basepath = '../secured/shopexport/';
+        $basepath = 'secured/shopexport/';
         $name = 'export1.xml';
         $namezip = 'export1.zip';
-        $host = $this->getRequest()->getHttpHost();
-        $id = intval($this->getRequest()->get('id'));
+        $host = $this->get('request_stack')->getMasterRequest()->getHttpHost();
+        $id = intval($this->get('request_stack')->getMasterRequest()->get('id'));
         $pageent = $this->getDoctrine()->getRepository('ExtendedShopExportBundle:ProductExportPages')->find($id);
         if (empty($pageent)) return new Response('', 404);
         $currency = $this->getDoctrine()->getRepository('ShopProductBundle:ProductCurrency')->find($pageent->getCurrencyId());

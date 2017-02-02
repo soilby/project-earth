@@ -614,7 +614,7 @@ class CmsManager
              $removeids = array();
              foreach ($files as $file)
              {
-                 @unlink('..'.$file['fileName']);
+                 @unlink('.'.$file['fileName']);
                  $removeids[] = $file['id'];
              }
              if (count($removeids) > 0)
@@ -646,7 +646,7 @@ class CmsManager
          preg_match_all('/<[iI][mM][gG]\s+([^>]*)/ui', $text, $matches);
          preg_match_all('/[sS][rR][cC]=["\']([^"\']*)/ui', implode(' ', $matches[1]), $matches);
          $newfiles = $matches[1];
-         foreach ($oldfiles as $file) if ((strpos($file, '/images/editor/') === 0) && (!in_array($file, $newfiles))) @unlink('..'.$file);
+         foreach ($oldfiles as $file) if ((strpos($file, '/images/editor/') === 0) && (!in_array($file, $newfiles))) @unlink('.'.$file);
          foreach ($newfiles as $file) if (strpos($file, '/images/editor/') === 0) $this->unlockTemporaryFile ($file);
      }
      
