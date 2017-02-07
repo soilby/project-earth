@@ -122,7 +122,7 @@ class DefaultController extends Controller
             ));
         }
         set_time_limit(0);
-        $this->backupTables('../secured/backup.sql');
+        $this->backupTables('secured/backup.sql');
         $zip = new \Addone\BackupBundle\Classes\ZipStream('backup.zip');
         
         $this->addToZip($zip, '../', '../', array('/\/app\/cache\//ui', '/\/app\/logs\//ui', '\/\/web/\/helper\/imageresize\//ui'));
