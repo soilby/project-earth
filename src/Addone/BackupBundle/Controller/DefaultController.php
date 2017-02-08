@@ -125,10 +125,10 @@ class DefaultController extends Controller
         $this->backupTables('secured/backup.sql');
         $zip = new \Addone\BackupBundle\Classes\ZipStream('backup.zip');
         
-        $this->addToZip($zip, './', './', array('/\/app\/cache\//ui', '/\/app\/logs\//ui', '/\/helper\/imageresize\//ui'));
+        $this->addToZip($zip, '../', '../', array('/\/app\/cache\//ui', '/\/app\/logs\//ui', '\/\/web/\/helper\/imageresize\//ui'));
         $zip->add_file('app/cache/.htaccess', "Deny from all\r\n");
         $zip->add_file('app/logs/.htaccess', "Deny from all\r\n");
-        $zip->add_file('helper/imageresize/.htaccess', "");
+        $zip->add_file('web/helper/imageresize/.htaccess', "");
         
         $zip->add_file('restore.php', $this->render('AddoneBackupBundle:Default:restore.php.twig')->getContent());
         
