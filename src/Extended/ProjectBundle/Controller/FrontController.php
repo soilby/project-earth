@@ -144,6 +144,8 @@ class FrontController extends Controller
     
     public function listAction($projectId, $locale, $user)
     {
+        $this->get('google.drive')->applyChnages();
+        
         $em = $this->getDoctrine()->getEntityManager();
         
         $files = $em->createQuery('SELECT f.id, f.isCollection, f.title, f.titleRu, f.createDate, f.modifyDate, f.parentId, f.mimeType, f.extension, 0 as nesting, f.accessControl FROM ExtendedProjectBundle:ProjectFile f WHERE f.projectId = :project ORDER BY f.modifyDate DESC')->setParameter('project', $projectId)->getResult();
@@ -276,6 +278,29 @@ class FrontController extends Controller
             ));
         }
         
+        
+        
+        if (in_array($file->getMimeType(), array(
+                'application/msword', 
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+                'application/vnd.oasis.opendocument.text',
+                'application/vnd.ms-excel', 
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint', 
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
+                'application/vnd.openxmlformats-officedocument.presentationml.slideshow'
+        ))) {
+            $googleToken = $this->get('google.drive')->createViewToken($fileId, $locale, $version);
+            if (!empty($googleToken)) {
+                $url = $googleToken->getLink();
+                if ($url) {
+                    return $this->redirect($url);
+                }
+            }
+        }
+        
+        
+        
         /*$lastVersion = $em->createQuery('SELECT v FROM ExtendedProjectBundle:ProjectFileVersion v WHERE v.fileId = :fileid AND v.locale = :locale ORDER BY v.id DESC')->setParameters(array(
             'fileid' => $fileId,
             'locale' => $locale,
@@ -368,12 +393,16 @@ class FrontController extends Controller
     
     public function editAction($fileId, $locale, $user, $request)
     {
+        if ($request->getMethod() == 'GET') {
+            $this->get('google.drive')->applyChnages();
+        }
+        
         $em = $this->getDoctrine()->getEntityManager();
         
         $file = $em->getRepository('ExtendedProjectBundle:ProjectFile')->find($fileId);
 
         if (!$this->checkPermissions('edit', $file->getProjectId(), $user, $file->getAccessControl())) {
-            return new Response('Edit denied');
+            return new Response('Edit denied', 403);
         }
         
         $versions = $em->createQuery('SELECT v.id, v.contentFile, v.createDate, v.createrId, v.locale, u.login as createrLogin, u.fullName as createrFullName FROM ExtendedProjectBundle:ProjectFileVersion v LEFT JOIN BasicCmsBundle:Users u WITH u.id = v.createrId WHERE v.fileId = :id ORDER BY v.createDate DESC')
@@ -472,16 +501,8 @@ class FrontController extends Controller
         $urlEn = null;
         
         if ($file->getIsCollection() == 0) {
-            
-            $token = $this->createToken($fileId, null, 'ru', (!empty($user) ? $user->getId() : 0), 1);
-            $urlRu = $this->generateUrl('extended_project_sabre_dav', array(
-                'path' => $token->getToken(),
-            ), true);
-
-            $token = $this->createToken($fileId, null, 'en', (!empty($user) ? $user->getId() : 0), 1);
-            $urlEn = $this->generateUrl('extended_project_sabre_dav', array(
-                'path' => $token->getToken(),
-            ), true);
+            $urlRu = $this->generateUrl('extended_project_front_edit', array('file' => $fileId, 'locale' => 'ru'));
+            $urlEn = $this->generateUrl('extended_project_front_edit', array('file' => $fileId, 'locale' => 'en'));
         }
         
         return $this->render('ExtendedProjectBundle:Front:Edit'.($locale == 'en' ? 'En' : '').'.html.twig', array(
@@ -499,6 +520,60 @@ class FrontController extends Controller
             'currentUser' => $user,
         ));
     }
+    
+    public function editRedirectAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getEntityManager();
+        
+        $fileId = $request->get('file');
+        $locale = $request->get('locale');
+        $user = $this->getCurrentUser();
+        
+        $file = $em->getRepository('ExtendedProjectBundle:ProjectFile')->find($fileId);
+
+        if (!$this->checkPermissions('edit', $file->getProjectId(), $user, $file->getAccessControl())) {
+            return new Response('Edit denied', 403);
+        }
+        if ($file->getIsCollection()) {
+            return new Response('Error', 404);
+        }
+        if (in_array($file->getMimeType(), array(
+                'application/msword', 
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+                'application/vnd.oasis.opendocument.text',
+                'application/vnd.ms-excel', 
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint', 
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
+                'application/vnd.openxmlformats-officedocument.presentationml.slideshow'
+        )) && ($request->get('type') != 'msoffice')) {
+            $googleToken = $this->get('google.drive')->createEditToken($fileId, $locale, $user->getId());
+            if (!empty($googleToken)) {
+                $url = $googleToken->getLink();
+                if ($url) {
+                    return $this->redirect($url);
+                }
+            }
+        }
+        
+        $token = $this->createToken($fileId, null, $locale, (!empty($user) ? $user->getId() : 0), 1);
+        $url = $this->generateUrl('extended_project_sabre_dav', array(
+            'path' => $token->getToken(),
+        ), true);
+        
+        if (in_array($file->getMimeType(), array('application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text'))) {
+            $url = 'ms-word:ofe|u|'.$url;
+        }
+        if (in_array($file->getMimeType(), array('application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))) {
+            $url = 'ms-excel:ofe|u|'.$url;
+        }
+        if (in_array($file->getMimeType(), array('application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow'))) {
+            $url = 'ms-powerpoint:ofe|u|'.$url;
+        }
+        
+        return $this->redirect($url);
+    }
+    
     
     private function getCurrentUser()
     {

@@ -84,22 +84,16 @@
     {% endfor %}
     {% if file.mimeType in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text'] %}
     <h3>Редактирование</h3>
-    <p>
-        <a href="ms-word:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в Word</a>
-        <a href="ms-word:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в Word</a>
-    </p>
+    <p><a href="{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в Google Docs</a> или <a href="{{urlRu != '' ? urlRu : urlEn}}&type=msoffice">Office</a></p>
+    <p><a href="{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в Google Docs</a> или <a href="{{urlRu != '' ? urlRu : urlEn}}&type=msoffice">Office</a></p>
     {% elseif file.mimeType in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
     <h3>Редактирование</h3>
-    <p>
-        <a href="ms-excel:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в Excel</a>
-        <a href="ms-excel:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в Excel</a>
-    </p>
+    <p><a href="{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в Google Docs</a> или <a href="{{urlRu != '' ? urlRu : urlEn}}&type=msoffice">Office</a></p>
+    <p><a href="{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в Google Docs</a> или <a href="{{urlRu != '' ? urlRu : urlEn}}&type=msoffice">Office</a></p>
     {% elseif file.mimeType in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow'] %}
     <h3>Редактирование</h3>
-    <p>
-        <a href="ms-powerpoint:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в PowerPoint</a>
-        <a href="ms-powerpoint:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в PowerPoint</a>
-    </p>
+    <p><a href="{{urlRu != '' ? urlRu : urlEn}}">Открыть русскую версию в Google Docs</a> или <a href="{{urlRu != '' ? urlRu : urlEn}}&type=msoffice">Office</a></p>
+    <p><a href="{{urlEn != '' ? urlEn : urlRu}}">Открыть английскую версию в Google Docs</a> или <a href="{{urlRu != '' ? urlRu : urlEn}}&type=msoffice">Office</a></p>
     {% elseif file.mimeType != 'text/html' %}
     <h3>Редактирование</h3>
     <p><a href="#" id="projectfiles-upload-ru" class="button">Закачать новую русскую версию</a> <a href="#" id="projectfiles-upload-en" class="button">Закачать новую английскую версию</a></p>

@@ -20,6 +20,10 @@ extended_project_front_view:
     path:  /system/view/projectfiles
     defaults: { _controller: ExtendedProjectBundle:Front:view }
 
+extended_project_front_edit:
+    path:  /system/edit/projectfiles
+    defaults: { _controller: ExtendedProjectBundle:Front:editRedirect }
+
 extended_project_front_removeversion:
     path:  /system/versionremove/projectfiles
     defaults: { _controller: ExtendedProjectBundle:Front:removeVersion }
