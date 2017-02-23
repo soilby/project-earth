@@ -2,4 +2,7 @@ services:
     object.project:
         class: Extended\ProjectBundle\ProjectManager
         arguments: ['@service_container']
+    google.drive:
+        class: Extended\ProjectBundle\Service\GoogleDrive
+        arguments: ['@service_container']
         

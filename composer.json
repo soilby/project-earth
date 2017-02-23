@@ -33,7 +33,8 @@
         "jms/security-extra-bundle": "^1.6",
         "liuggio/ExcelBundle": "^2.1",
         "facebook/graph-sdk": "^5.4",
-        "sabre/dav": "^1.0"
+        "sabre/dav": "^1.0",
+        "google/apiclient": "^2.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
