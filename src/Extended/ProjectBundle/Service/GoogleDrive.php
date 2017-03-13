@@ -72,7 +72,16 @@ class GoogleDrive
             $this->entityManager->persist($versionEntity);
         }
         $driveService = $this->getGoogleService();
-        $content = $driveService->files->export($token->getToken(), $fileEntity->getMimeType(), array('alt' => 'media'));
+        if ($fileEntity->getMimeType() == 'application/vnd.google-apps.document') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        } elseif ($fileEntity->getMimeType() == 'application/vnd.google-apps.presentation') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        } elseif ($fileEntity->getMimeType() == 'application/vnd.google-apps.spreadsheet') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        } else {
+            $mimeType = $fileEntity->getMimeType();
+        } 
+        $content = $driveService->files->export($token->getToken(), $mimeType, array('alt' => 'media'));
         file_put_contents(Node::FOLDER.$versionEntity->getContentFile(), $content->getBody());
         
         $token->setVersionId($versionEntity->getId());
@@ -175,18 +184,35 @@ class GoogleDrive
         if (in_array($file->getMimeType(), array('application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow'))) {
             $gdType = 'application/vnd.google-apps.presentation';
         }
+        if ($file->getMimeType() == 'application/vnd.google-apps.document') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        } elseif ($file->getMimeType() == 'application/vnd.google-apps.presentation') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        } elseif ($file->getMimeType() == 'application/vnd.google-apps.spreadsheet') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        } else {
+            $mimeType = $file->getMimeType();
+        } 
         
         $driveService = $this->getGoogleService();
         $fileMetadata = new \Google_Service_Drive_DriveFile(array(
             'name' => ($locale == 'en' ? $file->getTitle() : $file->getTitleRu()),
             'mimeType' => $gdType));
         $content = file_get_contents(Node::FOLDER.$version->getContentFile());
-        $googleFile = $driveService->files->create($fileMetadata, array(
-            'data' => $content,
-            'mimeType' => $file->getMimeType(),
-            'uploadType' => 'multipart',
-            'fields' => 'id,webContentLink,webViewLink'
-        ));
+        if (strlen($content) == 0) {
+            $googleFile = $driveService->files->create($fileMetadata, array(
+                'mimeType' => $gdType,
+                'uploadType' => 'multipart',
+                'fields' => 'id,webContentLink,webViewLink'
+            ));
+        } else {
+            $googleFile = $driveService->files->create($fileMetadata, array(
+                'data' => $content,
+                'mimeType' => $mimeType,
+                'uploadType' => 'multipart',
+                'fields' => 'id,webContentLink,webViewLink'
+            ));
+        }
         $permission = new \Google_Service_Drive_Permission();
         $permission->setRole('reader');
         $permission->setType('anyone');
@@ -244,18 +270,35 @@ class GoogleDrive
         if (in_array($file->getMimeType(), array('application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow'))) {
             $gdType = 'application/vnd.google-apps.presentation';
         }
+        if ($file->getMimeType() == 'application/vnd.google-apps.document') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        } elseif ($file->getMimeType() == 'application/vnd.google-apps.presentation') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        } elseif ($file->getMimeType() == 'application/vnd.google-apps.spreadsheet') {
+            $mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        } else {
+            $mimeType = $file->getMimeType();
+        } 
         
         $driveService = $this->getGoogleService();
         $fileMetadata = new \Google_Service_Drive_DriveFile(array(
             'name' => ($locale == 'en' ? $file->getTitle() : $file->getTitleRu()),
             'mimeType' => $gdType));
         $content = file_get_contents(Node::FOLDER.$version->getContentFile());
-        $googleFile = $driveService->files->create($fileMetadata, array(
-            'data' => $content,
-            'mimeType' => $file->getMimeType(),
-            'uploadType' => 'multipart',
-            'fields' => 'id,webContentLink,webViewLink'
-        ));
+        if (strlen($content) == 0) {
+            $googleFile = $driveService->files->create($fileMetadata, array(
+                'mimeType' => $gdType,
+                'uploadType' => 'multipart',
+                'fields' => 'id,webContentLink,webViewLink'
+            ));
+        } else {
+            $googleFile = $driveService->files->create($fileMetadata, array(
+                'data' => $content,
+                'mimeType' => $mimeType,
+                'uploadType' => 'multipart',
+                'fields' => 'id,webContentLink,webViewLink'
+            ));
+        }
         $permission = new \Google_Service_Drive_Permission();
         $permission->setRole('writer');
         $permission->setType('anyone');

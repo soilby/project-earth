@@ -145,7 +145,7 @@
             <div class="modal-body">
                 <p>Тип файла</p>
                 {% for mimeType,mimeTypeTitle in mimeHelper.getTypes() %}
-                    <p class="radio"><label><input onclick="if ($(this).val() == 'internal') {$('.projectfiles-for-type-internal').show();$('.projectfiles-for-type-file').hide();} else {$('.projectfiles-for-type-internal').hide();$('.projectfiles-for-type-file').show();}" autocomplete="off" type="radio" name="projectfiles-type" value="{{mimeType}}" />{{mimeTypeTitle}}</label></p>
+                    <p class="radio"><label><input onclick="{% if mimeHelper.isUploadedType(mimeType) %}$('.projectfiles-for-type-internal').hide();$('.projectfiles-for-type-file').show();{% else %}$('.projectfiles-for-type-internal').show();$('.projectfiles-for-type-file').hide();{% endif %}" autocomplete="off" type="radio" name="projectfiles-type" value="{{mimeType}}" />{{mimeTypeTitle}}</label></p>
                 {% endfor %}
             </div>
             <div class="modal-footer" id="projectfiles-add-file-controls">
@@ -230,7 +230,8 @@
                     titleRu: titleRu,
                     folder: $('#projectfiles-upload-folder').val(),
                     locale: $('#projectfiles-upload-locale').val(),
-                    project: '{{projectId}}'
+                    project: '{{projectId}}',
+                    documentType: $('#projectfiles-add-file-popup .radio input:checked').val()
                 },
                 'success': function (data) {
                     location.reload();

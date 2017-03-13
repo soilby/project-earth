@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Extended\ProjectBundle\FS\Node;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Extended\ProjectBundle\Classes\HtmlDiff;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FrontController extends Controller
 {
@@ -281,14 +282,9 @@ class FrontController extends Controller
         
         
         if (in_array($file->getMimeType(), array(
-                'application/msword', 
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-                'application/vnd.oasis.opendocument.text',
-                'application/vnd.ms-excel', 
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/vnd.ms-powerpoint', 
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
-                'application/vnd.openxmlformats-officedocument.presentationml.slideshow'
+                'application/vnd.google-apps.document', 
+                'application/vnd.google-apps.presentation', 
+                'application/vnd.google-apps.spreadsheet'
         ))) {
             $googleToken = $this->get('google.drive')->createViewToken($fileId, $locale, $version);
             if (!empty($googleToken)) {
@@ -313,7 +309,7 @@ class FrontController extends Controller
         $token = $this->createToken($fileId, $version, $locale, (!empty($user) ? $user->getId() : 0), 0);
         $url = $this->generateUrl('extended_project_sabre_dav', array(
             'path' => $token->getToken(),
-        ), true);
+        ), UrlGeneratorInterface::ABSOLUTE_URL);
         
         if (in_array($file->getMimeType(), array('application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text'))) {
             $url = 'ms-word:ofv|u|'.$url;
@@ -384,7 +380,7 @@ class FrontController extends Controller
         $token = $this->createToken($fileId, $version, $locale, (!empty($user) ? $user->getId() : 0), 0);
         $url = $this->generateUrl('extended_project_sabre_dav', array(
             'path' => $token->getToken(),
-        ), true);
+        ), UrlGeneratorInterface::ABSOLUTE_URL);
         
         return $this->redirect($url);
     }
@@ -538,15 +534,10 @@ class FrontController extends Controller
             return new Response('Error', 404);
         }
         if (in_array($file->getMimeType(), array(
-                'application/msword', 
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-                'application/vnd.oasis.opendocument.text',
-                'application/vnd.ms-excel', 
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/vnd.ms-powerpoint', 
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
-                'application/vnd.openxmlformats-officedocument.presentationml.slideshow'
-        )) && ($request->get('type') != 'msoffice')) {
+                'application/vnd.google-apps.document', 
+                'application/vnd.google-apps.presentation', 
+                'application/vnd.google-apps.spreadsheet'
+        ))) {
             $googleToken = $this->get('google.drive')->createEditToken($fileId, $locale, $user->getId());
             if (!empty($googleToken)) {
                 $url = $googleToken->getLink();
@@ -559,7 +550,7 @@ class FrontController extends Controller
         $token = $this->createToken($fileId, null, $locale, (!empty($user) ? $user->getId() : 0), 1);
         $url = $this->generateUrl('extended_project_sabre_dav', array(
             'path' => $token->getToken(),
-        ), true);
+        ), UrlGeneratorInterface::ABSOLUTE_URL);
         
         if (in_array($file->getMimeType(), array('application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text'))) {
             $url = 'ms-word:ofe|u|'.$url;
@@ -638,6 +629,13 @@ class FrontController extends Controller
         if ($request->headers->get('x-ajaxupload-partial-locale') != '') {
             $locale = $request->headers->get('x-ajaxupload-partial-locale');
         }
+        $documentType = $request->get('documentType');
+        $mimeType = 'text/html';
+        $mimeHelper = new \Extended\ProjectBundle\Classes\MimeHelper();
+        $mimeTypes = $mimeHelper->getMimeByType($documentType);
+        if (count($mimeTypes) > 0) {
+            $mimeType = $mimeTypes[0];
+        }
         $user = $this->getCurrentUser();
         
         if (!$this->checkPermissions('create', $project, $user)) {
@@ -659,7 +657,7 @@ class FrontController extends Controller
                 ->setCreateDate(new \DateTime('now'))
                 ->setExtension('html')
                 ->setIsCollection(0)
-                ->setMimeType('text/html')
+                ->setMimeType($mimeType)
                 ->setModifyDate(new \DateTime('now'))
                 ->setParentId(($folder != null ? $folder->getId() : null))
                 ->setProjectId($project)

@@ -5,6 +5,9 @@ class MimeHelper
 {
     private $types = array(
         'internal' => array('default' => 'Внутренний документ', 'en' => 'Internal document'),
+        'googledoc' => array('default' => 'Документ Google Docs', 'en' => 'Document Google Docs'),
+        'googlesheets' => array('default' => 'Документ Google Sheets', 'en' => 'Document Google Sheets'),
+        'googleslides' => array('default' => 'Документ Google Slides', 'en' => 'Document Google Slides'),
         'word' => array('default' => 'Документ Word 2010-2013', 'en' => 'Document Word 2010-2013'),
         'excel' => array('default' => 'Документ Excel 2010-2013', 'en' => 'Document Excel 2010-2013'),
         'powerpoint' => array('default' => 'Документ PowerPoint 2010-2013', 'en' => 'Document PowerPoint 2010-2013'),
@@ -15,6 +18,10 @@ class MimeHelper
     
     private $mimeTypes = array(
         'text/html' => 'internal',
+
+        'application/vnd.google-apps.document' => 'googledoc',
+        'application/vnd.google-apps.spreadsheet' => 'googlesheets',
+        'application/vnd.google-apps.presentation' => 'googleslides',
         
         'application/msword' => 'word', 
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'word', 
@@ -114,4 +121,9 @@ class MimeHelper
         return $types;
     }
 
+    public function isUploadedType($type)
+    {
+        return !in_array($type, array('internal', 'googledoc', 'googlesheets', 'googleslides'));
+    }
+    
 }
