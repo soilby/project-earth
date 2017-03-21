@@ -644,7 +644,8 @@ class ProjectManager
                     // Проверить права на редактирование
                     if (($cmsManager->getCurrentUser() != null) && ($cmsManager->getCurrentUser()->getBlocked() == 2)) 
                     {
-                         if ($cmsManager->getCurrentUser()->getId() == $project[0]['createrId']) 
+                         $userRole = 1;
+			 if ($cmsManager->getCurrentUser()->getId() == $project[0]['createrId']) 
                          {
                              $premissionMaster = 1;
                              $userRole = 3;
@@ -661,7 +662,6 @@ class ProjectManager
                              $users = $query->getResult();
                              if (isset($users[0]['usercount']) && ($users[0]['usercount'] > 0)) {$userRole = 3;$premissionMaster = 1;}
                          }
-                         $userRole = 1;
                          if (($document['isPublic'] == 2) && ($userRole >= 1)) $premission = 1;
                          if (($document['isPublic'] == 0) && ($userRole >= 2)) $premission = 1;
                          if (($document['isPublic'] == 3) && ($userRole >= 3)) $premission = 1;
