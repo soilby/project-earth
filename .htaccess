@@ -1,0 +1,11 @@
+#php_flag eaccelerator.enable 0
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    <IfModule mod_vhost_alias.c>
+        RewriteBase /
+    </IfModule>
+
+    RewriteRule ^(.*)$ /web/$1 [QSA,L] 
+</IfModule>
+

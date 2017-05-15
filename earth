@@ -1,0 +1,30 @@
+server {
+
+	server_name     project-earth.community;
+
+	error_log       /var/log/nginx/earth-error.log notice;
+	access_log      /var/log/nginx/earth-access.log;
+	root            /sites/projects/earth/web;
+
+	location / {
+		# This is cool because no php is touched for static content
+		try_files $uri @rewrite;
+	}
+	
+	location @rewrite {
+		rewrite ^ /app.php;
+	}
+ 
+	location ~ \.php$ {
+
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		#NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+		fastcgi_param SCRIPT_FILENAME $request_filename;
+		fastcgi_intercept_errors on;
+		fastcgi_pass unix:/run/php/php7.1-fpm.sock;
+		fastcgi_param   DOCUMENT_ROOT $realpath_root;
+		include         fastcgi_params;
+	}
+
+}
+
