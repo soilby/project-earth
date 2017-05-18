@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Extended\ProjectBundle\FS\Node;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Extended\ProjectBundle\Classes\HtmlDiff;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FrontController extends Controller
 {
@@ -78,8 +79,8 @@ class FrontController extends Controller
         }
         return 0;
     }
-    
-    
+
+
     private function createToken($file, $version, $locale, $user = 0, $permissions = 0)
     {
         $em = $this->getDoctrine()->getEntityManager();
@@ -108,20 +109,27 @@ class FrontController extends Controller
         if (!empty($token)) {
             return $token;
         }
-        $fileExtension = $em->createQuery('SELECT f.extension FROM ExtendedProjectBundle:ProjectFile f WHERE f.id = :file')->setParameter('file', $file)->getResult();
-        if (isset($fileExtension[0]['extension'])) {
-            $fileExtension = $fileExtension[0]['extension'];
-        } else {
-            $fileExtension = 'dat';
+        $fileExtension = $em->createQuery('SELECT f.title'.($locale == 'ru' ? 'Ru' : '').' as title, f.extension FROM ExtendedProjectBundle:ProjectFile f WHERE f.id = :file')->setParameter('file', $file)->getOneOrNullResult();
+        if (isset($fileExtension['title'])) {
+            $fileExtension['title'] = preg_replace('/[^-._[:alnum:]]+/u', '', $fileExtension['title']);
         }
-        $tokenName = md5(rand().time().rand()).'.'.$fileExtension;
+        $tokenName = (!empty($fileExtension['title']) ? $fileExtension['title'] : 'unknown').'.'.(!empty($fileExtension['extension']) ? $fileExtension['extension'] : 'dat');
+        $tokenNameIndex = 0;
+        do {
+            $checkTokenName = $em->createQuery('SELECT count(t.id) FROM ExtendedProjectBundle:ProjectFileToken t WHERE t.token = :name')->setParameter('name', $tokenName)->getSingleScalarResult();
+            if ($checkTokenName == 0) {
+                break;
+            }
+            $tokenNameIndex++;
+            $tokenName = (!empty($fileExtension['title']) ? $fileExtension['title'] : 'unknown')." ($tokenNameIndex).".(!empty($fileExtension['extension']) ? $fileExtension['extension'] : 'dat');
+        } while ($tokenNameIndex < 500);
         $token = new \Extended\ProjectBundle\Entity\ProjectFileToken();
         $token->setExpired(new \DateTime('+1 day'))->setPermission($permissions)->setToken($tokenName)->setUserId($user)->setVersionId($version)->setLocale($locale)->setFileId($file);
         $em->persist($token);
         $em->flush();
         return $token;
     }
-    
+
     private function sortTree($files, $id = null, $nesting = 0)
     {
         $output = array();
@@ -134,23 +142,23 @@ class FrontController extends Controller
         }
         return $output;
     }
-    
+
     public function getMimeType($file)
     {
         $guesser = MimeTypeGuesser::getInstance();
 
         return $guesser->guess($file);
     }
-    
+
     public function listAction($projectId, $locale, $user)
     {
         $this->get('google.drive')->applyChnages();
-        
+
         $em = $this->getDoctrine()->getEntityManager();
-        
+
         $files = $em->createQuery('SELECT f.id, f.isCollection, f.title, f.titleRu, f.createDate, f.modifyDate, f.parentId, f.mimeType, f.extension, 0 as nesting, f.accessControl FROM ExtendedProjectBundle:ProjectFile f WHERE f.projectId = :project ORDER BY f.modifyDate DESC')->setParameter('project', $projectId)->getResult();
         $files = $this->sortTree($files);
-        
+
         $filesIds = array();
         foreach ($files as $file) {
             $filesIds[] = $file['id'];
@@ -181,7 +189,7 @@ class FrontController extends Controller
         }
         unset($file);
         $files = array_values($files);
-        
+
         return $this->render('ExtendedProjectBundle:Front:List'.($locale == 'en' ? 'En' : '').'.html.twig', array(
             'files' => $files,
             'versions' => $versions,
@@ -194,7 +202,7 @@ class FrontController extends Controller
             'createPermission' => $this->checkPermissions('create', $projectId, $user),
         ));
     }
-    
+
     private function diff($oldText, $newText)
     {
         $imagereplaces = array();
@@ -217,7 +225,7 @@ class FrontController extends Controller
         $result = str_replace(array_keys($imagereplaces), array_values($imagereplaces), $result);
         return $result;
     }
-    
+
 
     public function viewAction(Request $request)
     {
@@ -225,20 +233,20 @@ class FrontController extends Controller
         $fileId = $request->get('id');
         $locale = $request->get('locale');
         $version = $request->get('version');
-        
+
         if ($locale != 'en') {
             $locale = 'ru';
         }
 
-        
+
         $em = $this->getDoctrine()->getEntityManager();
-        
+
         $file = $em->getRepository('ExtendedProjectBundle:ProjectFile')->find($fileId);
 
         if (!$this->checkPermissions('view', $file->getProjectId(), $user, $file->getAccessControl())) {
             return new Response('View denied');
         }
-        
+
         if ($file->getMimeType() == 'text/html') {
             if ($version == null) {
                 $lastVersions = $em->createQuery('SELECT v FROM ExtendedProjectBundle:ProjectFileVersion v WHERE v.fileId = :fileid AND v.locale = :locale ORDER BY v.id DESC')->setParameters(array(
@@ -265,9 +273,9 @@ class FrontController extends Controller
             if (isset($lastVersions[1])) {
                 $diffContent = $this->diff(file_get_contents(''.Node::FOLDER.$lastVersions[1]->getContentFile()), $content);
             }
-            
-            
-            
+
+
+
             return $this->render('ExtendedProjectBundle:Front:ViewHtml'.($locale == 'en' ? 'En' : '').'.html.twig', array(
                 'file' => $file,
                 'lastVersions' => $lastVersions,
@@ -277,18 +285,13 @@ class FrontController extends Controller
                 'currentUser' => $user,
             ));
         }
-        
-        
-        
+
+
+
         if (in_array($file->getMimeType(), array(
-                'application/msword', 
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-                'application/vnd.oasis.opendocument.text',
-                'application/vnd.ms-excel', 
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/vnd.ms-powerpoint', 
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
-                'application/vnd.openxmlformats-officedocument.presentationml.slideshow'
+                'application/vnd.google-apps.document',
+                'application/vnd.google-apps.presentation',
+                'application/vnd.google-apps.spreadsheet'
         ))) {
             $googleToken = $this->get('google.drive')->createViewToken($fileId, $locale, $version);
             if (!empty($googleToken)) {
@@ -298,9 +301,9 @@ class FrontController extends Controller
                 }
             }
         }
-        
-        
-        
+
+
+
         /*$lastVersion = $em->createQuery('SELECT v FROM ExtendedProjectBundle:ProjectFileVersion v WHERE v.fileId = :fileid AND v.locale = :locale ORDER BY v.id DESC')->setParameters(array(
             'fileid' => $fileId,
             'locale' => $locale,
@@ -313,8 +316,8 @@ class FrontController extends Controller
         $token = $this->createToken($fileId, $version, $locale, (!empty($user) ? $user->getId() : 0), 0);
         $url = $this->generateUrl('extended_project_sabre_dav', array(
             'path' => $token->getToken(),
-        ), true);
-        
+        ), UrlGeneratorInterface::ABSOLUTE_URL);
+
         if (in_array($file->getMimeType(), array('application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text'))) {
             $url = 'ms-word:ofv|u|'.$url;
         }
@@ -324,7 +327,7 @@ class FrontController extends Controller
         if (in_array($file->getMimeType(), array('application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow'))) {
             $url = 'ms-powerpoint:ofv|u|'.$url;
         }
-        
+
         return $this->redirect($url);
     }
 
@@ -333,15 +336,15 @@ class FrontController extends Controller
         if ($locale != 'en') {
             $locale = 'ru';
         }
-        
+
         $em = $this->getDoctrine()->getEntityManager();
-        
+
         $file = $em->getRepository('ExtendedProjectBundle:ProjectFile')->find($fileId);
 
         if (!$this->checkPermissions('view', $file->getProjectId(), $user, $file->getAccessControl())) {
             return new Response('View denied');
         }
-        
+
         if ($file->getMimeType() == 'text/html') {
             if ($version == null) {
                 $lastVersions = $em->createQuery('SELECT v FROM ExtendedProjectBundle:ProjectFileVersion v WHERE v.fileId = :fileid AND v.locale = :locale ORDER BY v.id DESC')->setParameters(array(
@@ -368,9 +371,9 @@ class FrontController extends Controller
             if (isset($lastVersions[1])) {
                 $diffContent = $this->diff(file_get_contents(''.Node::FOLDER.$lastVersions[1]->getContentFile()), $content);
             }
-            
-            
-            
+
+
+
             return $this->render('ExtendedProjectBundle:Front:ViewHtml'.($locale == 'en' ? 'En' : '').'.html.twig', array(
                 'file' => $file,
                 'lastVersions' => $lastVersions,
@@ -380,48 +383,48 @@ class FrontController extends Controller
                 'currentUser' => $user,
             ));
         }
-        
+
         $token = $this->createToken($fileId, $version, $locale, (!empty($user) ? $user->getId() : 0), 0);
         $url = $this->generateUrl('extended_project_sabre_dav', array(
             'path' => $token->getToken(),
-        ), true);
-        
+        ), UrlGeneratorInterface::ABSOLUTE_URL);
+
         return $this->redirect($url);
     }
 
 
-    
+
     public function editAction($fileId, $locale, $user, $request)
     {
         if ($request->getMethod() == 'GET') {
             $this->get('google.drive')->applyChnages();
         }
-        
+
         $em = $this->getDoctrine()->getEntityManager();
-        
+
         $file = $em->getRepository('ExtendedProjectBundle:ProjectFile')->find($fileId);
 
         if (!$this->checkPermissions('edit', $file->getProjectId(), $user, $file->getAccessControl())) {
             return new Response('Edit denied', 403);
         }
-        
+
         $versions = $em->createQuery('SELECT v.id, v.contentFile, v.createDate, v.createrId, v.locale, u.login as createrLogin, u.fullName as createrFullName FROM ExtendedProjectBundle:ProjectFileVersion v LEFT JOIN BasicCmsBundle:Users u WITH u.id = v.createrId WHERE v.fileId = :id ORDER BY v.createDate DESC')
                 ->setParameter('id', $fileId)->getResult();
-        
+
         $findLocales = array();
         foreach ($versions as $version) {
             if (!in_array($version['locale'], $findLocales)) {
                 $findLocales[] = $version['locale'];
             }
         }
-        
+
         if ($file->getIsCollection()) {
             $folders = array();
         } else {
             $folders = $em->createQuery('SELECT f.id, f.title'.($locale != 'en' ? 'Ru' : '').' as title, f.parentId, 0 as nesting FROM ExtendedProjectBundle:ProjectFile f WHERE f.projectId = :project AND f.isCollection != 0 ORDER BY f.modifyDate ASC')->setParameter('project', $file->getProjectId())->getResult();
             $folders = $this->sortTree($folders);
         }
-        
+
         $htmlContentRu = '';
         $htmlContentEn = '';
         if ($file->getMimeType() == 'text/html') {
@@ -440,7 +443,7 @@ class FrontController extends Controller
                 $htmlContentEn = file_get_contents(''.Node::FOLDER.$htmlLastVersionEn->getContentFile());
             }
         }
-        
+
         $errors = array();
         $result = false;
         if ($request->getMethod() == "POST") {
@@ -496,15 +499,15 @@ class FrontController extends Controller
                 $result = true;
             }
         }
-        
+
         $urlRu = null;
         $urlEn = null;
-        
+
         if ($file->getIsCollection() == 0) {
             $urlRu = $this->generateUrl('extended_project_front_edit', array('file' => $fileId, 'locale' => 'ru'));
             $urlEn = $this->generateUrl('extended_project_front_edit', array('file' => $fileId, 'locale' => 'en'));
         }
-        
+
         return $this->render('ExtendedProjectBundle:Front:Edit'.($locale == 'en' ? 'En' : '').'.html.twig', array(
             'urlRu' => $urlRu,
             'urlEn' => $urlEn,
@@ -520,15 +523,15 @@ class FrontController extends Controller
             'currentUser' => $user,
         ));
     }
-    
+
     public function editRedirectAction(Request $request)
     {
         $em = $this->getDoctrine()->getEntityManager();
-        
+
         $fileId = $request->get('file');
         $locale = $request->get('locale');
         $user = $this->getCurrentUser();
-        
+
         $file = $em->getRepository('ExtendedProjectBundle:ProjectFile')->find($fileId);
 
         if (!$this->checkPermissions('edit', $file->getProjectId(), $user, $file->getAccessControl())) {
@@ -538,15 +541,10 @@ class FrontController extends Controller
             return new Response('Error', 404);
         }
         if (in_array($file->getMimeType(), array(
-                'application/msword', 
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-                'application/vnd.oasis.opendocument.text',
-                'application/vnd.ms-excel', 
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/vnd.ms-powerpoint', 
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
-                'application/vnd.openxmlformats-officedocument.presentationml.slideshow'
-        )) && ($request->get('type') != 'msoffice')) {
+                'application/vnd.google-apps.document',
+                'application/vnd.google-apps.presentation',
+                'application/vnd.google-apps.spreadsheet'
+        ))) {
             $googleToken = $this->get('google.drive')->createEditToken($fileId, $locale, $user->getId());
             if (!empty($googleToken)) {
                 $url = $googleToken->getLink();
@@ -555,12 +553,12 @@ class FrontController extends Controller
                 }
             }
         }
-        
+
         $token = $this->createToken($fileId, null, $locale, (!empty($user) ? $user->getId() : 0), 1);
         $url = $this->generateUrl('extended_project_sabre_dav', array(
             'path' => $token->getToken(),
-        ), true);
-        
+        ), UrlGeneratorInterface::ABSOLUTE_URL);
+
         if (in_array($file->getMimeType(), array('application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text'))) {
             $url = 'ms-word:ofe|u|'.$url;
         }
@@ -570,11 +568,11 @@ class FrontController extends Controller
         if (in_array($file->getMimeType(), array('application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow'))) {
             $url = 'ms-powerpoint:ofe|u|'.$url;
         }
-        
+
         return $this->redirect($url);
     }
-    
-    
+
+
     private function getCurrentUser()
     {
         $userid = $this->get('request_stack')->getMasterRequest()->getSession()->get('front_system_autorized');
@@ -599,11 +597,11 @@ class FrontController extends Controller
         if ($request->headers->get('x-ajaxupload-partial-locale') != '') {
             $locale = $request->headers->get('x-ajaxupload-partial-locale');
         }
-        
+
         if (!$this->checkPermissions('create', $project, $this->getCurrentUser())) {
             return new Response('Create denied');
         }
-        
+
         $folder = null;
         if ($request->get('folder') != null) {
             $folder = $this->getDoctrine()->getRepository('ExtendedProjectBundle:ProjectFile')->findOneBy(array('isCollection' => 1, 'id' => $request->get('folder')));
@@ -613,7 +611,7 @@ class FrontController extends Controller
         }
         $title = $request->get('title');
         $titleRu = $request->get('titleRu');
-        
+
         $projectFile = new \Extended\ProjectBundle\Entity\ProjectFile();
         $projectFile
                 ->setCreateDate(new \DateTime('now'))
@@ -638,12 +636,19 @@ class FrontController extends Controller
         if ($request->headers->get('x-ajaxupload-partial-locale') != '') {
             $locale = $request->headers->get('x-ajaxupload-partial-locale');
         }
+        $documentType = $request->get('documentType');
+        $mimeType = 'text/html';
+        $mimeHelper = new \Extended\ProjectBundle\Classes\MimeHelper();
+        $mimeTypes = $mimeHelper->getMimeByType($documentType);
+        if (count($mimeTypes) > 0) {
+            $mimeType = $mimeTypes[0];
+        }
         $user = $this->getCurrentUser();
-        
+
         if (!$this->checkPermissions('create', $project, $user)) {
             return new Response('Create denied');
         }
-        
+
         $folder = null;
         if ($request->get('folder') != null) {
             $folder = $this->getDoctrine()->getRepository('ExtendedProjectBundle:ProjectFile')->findOneBy(array('isCollection' => 1, 'id' => $request->get('folder')));
@@ -653,13 +658,13 @@ class FrontController extends Controller
         }
         $title = $request->get('title');
         $titleRu = $request->get('titleRu');
-        
+
         $projectFile = new \Extended\ProjectBundle\Entity\ProjectFile();
         $projectFile
                 ->setCreateDate(new \DateTime('now'))
                 ->setExtension('html')
                 ->setIsCollection(0)
-                ->setMimeType('text/html')
+                ->setMimeType($mimeType)
                 ->setModifyDate(new \DateTime('now'))
                 ->setParentId(($folder != null ? $folder->getId() : null))
                 ->setProjectId($project)
@@ -682,7 +687,7 @@ class FrontController extends Controller
         $em->flush();
         return new Response('OK');
     }
-    
+
     public function uploadAction(Request $request)
     {
         $em = $this->getDoctrine()->getEntityManager();
@@ -692,7 +697,7 @@ class FrontController extends Controller
         if ($request->headers->get('x-ajaxupload-partial-locale') != '') {
             $locale = $request->headers->get('x-ajaxupload-partial-locale');
         }
-        
+
         $projectFile = null;
         if ($file != null) {
             $projectFile = $em->getRepository('ExtendedProjectBundle:ProjectFile')->find($file);
@@ -700,11 +705,11 @@ class FrontController extends Controller
                 $project = $projectFile->getProjectId();
             }
         }
-        
+
         if (!$this->checkPermissions((!empty($projectFile) ? 'edit' : 'create'), $project, $this->getCurrentUser(), (!empty($projectFile) ? $projectFile->getAccessControl() : null))) {
             return new Response('Create denied');
         }
-        
+
         $folder = null;
         if ($request->headers->get('x-ajaxupload-partial-folder') != '') {
             $folder = $this->getDoctrine()->getRepository('ExtendedProjectBundle:ProjectFile')->findOneBy(array('isCollection' => 1, 'id' => $request->headers->get('x-ajaxupload-partial-folder')));
@@ -793,9 +798,9 @@ class FrontController extends Controller
                             ->setModifyDate(new \DateTime('now'));
                     $em->flush();
                 }
-                
+
                 $user = $this->getCurrentUser();
-                
+
                 $projectFileVersion = new \Extended\ProjectBundle\Entity\ProjectFileVersion();
                 $projectFileVersion
                         ->setContentFile($fileUploadFileName)
@@ -809,12 +814,12 @@ class FrontController extends Controller
             }
         } else {
             /*$file = $this->get('request_stack')->getMasterRequest()->files->get('file');
-            $tmpfile = $file->getPathName(); 
+            $tmpfile = $file->getPathName();
             $fileInfo = @unserialize(file_get_contents($projectFolder.'/'.'.folderinfo'));
             if (!is_array($fileInfo)) $fileInfo = array();
             if (!isset($fileInfo[$file->getClientOriginalName()]) || ($fileInfo[$file->getClientOriginalName()] == $documentId) || ($fileInfo[$file->getClientOriginalName()] == 'proj'.$projectId))
             {
-                if (move_uploaded_file($tmpfile, $projectFolder.'/'.$file->getClientOriginalName())) 
+                if (move_uploaded_file($tmpfile, $projectFolder.'/'.$file->getClientOriginalName()))
                 {
                     if ($documentId !== null) $fileInfo[$file->getClientOriginalName()] = $documentId; else $fileInfo[$file->getClientOriginalName()] = 'proj'.$projectId;
                     file_put_contents($projectFolder.'/'.'.folderinfo', serialize($fileInfo));
@@ -822,7 +827,7 @@ class FrontController extends Controller
             } else {$operationResult = 'Error';$operationMessage = 'Файл уже существует для другого документа';}*/
         }
     }
-    
+
     public function removeVersionAction(Request $request)
     {
         $id = $request->get('id');
@@ -845,7 +850,7 @@ class FrontController extends Controller
         }
         return new Response('OK');
     }
-    
+
     public function changeAccessControlAction(Request $request)
     {
         $id = $request->get('id');
@@ -862,6 +867,6 @@ class FrontController extends Controller
         $em->flush();
         return new Response('OK');
     }
-    
-    
+
+
 }

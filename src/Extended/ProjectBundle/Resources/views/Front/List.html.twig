@@ -29,7 +29,7 @@
             <li>
                 <div>
                 <div style="border: 1px solid rgba(170, 170, 68, 0.7); padding: 10px; margin-top: 30px; background: rgba(255, 255, 204, 0.4) none repeat scroll 0% 0%; display: inline-block; min-width: 400px; position: relative; border-radius: 2px;">
-                    <div style="position: absolute; left: 10px; border: 1px solid rgba(170, 170, 68, 0.7); bottom: 100%; background: rgba(255, 255, 204, 0.4) none repeat scroll 0% 0%; border-radius: 2px 20px 0px 0px; padding: 2px 20px 2px 10px;"><a href="?file={{files[i]['id']}}">{{files[i]['titleRu']}} / {{files[i]['title']}}</a>&nbsp;</div>
+                    <div style="position: absolute; left: 10px; border: 1px solid rgba(170, 170, 68, 0.7); bottom: 100%; background: rgba(255, 255, 204, 0.4) none repeat scroll 0% 0%; border-radius: 2px 20px 0px 0px; padding: 2px 20px 2px 10px;"><a href="?file={{files[i]['id']}}">{{ currentLocale == 'en' ?  files[i]['title'] : files[i]['titleRu'] }}</a>&nbsp;</div>
             {% else %}
             <li>
                 <div>
@@ -42,12 +42,16 @@
                         {{files[i]['titleRu']}}
                         (версия от {{files[i]['versions']['ru'][0]['createDate'] | date('d.m.Y H:i')}} {{files[i]['versions']['ru'][0]['createrFullName']}})
                         </a>{% if removePermission %} (<a href="#" class="projectfiles-remove-btn" data-version-id="{{files[i]['versions']['ru'][0]['id']}}">удалить</a>){% endif %}</p>
+                {% else %}
+                    <p>{{files[i]['titleRu']}} (русская версия еще не создана)</p>
                 {% endif %}
                 {% if 'en' in files[i]['findLocales'] %}
                     <p><a href="{% if files[i]['mimeType'] == 'text/html' %}?view=true&file={{files[i]['id']}}&locale=en{% else %}{{path('extended_project_front_view', {'id': files[i]['id'], 'locale': 'en'})}}{% endif %}">
                         {{files[i]['title']}}
                         (version dated {{files[i]['versions']['en'][0]['createDate'] | date('d.m.Y H:i')}} {{files[i]['versions']['en'][0]['createrFullName']}})
                         </a>{% if removePermission %} (<a href="#" class="projectfiles-remove-btn" data-version-id="{{files[i]['versions']['en'][0]['id']}}">удалить</a>){% endif %}</p>
+                {% else %}
+                    <p>{{files[i]['title']}} (english version not yet created)</p>
                 {% endif %}
                 
                 <div id="projectfiles-list-file-{{files[i]['id']}}" style="display:none">
@@ -145,7 +149,7 @@
             <div class="modal-body">
                 <p>Тип файла</p>
                 {% for mimeType,mimeTypeTitle in mimeHelper.getTypes() %}
-                    <p class="radio"><label><input onclick="if ($(this).val() == 'internal') {$('.projectfiles-for-type-internal').show();$('.projectfiles-for-type-file').hide();} else {$('.projectfiles-for-type-internal').hide();$('.projectfiles-for-type-file').show();}" autocomplete="off" type="radio" name="projectfiles-type" value="{{mimeType}}" />{{mimeTypeTitle}}</label></p>
+                    <p class="radio"><label><input onclick="{% if mimeHelper.isUploadedType(mimeType) %}$('.projectfiles-for-type-internal').hide();$('.projectfiles-for-type-file').show();{% else %}$('.projectfiles-for-type-internal').show();$('.projectfiles-for-type-file').hide();{% endif %}" autocomplete="off" type="radio" name="projectfiles-type" value="{{mimeType}}" />{{mimeTypeTitle}}</label></p>
                 {% endfor %}
             </div>
             <div class="modal-footer" id="projectfiles-add-file-controls">
@@ -230,7 +234,8 @@
                     titleRu: titleRu,
                     folder: $('#projectfiles-upload-folder').val(),
                     locale: $('#projectfiles-upload-locale').val(),
-                    project: '{{projectId}}'
+                    project: '{{projectId}}',
+                    documentType: $('#projectfiles-add-file-popup .radio input:checked').val()
                 },
                 'success': function (data) {
                     location.reload();

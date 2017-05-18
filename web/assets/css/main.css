@@ -387,6 +387,16 @@ body h1 {
 
 .earth-menu-lang-mobile {
     font-size: 0;
+    padding-left: 100px;
+}
+
+@media(max-width:606px) {
+    #ec-chat-toggle {
+        left: 110px !important;
+    }
+    .earth-menu-lang-mobile {
+        padding-left: 200px;
+    }
 }
 
 .earth-menu-lang-mobile li {

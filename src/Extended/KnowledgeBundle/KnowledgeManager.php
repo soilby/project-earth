@@ -7,7 +7,7 @@ use Facebook\Facebook;
 
 class KnowledgeManager
 {
-    
+
     public function postToFacebook($message, $url = null)
     {
         try {
@@ -29,10 +29,10 @@ class KnowledgeManager
                 $response = $facebook->post('/'.$facebookcfg['group'].'/feed', $data);
                 /*$graphObject = $response->getGraphObject();
 
-                if ($graphObject->getProperty('id') != '') 
+                if ($graphObject->getProperty('id') != '')
                 {
                 }*/
-            }    
+            }
             $vkcfg = $this->container->get('cms.cmsManager')->getConfigValue('alerts.vkontaktecfg');
             if (!is_array($vkcfg)) {
                 $vkcfg = array();
@@ -52,15 +52,15 @@ class KnowledgeManager
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $response = curl_exec($ch);
                 curl_close($ch);
-            }        
+            }
             return true;
         } catch (\Exception $e) {
         }
         return false;
     }
-    
-    
-    
+
+
+
     public function checkKnowledgeObject($objectType, $objectId, $objectTextId)
     {
         $objectEnt = $this->container->get('doctrine')->getRepository('ExtendedKnowledgeBundle:KnowledgeObject')->findOneBy(array(
@@ -73,8 +73,8 @@ class KnowledgeManager
         }
         return $objectEnt;
     }
-    
-    
+
+
     public function addKnowledgeChange($objectType, $objectId, $objectTextId, $changeType, $changeValue, $description = '')
     {
         if ($description == null) {
@@ -99,7 +99,7 @@ class KnowledgeManager
         $em->persist($changeEnt);
         $em->flush();
     }
-    
+
     public function addKnowledgeObject($objectType, $objectId, $objectTextId, $title, $types)
     {
         $em = $this->container->get('doctrine')->getEntityManager();
@@ -109,7 +109,7 @@ class KnowledgeManager
         if (!isset($title['default'])) {
             $title['default'] = '';
         }
-        
+
         $count = $em->createQuery('SELECT count(o.id) FROM ExtendedKnowledgeBundle:KnowledgeObject o WHERE o.objectType = :type AND o.objectId = :id AND o.objectTextId = :textid')
                     ->setParameter('type', $objectType)
                     ->setParameter('id', $objectId)
@@ -145,7 +145,7 @@ class KnowledgeManager
         }
         return true;
     }
-    
+
     public function changeKnowledgeObject($objectType, $objectId, $objectTextId, $title, $types, $description = '')
     {
         $em = $this->container->get('doctrine')->getEntityManager();
@@ -190,8 +190,8 @@ class KnowledgeManager
         }
         $this->addKnowledgeChange($objectType, $objectId, $objectTextId, Entity\KnowledgeChanges::KC_CT_CONTENT, 0, $description);
     }
-    
-    
+
+
     public function getKnowledgeParameters($locale, $objectType = null, $objectId = null, $objectTextId = null)
     {
         $result = array(
@@ -229,7 +229,7 @@ class KnowledgeManager
         $result['objectTitleForLocale'] = $this->container->get('cms.cmsManager')->decodeLocalString($objectEnt->getTitle(), $locale, true);
         return $result;
     }
-    
+
     public function getKnowledgeInfo()
     {
         return array(
@@ -237,12 +237,12 @@ class KnowledgeManager
                 'document' => Entity\KnowledgeObject::KO_TYPE_DOCUMENT,
                 'file' => Entity\KnowledgeObject::KO_TYPE_FILE,
             ),
-            
-            
+
+
         );
     }
-    
-    
+
+
     private function typesGetTree($tree, $id, $nesting, &$cats)
     {
         foreach ($tree as $cat)
@@ -254,7 +254,7 @@ class KnowledgeManager
             }
         }
     }
-    
+
     public function getKnowledgeTypes($expanded = false, $locale = 'default')
     {
         $em = $this->container->get('doctrine')->getEntityManager();
@@ -271,10 +271,10 @@ class KnowledgeManager
         }
         return $result;
     }
-    
+
     private $container;
 
-    public function __construct(Container $container) 
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
@@ -283,7 +283,7 @@ class KnowledgeManager
     {
         return 'object.knowledge';
     }
-    
+
     public function getDescription()
     {
         return 'База знаний';
@@ -292,7 +292,7 @@ class KnowledgeManager
     public function registerMenu()
     {
         $manager = $this->container->get('cms.cmsManager');
-        
+
         $manager->addAdminMenu('Реестр объектов', $this->container->get('router')->generate('extended_knowledge_list'), 1, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('knowledge_list'));
         $manager->addAdminMenu('Браузер объектов', $this->container->get('router')->generate('extended_knowledge_list'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('knowledge_list'), 'Реестр объектов');
         /*$manager->addAdminMenu('Создать представление', $this->container->get('router')->generate('basic_cms_taxonomyshow_create'), 0, $this->container->get('security.token_storage')->getToken()->getUser()->checkAccess('taxonomy_newshow'), 'Реестр объектов');*/
@@ -300,11 +300,11 @@ class KnowledgeManager
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->registerMenu();
     }
-    
+
     public function registerRoles()
     {
         $manager = $this->container->get('cms.cmsManager');
-        
+
         $manager->addRole('knowledge_list','Просмотр реестра объектов');
         $manager->addRole('knowledge_typelist','Настройка дерева объектов');
         $manager->addRole('knowledge_addobject','Добавление в реестр объектов');
@@ -316,12 +316,12 @@ class KnowledgeManager
         $manager->addRole('taxonomy_viewshow','Просмотр представлений');
         $manager->addRole('taxonomy_newshow','Создание новых представлений');
         $manager->addRole('taxonomy_editshow','Редактирование представлений');*/
-        
+
         $cmsservices = $this->container->getServiceIds();
         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->registerRoles();
-        
+
      }
-     
+
      public function getContentTypes()
      {
         $contents = array(/*'view' => 'Просмотр категории','viewshow' => 'Просмотр представления'*/);
@@ -329,7 +329,7 @@ class KnowledgeManager
         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->getContentTypes($contents);
         return $contents;
      }
-     
+
      public function getTaxonomyType()
      {
          return false;
@@ -340,7 +340,7 @@ class KnowledgeManager
          /*if ($contentType == 'view') return 'BasicCmsBundle:Front:taxonomyview.html.twig';
          if ($contentType == 'viewshow') return 'BasicCmsBundle:Front:taxonomyshowview.html.twig';*/
          $cmsservices = $this->container->getServiceIds();
-         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
+         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0)
          {
              $result = $this->container->get($item)->getTemplateTwig($contentType, $template);
              if ($result != null) return $result;
@@ -353,7 +353,7 @@ class KnowledgeManager
          /*if ($contentType == 'taxonomy_show') return 'BasicCmsBundle:Front:moduletaxonomyshow.html.twig';
          if ($contentType == 'taxonomy_menu') return 'BasicCmsBundle:Front:moduletaxonomymenu.html.twig';*/
          $cmsservices = $this->container->getServiceIds();
-         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) 
+         foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0)
          {
              $result = $this->container->get($item)->getModuleTemplateTwig($contentType, $template);
              if ($result != null) return $result;
@@ -372,8 +372,8 @@ class KnowledgeManager
             }
         }
     }*/
-     
-     private function transliterate($text) 
+
+     private function transliterate($text)
      {
         $converter = array(
         'а' => 'a',   'б' => 'b',   'в' => 'v',
@@ -400,7 +400,7 @@ class KnowledgeManager
         'Э' => 'E',   'Ю' => 'Yu',  'Я' => 'Ya');
         return strtr($text, $converter);
      }
-     
+
      public function getFrontContent($locale, $contentType, $contentId, $result = null)
      {
          if ($contentType == 'viewblogsprofile') {
@@ -411,7 +411,7 @@ class KnowledgeManager
              }
              $locales = $em->createQuery('SELECT l.shortName, l.fullName FROM BasicCmsBundle:Locales l')->getResult();
              $request = $this->container->get('request_stack')->getCurrentRequest();
-             $textEntity = $em->getRepository('BasicCmsBundle:TextPages')->find(intval($request->get('editpost')));             
+             $textEntity = $em->getRepository('BasicCmsBundle:TextPages')->find(intval($request->get('editpost')));
              if (!empty($textEntity) && ($textEntity->getCreaterId() == $user->getId())) {
                  // Найти локали
                  $textEntityLocales = array();
@@ -665,7 +665,7 @@ class KnowledgeManager
                                         'FROM ExtendedProjectBundle:Projects p '.
                                         'LEFT JOIN ExtendedProjectBundle:ProjectsLocale pl WITH pl.projectId = p.id AND pl.locale = :locale '.
                                         'LEFT JOIN ExtendedProjectBundle:ProjectUsers pu WITH pu.userId = :id AND pu.projectId = p.id AND pu.projectRole = 3 '.
-                                        'WHERE p.enabled != 0 AND (p.createrId = :id OR pu IS NOT NULL)')->setParameter('id', $user->getId())->setParameter('locale', $locale)->getResult();
+                                        'WHERE p.enabled != 0 AND (p.createrId = :id OR pu.id IS NOT NULL)')->setParameter('id', $user->getId())->setParameter('locale', $locale)->getResult();
              $blogs = array_merge($vilages, $houses, $projects);
              // вывод
              $params = array(
@@ -851,8 +851,8 @@ class KnowledgeManager
              $params['template'] = '';
              return $params;
          }
-         
-         
+
+
          /*if ($contentType == 'view')
          {
              // Забираем данные
@@ -952,7 +952,7 @@ class KnowledgeManager
                      if (isset($categories[$i]['url']) && ($categories[$i]['url'] != '')) $categories[$i]['url'] = '/'.($locale != '' ? $locale.'/' : '').$categories[$i]['url'];
                      if (!isset($categories[$i]['indexChildrens'])) $categories[$i]['indexChildrens'] = array();
                      $parent[$categories[$i]['nesting']] = $i;
-                     if (isset($parent[$categories[$i]['nesting'] - 1])) 
+                     if (isset($parent[$categories[$i]['nesting'] - 1]))
                      {
                          if (!isset($categories[$parent[$categories[$i]['nesting'] - 1]]['indexChildrens'])) $categories[$parent[$categories[$i]['nesting'] - 1]]['indexChildrens'] = array();
                          $categories[$parent[$categories[$i]['nesting'] - 1]]['indexChildrens'][] = $i;
@@ -1090,7 +1090,7 @@ class KnowledgeManager
          foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->getFrontContent($locale, $contentType, $contentId, $result, $params);
          return $params;
      }
-     
+
      public function setFrontAction($locale, $seoPage, $action)
      {
          $result = null;
@@ -1098,7 +1098,7 @@ class KnowledgeManager
          foreach ($cmsservices as $item) if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->setFrontAction($locale, $seoPage, $action, $result);
          return $result;
      }
-     
+
      public function getModuleTypes()
      {
          $contents = array(/*'taxonomy_show'=>'Модуль представления','taxonomy_menu'=>'Модуль меню категорий'*/);
@@ -1109,9 +1109,9 @@ class KnowledgeManager
 
     /* private function taxonomyGetTreeForFrontModule($tree, $id, $nesting, &$cats, $addedFirst)
     {
-        if ($addedFirst != 0) 
+        if ($addedFirst != 0)
         {
-            foreach ($tree as $cat) 
+            foreach ($tree as $cat)
                 if ($cat['id'] == $id) {$cats[] = array_merge($cat, array('nesting' => $nesting));$nesting++;}
         }
         foreach ($tree as $cat)
@@ -1123,7 +1123,7 @@ class KnowledgeManager
             }
         }
     }*/
-     
+
      public function getFrontModule($locale, $seoPage, $moduleType, $parameters, $result = null)
      {
          $params = null;
@@ -1231,7 +1231,7 @@ class KnowledgeManager
              foreach ($tree as &$treeitem)
              {
                  $treeitem['active'] = 0;
-                 foreach ($breadcrumbs as $breadcrumb) 
+                 foreach ($breadcrumbs as $breadcrumb)
                  {
                      if ($breadcrumb['id'] == $treeitem['seoId']) $treeitem['active'] = 1;
                  }
@@ -1246,7 +1246,7 @@ class KnowledgeManager
                  if (isset($categories[$i]['url']) && ($categories[$i]['url'] != '')) $categories[$i]['url'] = '/'.($locale != '' ? $locale.'/' : '').$categories[$i]['url'];
                  if (!isset($categories[$i]['indexChildrens'])) $categories[$i]['indexChildrens'] = array();
                  $parent[$categories[$i]['nesting']] = $i;
-                 if (isset($parent[$categories[$i]['nesting'] - 1])) 
+                 if (isset($parent[$categories[$i]['nesting'] - 1]))
                  {
                      if (!isset($categories[$parent[$categories[$i]['nesting'] - 1]]['indexChildrens'])) $categories[$parent[$categories[$i]['nesting'] - 1]]['indexChildrens'] = array();
                      $categories[$parent[$categories[$i]['nesting'] - 1]]['indexChildrens'][] = $i;
@@ -1257,7 +1257,7 @@ class KnowledgeManager
          }*/
          if ($params != null) return $params;
          $cmsservices = $this->container->getServiceIds();
-         foreach ($cmsservices as $item) 
+         foreach ($cmsservices as $item)
          {
              if (strpos($item,'addone.knowledge.') === 0) $params = $this->container->get($item)->getFrontModule($locale, $seoPage, $moduleType, $parameters, $result);
              if ($params != null) return $params;
@@ -1276,7 +1276,7 @@ class KnowledgeManager
             }
         }
     }*/
-     
+
     public function getAdminModuleController($request, $module, $actionType, $nullparameters = null)
     {
         $em = $this->container->get('doctrine')->getEntityManager();
@@ -1357,14 +1357,14 @@ class KnowledgeManager
         }*/
         $answer = null;
         $cmsservices = $this->container->getServiceIds();
-        foreach ($cmsservices as $item) 
+        foreach ($cmsservices as $item)
         {
             if (strpos($item,'addone.knowledge.') === 0) $answer = $this->container->get($item)->getAdminModuleController($request, $module, $actionType, $nullparameters);
             if ($answer != null) return $answer;
         }
         return null;
     }
-    
+
     public function getInfoTitle($contentType, $contentId)
     {
          /*if ($contentType == 'view')
@@ -1404,7 +1404,7 @@ class KnowledgeManager
              }
          }*/
          $cmsservices = $this->container->getServiceIds();
-         foreach ($cmsservices as $item) 
+         foreach ($cmsservices as $item)
          {
              $answer = null;
              if (strpos($item,'addone.knowledge.') === 0) $answer = $this->container->get($item)->getInfoTitle($contentType, $contentId);
@@ -1444,7 +1444,7 @@ class KnowledgeManager
              }
          }*/
          $cmsservices = $this->container->getServiceIds();
-         foreach ($cmsservices as $item) 
+         foreach ($cmsservices as $item)
          {
              $answer = null;
              if (strpos($item,'addone.knowledge.') === 0) $answer = $this->container->get($item)->getInfoSitemap($contentType, $contentId);
@@ -1452,10 +1452,10 @@ class KnowledgeManager
          }
          return null;
     }
-    
-// **********************************    
+
+// **********************************
 // Обработчик таба таксономии
-// **********************************    
+// **********************************
     /*private function taxonomyGetTree($tree, $id, $nesting, &$cats)
     {
         foreach ($tree as $cat)
@@ -1479,9 +1479,9 @@ class KnowledgeManager
             }
         }
     }
-    
-    
-    
+
+
+
     public function getTaxonomyListInfo($object, $actionIds = null)
     {
         $result = array();
@@ -1516,10 +1516,10 @@ class KnowledgeManager
         }
         return $result;
     }
-    
-    
-    
-  
+
+
+
+
     public function getTaxonomyController($request, $action, $object, $actionId, $actionType)
     {
         $em = $this->container->get('doctrine')->getEntityManager();
@@ -1638,12 +1638,12 @@ class KnowledgeManager
         /*$options['object.taxonomy.on'] = 'Искать информацию в категориях';
         $options['object.taxonomy.onlypage'] = 'Искать информацию в категориях только со страницей сайта';*/
         $cmsservices = $this->container->getServiceIds();
-        foreach ($cmsservices as $item) 
+        foreach ($cmsservices as $item)
         {
             if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->getSearchOptions($options);
         }
     }
-    
+
     public function getSearchItemCount($options, $searchstring, $locale)
     {
         $count = 0;
@@ -1659,13 +1659,13 @@ class KnowledgeManager
             if (isset($taxcount[0]['taxcount'])) $count += $taxcount[0]['taxcount'];
         }*/
         $cmsservices = $this->container->getServiceIds();
-        foreach ($cmsservices as $item) 
+        foreach ($cmsservices as $item)
         {
             if (strpos($item,'addone.knowledge.') === 0) $count += $this->container->get($item)->getSearchItemCount($options, $searchstring, $locale);
         }
         return $count;
     }
-    
+
     public function getSearchItems($options, $searchstring, $locale, $sortdir, $start, $limit, &$items)
     {
         /*if (isset($options['object.taxonomy.on']) && ($options['object.taxonomy.on'] != 0))
@@ -1689,12 +1689,12 @@ class KnowledgeManager
             unset($result);
         }*/
         $cmsservices = $this->container->getServiceIds();
-        foreach ($cmsservices as $item) 
+        foreach ($cmsservices as $item)
         {
             if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->getSearchItems($options, $searchstring, $locale, $sortdir, $start, $limit, $items);
         }
     }
-    
+
 //****************************************
 // Справочная система
 //****************************************
@@ -1704,23 +1704,23 @@ class KnowledgeManager
         $chapters = array();
         //$chapters['d1537bd0b66a4289001629ac2e06e742'] = 'Главная страница CMS';
         $cmsservices = $this->container->getServiceIds();
-        foreach ($cmsservices as $item) 
+        foreach ($cmsservices as $item)
         {
             if (strpos($item,'addone.knowledge.') === 0) $this->container->get($item)->getHelpChapters($chapters);
         }
         return $chapters;
     }
-    
+
     public function getHelpContent($page, &$answer)
     {
         //if ($page == 'd1537bd0b66a4289001629ac2e06e742') $answer .= $this->container->get('templating')->render('BasicCmsBundle:Help:index.html.twig',array());
         $cmsservices = $this->container->getServiceIds();
-        foreach ($cmsservices as $item) 
+        foreach ($cmsservices as $item)
         {
             if (strpos($item,'addone.knowledge.') === 0) $answer .= $this->container->get($item)->getHelpContent($page);
         }
         return $answer;
     }
-    
-    
+
+
 }

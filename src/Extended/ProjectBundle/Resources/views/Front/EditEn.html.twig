@@ -85,21 +85,25 @@
     {% if file.mimeType in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text'] %}
     <h3>Edit</h3>
     <p>
-        <a href="ms-word:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Open russian version in Word</a>
-        <a href="ms-word:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Open english version in Word</a>
+        <a href="{{urlRu != '' ? urlRu : urlEn}}">Open russian version in Word</a>
+        <a href="{{urlEn != '' ? urlEn : urlRu}}">Open english version in Word</a>
     </p>
     {% elseif file.mimeType in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
     <h3>Edit</h3>
     <p>
-        <a href="ms-excel:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Open russian version in Excel</a>
-        <a href="ms-excel:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Open english version in Excel</a>
+        <a href="{{urlRu != '' ? urlRu : urlEn}}">Open russian version in Excel</a>
+        <a href="{{urlEn != '' ? urlEn : urlRu}}">Open english version in Excel</a>
     </p>
     {% elseif file.mimeType in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow'] %}
     <h3>Edit</h3>
     <p>
-        <a href="ms-powerpoint:ofe|u|{{urlRu != '' ? urlRu : urlEn}}">Open russian version in PowerPoint</a>
-        <a href="ms-powerpoint:ofe|u|{{urlEn != '' ? urlEn : urlRu}}">Open english version in PowerPoint</a>
+        <a href="{{urlRu != '' ? urlRu : urlEn}}">Open russian version in PowerPoint</a>
+        <a href="{{urlEn != '' ? urlEn : urlRu}}">Open english version in PowerPoint</a>
     </p>
+    {% elseif file.mimeType in ['application/vnd.google-apps.document', 'application/vnd.google-apps.presentation', 'application/vnd.google-apps.spreadsheet'] %}
+    <h3>Редактирование</h3>
+    <p><a href="{{urlRu != '' ? urlRu : urlEn}}">Open russian version in Google Docs</a></p>
+    <p><a href="{{urlEn != '' ? urlEn : urlRu}}">Open english version in Google Docs</a></p>
     {% elseif file.mimeType != 'text/html' %}
     <h3>Edit</h3>
     <p><a href="#" id="projectfiles-upload-ru" class="button">Upload new russian version</a> <a href="#" id="projectfiles-upload-en" class="button">Upload new english version</a></p>
