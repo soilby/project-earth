@@ -42,12 +42,16 @@
                         {{files[i]['title']}}
                         (version dated {{files[i]['versions']['en'][0]['createDate'] | date('d.m.Y H:i')}} {{files[i]['versions']['en'][0]['createrFullName']}})
                         </a>{% if removePermission %} (<a href="#" class="projectfiles-remove-btn" data-version-id="{{files[i]['versions']['ru'][0]['id']}}">remove</a>){% endif %}</p>
+                {% else %}
+                    <p>{{files[i]['title']}} (english version not yet created)</p>
                 {% endif %}
                 {% if 'ru' in files[i]['findLocales'] %}
                     <p><a href="{% if files[i]['mimeType'] == 'text/html' %}?view=true&file={{files[i]['id']}}&locale=ru{% else %}{{path('extended_project_front_view', {'id': files[i]['id'], 'locale': 'ru'})}}{% endif %}">
                         {{files[i]['titleRu']}}
                         (версия от {{files[i]['versions']['ru'][0]['createDate'] | date('d.m.Y H:i')}} {{files[i]['versions']['ru'][0]['createrFullName']}})
                         </a>{% if removePermission %} (<a href="#" class="projectfiles-remove-btn" data-version-id="{{files[i]['versions']['ru'][0]['id']}}">remove</a>){% endif %}</p>
+                {% else %}
+                    <p>{{files[i]['titleRu']}} (русская версия еще не создана)</p>
                 {% endif %}
                 
                 <div id="projectfiles-list-file-{{files[i]['id']}}" style="display:none">
